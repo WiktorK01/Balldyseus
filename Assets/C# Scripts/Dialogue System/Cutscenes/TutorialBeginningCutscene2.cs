@@ -26,6 +26,8 @@ public class TutorialBeginningCutscene2 : BaseCutscene
         DialogueManager.AddDialogue("Elpenor", "Shoving an enemy or a wall will also push you back!");
         DialogueManager.AddDialogue("Elpenor", "You have a limited number of shoves which resets every turn! You can view this on the top-left!");
         DialogueManager.AddDialogue("Elpenor", "Try it on him! And remember that you can click Reset if you mess up!");
+        DialogueManager.AddDialogue("Narrator", "You will be unable to Left-Click for this section. Try to win using only Shove-Mode!");
+
 
         yield return new WaitUntil(() => DialogueManager.IsDialogueAcknowledged());
 

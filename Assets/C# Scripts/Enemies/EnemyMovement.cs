@@ -20,15 +20,14 @@ public class EnemyMovement : MonoBehaviour
     public GameObject pathfindingErrorPrefab;
     
     public enum Direction { Up, Down, Left, Right }
-
-    public async void Move()
+    
+    public void Move()
     {
         Debug.Log("Beginning Enemy Movement");
         SetStartingPointWalkable();
-        var path = await FindPath();
+        var path = FindPathSync(); // Updated call here
         if (path == null || path.Length == 0)
         {
-            GameObject errorUIInstance = Instantiate(pathfindingErrorPrefab);
             Debug.LogError("Failed to find path");
             return;
         }
@@ -39,11 +38,12 @@ public class EnemyMovement : MonoBehaviour
 
     void SetStartingPointWalkable()
     {
-        Debug.Log("Setting Starting Point as Walkable");
+        Debug.Log("Beginning Setting Starting Point as Walkable");
         int startX = Mathf.FloorToInt(transform.position.x);
         int startY = Mathf.FloorToInt(transform.position.y);
         bool[,] walkableMap = pathfindingManager.GetWalkableMap();
         walkableMap[startY, startX] = true;
+        Debug.Log("Finished Setting Starting Point as Walkable");
     }
 
     public void ResetMovement()
@@ -122,6 +122,30 @@ public class EnemyMovement : MonoBehaviour
         return false;
     }
 
+    (int, int)[] FindPathSync()
+    {
+        Debug.Log("Finding a Path");
+        GameObject objective = FindObjective();
+        if (objective == null)
+        {
+            Debug.LogError("No objective found");
+            return null;
+        }
+        Debug.Log("Closest Objective Found");
+
+        int startX = Mathf.FloorToInt(transform.position.x);
+        int startY = Mathf.FloorToInt(transform.position.y);
+        int goalX = Mathf.FloorToInt(objective.transform.position.x);
+        int goalY = Mathf.FloorToInt(objective.transform.position.y);
+        
+        Debug.Log("Getting Walkable Map");
+        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
+
+        Debug.Log("Generating Path");
+        // Call the synchronous pathfinding method here
+        return AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true);
+    }
+
     GameObject FindObjective()
     {
         GameObject[] objectives = GameObject.FindGameObjectsWithTag("Objective");
@@ -139,25 +163,6 @@ public class EnemyMovement : MonoBehaviour
             }
         }
         return closest;
-    }
-
-    async Task<(int, int)[]> FindPath()
-    {
-        Debug.Log("Finding a Path");
-        GameObject objective = FindObjective();
-        if (objective == null)
-        {
-            Debug.LogError("No objective found");
-            return null;
-        }
-
-        int startX = Mathf.FloorToInt(transform.position.x);
-        int startY = Mathf.FloorToInt(transform.position.y);
-        int goalX = Mathf.FloorToInt(objective.transform.position.x);
-        int goalY = Mathf.FloorToInt(objective.transform.position.y);
-
-        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-        return await AStar.AStarPathfinding.GeneratePath(startX, startY, goalX, goalY, walkableMap, true);
     }
 
     void MoveToNextSpace((int, int)[] path)

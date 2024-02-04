@@ -46,6 +46,8 @@ public class TurnManager : MonoBehaviour
 
     public GameObject OuterCanvasUI;
 
+    bool endingCutsceneBegan = false;
+
     public float TurnNumber = 0;
 
     [SerializeField] BaseCutscene beginningCutscene;
@@ -92,6 +94,7 @@ public class TurnManager : MonoBehaviour
     private void CheckForEndingCutscene(){
         if (endingCutscene != null)
         {
+            endingCutsceneBegan = true;
             currentState = GameState.Cutscene;
             endingCutscene.StartCutscene();
         }
@@ -251,7 +254,7 @@ public class TurnManager : MonoBehaviour
     }
 
     private void CheckForWin(){
-        if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss)
+        if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss && !endingCutsceneBegan)
         {
             CheckForEndingCutscene();
             

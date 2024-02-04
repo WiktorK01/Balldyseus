@@ -38,7 +38,6 @@ public class TutorialBeginningCutscene3 : BaseCutscene
     }
 
     void EndCutsceneAndStartLevel(){
-        BallMovement BallMovement = Balldyseus.GetComponent<BallMovement>();
         cutsceneFinished = true;
         TurnManager.Instance.StartPlayerTurn();
     }

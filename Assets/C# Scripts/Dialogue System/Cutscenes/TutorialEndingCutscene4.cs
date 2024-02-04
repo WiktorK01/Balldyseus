@@ -51,22 +51,4 @@ public class TutorialEndingCutscene3 : BaseCutscene
     void EndCutsceneAndEndLevel(){
         TurnManager.Instance.BeginHandlingWinCoroutine();
     }
-
-    IEnumerator MoveObjectSmoothly(GameObject objectToMove, Vector3 targetPosition, float duration)
-    {
-        Vector3 startPosition = objectToMove.transform.position;
-        float time = 0;
-
-        while (time < duration)
-        {
-            objectToMove.transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
-            time += Time.deltaTime;
-            yield return null;
-        }
-
-        objectToMove.transform.position = targetPosition; // Ensure final position is set
-    }
-
-
-
 }
