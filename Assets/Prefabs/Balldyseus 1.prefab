@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1054530932845661964}
   - component: {fileID: 6201103981504953853}
   m_Layer: 0
-  m_Name: ballBwomp
+  m_Name: BallBwompAnimation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
