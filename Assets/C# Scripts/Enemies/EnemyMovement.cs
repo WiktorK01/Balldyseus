@@ -169,7 +169,7 @@ public class EnemyMovement : MonoBehaviour
     void MoveToNextSpace((int, int)[] path)
     {
         Debug.Log("Moving to the Next Space");
-        if (path == null || path.Length == 0)
+        if (path == null || path.Length <= 1)
         {
             Debug.LogError("Path is null or empty");
             return;

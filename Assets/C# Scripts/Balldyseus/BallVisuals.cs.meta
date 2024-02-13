@@ -3,7 +3,11 @@ guid: 150369cf842347e43a066a8d9fd164a9
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - spriteRenderer: {instanceID: 0}
+  - trajectoryLineRenderer: {instanceID: 0}
+  - pullLineRenderer: {instanceID: 0}
+  - contactPointCirclePrefab: {fileID: 6565391829700723548, guid: dc6a04c7837f37c49aa9d575aed382b9, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

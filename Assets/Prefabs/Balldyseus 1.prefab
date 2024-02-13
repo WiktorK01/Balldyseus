@@ -72,7 +72,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -48840199
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 1}
@@ -186,7 +186,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1296238145
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: d2cae07d1e6077d4fab883993b1e0fc0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -276,11 +276,11 @@ MonoBehaviour:
   BallVisuals: {fileID: 3150853597100525436}
   BallCollision: {fileID: 2993666101185895071}
   stopThreshold: 0.1
-  forceMultiplier: 4.2
-  maxDragDistance: 6
+  forceMultiplier: 7
+  maxDragDistance: 4
+  maxVelocity: 34
   dampingFactor: 0.95
   highSpeedThreshold: 26.5
-  maxVelocity: 34
   delayToTurnOffHighSpeed: 0.3
 --- !u!120 &4984548907284499094
 LineRenderer:
@@ -322,7 +322,7 @@ LineRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -48840199
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
@@ -409,7 +409,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 1201779171585371711}
   trajectoryLineRenderer: {fileID: 6772329230206796350}
-  lineRenderer: {fileID: 4984548907284499094}
+  pullLineRenderer: {fileID: 4984548907284499094}
+  contactPointCircle: {fileID: 0}
 --- !u!114 &3646283871834573475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -513,7 +514,7 @@ LineRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -48840199
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
@@ -538,7 +539,7 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
+      key0: {r: 0.61954975, g: 0, b: 1, a: 1}
       key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
@@ -547,7 +548,7 @@ LineRenderer:
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 26407
+      ctime1: 32768
       ctime2: 0
       ctime3: 0
       ctime4: 0
