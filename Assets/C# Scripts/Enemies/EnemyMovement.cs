@@ -8,11 +8,12 @@ using AStar;
 
 public class EnemyMovement : MonoBehaviour
 {
-    public int moveMoney = 2; 
-    public float moveDuration = 0.1f;
 
     public PathfindingManager pathfindingManager;
     public EnemyProperties enemyProperties;
+
+    public int moveMoney = 2; 
+    public float moveDuration = 0.1f;
 
     bool hasMoved = false;
     bool hasCompletedAllMovements = false;

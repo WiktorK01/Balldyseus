@@ -6,18 +6,19 @@ public class BallVisuals : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private LineRenderer trajectoryLineRenderer;
-    [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] private LineRenderer pullLineRenderer;
+    [SerializeField] private GameObject contactPointCircle;
 
     private Color attackModeColor = Color.red; 
     private Color shoveModeColor = Color.blue;
 
     void Start()
     {
-        if (lineRenderer == null)
+        if (pullLineRenderer == null)
         {
-            lineRenderer = GetComponent<LineRenderer>();
-            lineRenderer.positionCount = 2;
-            lineRenderer.enabled = false;
+            pullLineRenderer = GetComponent<LineRenderer>();
+            pullLineRenderer.positionCount = 2;
+            pullLineRenderer.enabled = false;
         }
 
         if (trajectoryLineRenderer == null)
@@ -27,6 +28,9 @@ public class BallVisuals : MonoBehaviour
         }
     }
 
+
+    //PULL LINE
+    /*-------------------------------------------------------------------------*/
     public void SetSpriteColor(bool isShoveMode)
     {
         if (isShoveMode)
@@ -39,45 +43,76 @@ public class BallVisuals : MonoBehaviour
         }    
     }
 
-    public void SetLineRendererState(bool enabled, Color color, Vector2 startPoint)
+    public void SetPullLineRendererState(bool enabled, Color color, Vector2 startPoint)
     {
-        lineRenderer.enabled = enabled;
-        lineRenderer.startColor = color;
-        lineRenderer.endColor = color;
-        lineRenderer.SetPosition(0, startPoint);
+        pullLineRenderer.enabled = enabled;
+        pullLineRenderer.startColor = color;
+        pullLineRenderer.endColor = color;
+        pullLineRenderer.SetPosition(0, startPoint);
     }
 
-    public void UpdateTrajectory(Vector2 start, Vector2 end, float forceMultiplier)
+    public void UpdatePullLineRendererPosition(Vector2 position)
     {
-        Vector2 direction = start - end;
-        Vector2 force = direction * forceMultiplier;
-        int numPoints = 11; 
-        trajectoryLineRenderer.positionCount = numPoints;
-
-        for (int i = 0; i < numPoints; i++)
+        if (pullLineRenderer.enabled)
         {
-            float simulationTime = i * 0.1f;
-            Vector2 displacement = force * simulationTime;
-            Vector3 drawPoint = transform.position + new Vector3(displacement.x, displacement.y, 0); // Correctly add Vector2 to Vector3
-            trajectoryLineRenderer.SetPosition(i, drawPoint);
+            pullLineRenderer.SetPosition(1, position);
         }
     }
+
+    public void DisablePullLineRenderer()
+    {
+        pullLineRenderer.enabled = false;
+    }
+
+    
+    //TRAJECTORY LINE
+    /*-------------------------------------------------------------------------*/
+public void UpdateTrajectory(Vector2 start, Vector2 end, float forceMultiplier)
+{
+    Vector2 direction = start - end;
+    Vector2 force = direction * forceMultiplier;
+    int numPoints = 11;
+    List<Vector3> points = new List<Vector3>();
+
+    bool hitDetected = false;
+    Vector2 lastPosition = transform.position; // Start from the GameObject's current position
+
+    points.Add(lastPosition); // Ensure the first point is the GameObject's position
+
+    for (int i = 1; i < numPoints; i++) // Start loop from 1 since the first point is already added
+    {
+        float simulationTime = i * 0.1f;
+        Vector2 displacement = force * simulationTime;
+        Vector2 currentPosition = (Vector2)transform.position + displacement; // Adjust to start from the GameObject's position
+        RaycastHit2D hit = Physics2D.Linecast(lastPosition, currentPosition);
+
+        if (hit.collider != null && !hit.collider.CompareTag("Player") && !hit.collider.CompareTag("Objective") && !hit.collider.CompareTag("PassableObstacle"))
+        {
+            // If a collision is detected, add the hit point to the trajectory and break the loop
+            points.Add(hit.point);
+            contactPointCircle.transform.position = hit.point; // Move the contact circle to the collision point
+            contactPointCircle.SetActive(true); // Make sure the circle is visible
+            hitDetected = true;
+            break;
+        }
+
+        points.Add(new Vector3(currentPosition.x, currentPosition.y, 0));
+        lastPosition = currentPosition;
+    }
+
+    if (!hitDetected)
+    {
+        contactPointCircle.SetActive(false); // Hide the circle if no collision is detected
+    }
+
+    trajectoryLineRenderer.positionCount = points.Count;
+    trajectoryLineRenderer.SetPositions(points.ToArray());
+}
 
     public void ClearTrajectory()
     {
         trajectoryLineRenderer.positionCount = 0;
+        contactPointCircle.transform.position = new Vector3(1000,1000,0);
     }
-
-    public void UpdateLineRendererPosition(Vector2 position)
-    {
-        if (lineRenderer.enabled)
-        {
-            lineRenderer.SetPosition(1, position);
-        }
-    }
-
-    public void DisableLineRenderer()
-    {
-        lineRenderer.enabled = false;
-    }
+    
 }

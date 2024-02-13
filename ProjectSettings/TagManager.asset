@@ -8,6 +8,7 @@ TagManager:
   - Objective
   - Wall
   - Obstacle
+  - PassableObstacle
   layers:
   - Default
   - TransparentFX
@@ -53,6 +54,9 @@ TagManager:
     locked: 0
   - name: Obstacles
     uniqueID: 3602620075
+    locked: 0
+  - name: Balldyseus
+    uniqueID: 3826745941
     locked: 0
   - name: Entities
     uniqueID: 2998729151

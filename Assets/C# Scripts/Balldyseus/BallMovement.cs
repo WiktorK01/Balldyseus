@@ -21,13 +21,17 @@ public class BallMovement : MonoBehaviour
     private Vector2 startPoint;
     private Vector2 originalVelocity;
 
+    [Header("Drag vars")]
     [SerializeField] private float stopThreshold = .1f;
     [SerializeField] private float forceMultiplier = 1f;
     [SerializeField] private float maxDragDistance = 5f;
-    [SerializeField] private float dampingFactor = 0.95f;
-    [SerializeField] private float highSpeedThreshold = 10f;
 
+    [Header("Velocity vars")]
     [SerializeField] private float maxVelocity = 40f;
+    [SerializeField] private float dampingFactor = 0.95f;
+
+    [Header("HighSpeed vars")]
+    [SerializeField] private float highSpeedThreshold = 10f;
     [SerializeField] private float delayToTurnOffHighSpeed = 0.7f;
 
     private Coroutine resetHighSpeedCoroutine = null;
@@ -36,7 +40,7 @@ public class BallMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
     }
-
+//Line
     void Update()
     {
         CheckForPlayerInput();
@@ -56,7 +60,7 @@ public class BallMovement : MonoBehaviour
                 isShoveMode = Input.GetMouseButtonDown(1);
 
                 BallVisuals.SetSpriteColor(isShoveMode); 
-                BallVisuals.SetLineRendererState(true, isShoveMode ? Color.blue : Color.red, startPoint);
+                BallVisuals.SetPullLineRendererState(true, isShoveMode ? Color.blue : Color.red, startPoint);
             }
         }
         else if (isMoving)
@@ -84,7 +88,7 @@ public class BallMovement : MonoBehaviour
                 currentPoint = startPoint - dragVector;
             }
 
-            BallVisuals.UpdateLineRendererPosition(currentPoint);
+            BallVisuals.UpdatePullLineRendererPosition(currentPoint);
             BallVisuals.UpdateTrajectory(startPoint, currentPoint, forceMultiplier);
 
             // Perform movement only if the released button corresponds to the current mode
@@ -141,7 +145,7 @@ public class BallMovement : MonoBehaviour
         isDragging = false;
         isMoving = true;
         hasMovedThisTurn = true;
-        BallVisuals.DisableLineRenderer();
+        BallVisuals.DisablePullLineRenderer();
         BallVisuals.ClearTrajectory();
     }
 
