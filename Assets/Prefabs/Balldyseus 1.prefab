@@ -410,7 +410,7 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1201779171585371711}
   trajectoryLineRenderer: {fileID: 6772329230206796350}
   pullLineRenderer: {fileID: 4984548907284499094}
-  contactPointCircle: {fileID: 0}
+  contactPointCirclePrefab: {fileID: 6565391829700723548, guid: dc6a04c7837f37c49aa9d575aed382b9, type: 3}
 --- !u!114 &3646283871834573475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,7 +539,7 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.61954975, g: 0, b: 1, a: 1}
+      key0: {r: 1, g: 1, b: 1, a: 1}
       key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
