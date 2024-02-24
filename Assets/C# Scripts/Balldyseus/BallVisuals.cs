@@ -9,11 +9,12 @@ public class BallVisuals : MonoBehaviour
     [SerializeField] private LineRenderer pullLineRenderer;
     [SerializeField] private GameObject contactPointCirclePrefab; // Reference to the circle prefab
 
-        private GameObject currentContactPointCircle = null; // To keep track of the instantiated prefab
+    private GameObject currentContactPointCircle = null; // To keep track of the instantiated prefab
 
 
     private Color attackModeColor = Color.red; 
     private Color shoveModeColor = Color.blue;
+    BallMovement BallMovement;
 
     void Start()
     {
@@ -29,6 +30,11 @@ public class BallVisuals : MonoBehaviour
             trajectoryLineRenderer = GetComponent<LineRenderer>();
             trajectoryLineRenderer.positionCount = 0;
         }
+    }
+
+    void Update(){
+        bool isShoveMode = BallMovement.isShoveMode();
+        SetSpriteColor(isShoveMode);
     }
 
 

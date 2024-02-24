@@ -4,53 +4,55 @@ using UnityEngine;
 
 public class BallMovement : MonoBehaviour
 {
-    [SerializeField] private BallVisuals BallVisuals; 
-    [SerializeField] private BallCollision BallCollision;
+    [SerializeField] BallVisuals BallVisuals; 
+    [SerializeField] BallCollision BallCollision;
+    [SerializeField] BallProperties BallProperties;
 
-    private Rigidbody2D rb;
+    Rigidbody2D rb;
 
-    private bool isDragging = false;
-    private bool isMoving = false;
-    private bool hasMovedThisTurn = true;
-    private bool isShoveMode = false;
-    private bool isHighSpeed;
+    bool isDragging = false;
+    bool isMoving = false;
+    bool hasMovedThisTurn = true;
 
-    private bool isShoveGagged = false;
-    private bool isAttackGagged = false;
-
-    private Vector2 startPoint;
-    private Vector2 originalVelocity;
+    Vector2 startPoint;
+    Vector2 originalVelocity;
 
     [Header("Drag vars")]
-    [SerializeField] private float stopThreshold = .1f;
-    [SerializeField] private float forceMultiplier = 1f;
-    [SerializeField] private float maxDragDistance = 5f;
+    [SerializeField] float stopThreshold = .1f;
+    [SerializeField] float forceMultiplier = 1f;
+    [SerializeField] float maxDragDistance = 5f;
 
     [Header("Velocity vars")]
-    [SerializeField] private float maxVelocity = 40f;
-    [SerializeField] private float dampingFactor = 0.95f;
+    [SerializeField] float maxVelocity = 40f;
+    [SerializeField] float dampingFactor = 0.95f;
 
-    [Header("HighSpeed vars")]
-    [SerializeField] private float highSpeedThreshold = 10f;
-    [SerializeField] private float delayToTurnOffHighSpeed = 0.7f;
-
-    private Coroutine resetHighSpeedCoroutine = null;
+    Coroutine resetHighSpeedCoroutine = null;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
-//Line
+
     void Update()
     {
         CheckForPlayerInput();
         HandleDrag();
+
         BringToStopWhenTooSlow();
         KeepSpeedBelowMaxVelocity();
         CheckForHighSpeed();
+
+        BallVisuals.SetSpriteColor(isShoveMode);
     }
 
+    //this function looks for player input, whether or not the respective mode is gagged, and if the player has moved yet during its turn,
+    //then performs the expected methods for those input
+
     private void CheckForPlayerInput(){
+        bool isAttackGagged = BallProperties.isAttackGagged();
+        bool isShoveGagged = BallProperties.isShoveGagged();
+        bool isShoveMode = BallProperties.isShoveMode();
+
         if (!hasMovedThisTurn)
         {
             if ((Input.GetMouseButtonDown(0) && !isAttackGagged) || (Input.GetMouseButtonDown(1) && !isShoveGagged))
@@ -59,18 +61,15 @@ public class BallMovement : MonoBehaviour
                 isDragging = true;
                 isShoveMode = Input.GetMouseButtonDown(1);
 
-                BallVisuals.SetSpriteColor(isShoveMode); 
                 BallVisuals.SetPullLineRendererState(true, isShoveMode ? Color.blue : Color.red, startPoint);
             }
         }
         else if (isMoving)
         {
             if (Input.GetMouseButtonDown(0) && !isAttackGagged)
-                isShoveMode = false;
+                BallProperties.SetAttackMode();
             else if (Input.GetMouseButtonDown(1) && !isShoveGagged)
-                isShoveMode = true;
-
-            BallVisuals.SetSpriteColor(isShoveMode);
+                BallProperties.SetShoveModeMode();
         }
     }
 
@@ -92,20 +91,38 @@ public class BallMovement : MonoBehaviour
             BallVisuals.UpdateTrajectory(startPoint, currentPoint, forceMultiplier);
 
             // Perform movement only if the released button corresponds to the current mode
+
             if (isShoveMode && Input.GetMouseButtonUp(1))
             {
+                isDragging = false;
                 PerformMovement(dragVector);
             }
             else if (!isShoveMode && Input.GetMouseButtonUp(0))
             {
+                isDragging = false;
                 PerformMovement(dragVector);
             }
         }
-        else if (!isMoving){
-            BallVisuals.ClearTrajectory(); 
-        }
     }
-    
+
+    public void PerformMovement(Vector2 dragVector)
+    {
+        Vector2 force = dragVector * forceMultiplier;
+        rb.AddForce(force, ForceMode2D.Impulse);
+        isDragging = false;
+        isMoving = true;
+        hasMovedThisTurn = true;
+
+        DisableLineRenderers();
+    }
+
+    private void DisableLineRenderers(){
+        BallVisuals.DisablePullLineRenderer();
+        BallVisuals.ClearTrajectory();
+    }
+
+/*-------------------------------------------------------------------------------------------*/
+
     private void BringToStopWhenTooSlow(){
         if (isMoving && rb.velocity.magnitude < stopThreshold){
             rb.velocity *= dampingFactor;
@@ -138,15 +155,8 @@ public class BallMovement : MonoBehaviour
         }
     }
 
-    private void PerformMovement(Vector2 dragVector)
-    {
-        Vector2 force = dragVector * forceMultiplier;
-        rb.AddForce(force, ForceMode2D.Impulse);
-        isDragging = false;
-        isMoving = true;
-        hasMovedThisTurn = true;
-        BallVisuals.DisablePullLineRenderer();
-        BallVisuals.ClearTrajectory();
+    bool SpeedGreaterThanThreshold(){
+        return rb.velocity.magnitude > highSpeedThreshold;
     }
 
     private IEnumerator ResetHighSpeedAfterDelay(float delay)
@@ -154,10 +164,6 @@ public class BallMovement : MonoBehaviour
         yield return new WaitForSeconds(delay);
         isHighSpeed = false;
         resetHighSpeedCoroutine = null; // Reset the coroutine reference
-    }
-
-    bool SpeedGreaterThanThreshold(){
-        return rb.velocity.magnitude > highSpeedThreshold;
     }
 
     public void ResetMovement()
@@ -202,14 +208,11 @@ public class BallMovement : MonoBehaviour
     public void GagShove(){
         isShoveGagged = true;
     }
-
     public void GagAttack(){
         isAttackGagged = true;
     }
-
     public bool ShoveGagged(){
         return isShoveGagged;
     }
 
 }
-
