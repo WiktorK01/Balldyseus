@@ -12,7 +12,8 @@ public class UIManager : MonoBehaviour
     public Text TurnNumberText;
 
     public BallCollision BallCollision;
-    public BallMovement ballMovement;
+    public BallMovement BallMovement;
+    public BallProperties BallProperties;
     public TurnManager turnManager;
 
 
@@ -29,11 +30,11 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (ballMovement != null)
+        if (BallProperties != null)
         {
             if (impulseCountNumber != null)
             {
-                if(ballMovement.ShoveGagged()){
+                if(BallProperties.ShoveGagged){
                     impulseCountNumber.gameObject.SetActive(false);
                     impulseCountText.gameObject.SetActive(false);
                 }
@@ -53,7 +54,7 @@ public class UIManager : MonoBehaviour
                 //speedNumberText.text = currentSpeed.ToString("F2");
             }
 
-            if (ballMovement.IsHighSpeed())
+            if (BallProperties.HighSpeed)
             {
                 if (highSpeedImage != null && !highSpeedImage.gameObject.activeSelf)
                 {

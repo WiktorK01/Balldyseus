@@ -4,34 +4,46 @@ using UnityEngine;
 
 public class BallProperties : MonoBehaviour
 {
-    private bool ShoveMode = false;
-    private bool HighSpeed;
+    public bool ShoveMode = false;
 
-    private bool ShoveGagged = false;
-    private bool AttackGagged = false;
+    public bool ShoveGagged = false;
+    public bool AttackGagged = false;
 
     [Header("HighSpeed vars")]
-    [SerializeField] private float highSpeedThreshold = 10f;
-    [SerializeField] private float delayToTurnOffHighSpeed = 0.7f;
+    public bool HighSpeed;
+    public float highSpeedThreshold = 10f;
+    public float delayToTurnOffHighSpeed = 0.7f;
 
 
-    void SetShoveMode(){
-        if(ShoveGagged == true)
-            
+    public void SetShoveMode(){
+        if(ShoveGagged == true) ShoveMode = false;
         ShoveMode = true;
     }
 
-    void SetAttackMode(){
+    public void SetAttackMode(){
+        if(AttackGagged == true) ShoveMode = true;
         ShoveMode = false;
     }
 
-    void Start()
-    {
-        
+    public void EnableHighSpeed(){
+        HighSpeed = true;
     }
 
-    void Update()
-    {
-        
+    public void DisableHighSpeed(){
+        HighSpeed = false;
     }
+
+    public void GagShove(){
+        ShoveGagged = true;
+    }
+
+    public void GagAttack(){
+        AttackGagged = true;
+    }
+
+    public void UngagAll(){
+        ShoveGagged = false;
+        AttackGagged = false;
+    }
+
 }

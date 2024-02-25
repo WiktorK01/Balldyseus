@@ -1872,26 +1872,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3150853597100525436, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-      propertyPath: contactPointCircle
-      value: 
-      objectReference: {fileID: 330144088}
-    - target: {fileID: 3150853597100525436, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-      propertyPath: contactPointCirclePrefab
-      value: 
-      objectReference: {fileID: 6565391829700723548, guid: dc6a04c7837f37c49aa9d575aed382b9, type: 3}
-    - target: {fileID: 6772329230206796350, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-      propertyPath: m_Parameters.colorGradient.key0.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6772329230206796350, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-      propertyPath: m_Parameters.colorGradient.key0.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6772329230206796350, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-      propertyPath: m_Parameters.colorGradient.key0.r
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

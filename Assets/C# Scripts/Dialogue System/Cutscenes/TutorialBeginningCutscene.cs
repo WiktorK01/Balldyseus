@@ -66,8 +66,8 @@ public class TestCutscene : BaseCutscene
     }
 
     void EndCutsceneAndStartLevel(){
-        BallMovement BallMovement = Balldyseus.GetComponent<BallMovement>();
-        BallMovement.GagShove();
+        BallProperties BallProperties = Balldyseus.GetComponent<BallProperties>();
+        BallProperties.GagShove();
         
         TurnManager.Instance.StartPlayerTurn();
     }

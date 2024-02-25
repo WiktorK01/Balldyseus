@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class BallVisuals : MonoBehaviour
 {
-    [SerializeField] private SpriteRenderer spriteRenderer;
+    SpriteRenderer spriteRenderer;
+    BallProperties BallProperties;
+    
     [SerializeField] private LineRenderer trajectoryLineRenderer;
     [SerializeField] private LineRenderer pullLineRenderer;
     [SerializeField] private GameObject contactPointCirclePrefab; // Reference to the circle prefab
@@ -14,10 +16,12 @@ public class BallVisuals : MonoBehaviour
 
     private Color attackModeColor = Color.red; 
     private Color shoveModeColor = Color.blue;
-    BallMovement BallMovement;
 
     void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        BallProperties = GetComponent<BallProperties>();
+
         if (pullLineRenderer == null)
         {
             pullLineRenderer = GetComponent<LineRenderer>();
@@ -33,16 +37,15 @@ public class BallVisuals : MonoBehaviour
     }
 
     void Update(){
-        bool isShoveMode = BallMovement.isShoveMode();
-        SetSpriteColor(isShoveMode);
+        SetSpriteColor(BallProperties.ShoveMode);
     }
 
 
     //PULL LINE
     /*-------------------------------------------------------------------------*/
-    public void SetSpriteColor(bool isShoveMode)
+    public void SetSpriteColor(bool ShoveMode)
     {
-        if (isShoveMode)
+        if (ShoveMode)
         {
             spriteRenderer.color = shoveModeColor;
         }

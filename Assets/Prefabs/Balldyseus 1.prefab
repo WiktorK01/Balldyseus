@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: 3150853597100525436}
   - component: {fileID: 3646283871834573475}
   - component: {fileID: 2993666101185895071}
+  - component: {fileID: 8121216698731663183}
   m_Layer: 9
   m_Name: Balldyseus 1
   m_TagString: Player
@@ -273,15 +274,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a21843ac793fc2b43a1d4f0aeedaea7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BallVisuals: {fileID: 3150853597100525436}
-  BallCollision: {fileID: 2993666101185895071}
   stopThreshold: 0.1
   forceMultiplier: 7
   maxDragDistance: 4
   maxVelocity: 34
   dampingFactor: 0.95
-  highSpeedThreshold: 26.5
-  delayToTurnOffHighSpeed: 0.3
 --- !u!120 &4984548907284499094
 LineRenderer:
   serializedVersion: 2
@@ -407,7 +404,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 150369cf842347e43a066a8d9fd164a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 1201779171585371711}
   trajectoryLineRenderer: {fileID: 6772329230206796350}
   pullLineRenderer: {fileID: 4984548907284499094}
   contactPointCirclePrefab: {fileID: 6565391829700723548, guid: dc6a04c7837f37c49aa9d575aed382b9, type: 3}
@@ -423,8 +419,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862bdd22f322f3f4aaee0ff4e56722dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BallMovement: {fileID: 5107287664606838169}
-  BallCollision: {fileID: 2993666101185895071}
   BallBwompAnimator: {fileID: 6201103981504953853}
 --- !u!114 &2993666101185895071
 MonoBehaviour:
@@ -438,10 +432,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 391487c9524d4184ca13dc09b98bc48a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballMovement: {fileID: 5107287664606838169}
-  shoveModeAgainstWallImpulseStrength: 6
+  shoveModeImpulseStrength: 12
   remainingShoveCount: 5
   referenceShoveCount: 5
+--- !u!114 &8121216698731663183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305155721191999777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fee8ba4bdf6212408840958ef665afc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShoveMode: 0
+  ShoveGagged: 0
+  AttackGagged: 0
+  HighSpeed: 0
+  highSpeedThreshold: 10
+  delayToTurnOffHighSpeed: 0.7
 --- !u!1 &6500817122697128397
 GameObject:
   m_ObjectHideFlags: 0
