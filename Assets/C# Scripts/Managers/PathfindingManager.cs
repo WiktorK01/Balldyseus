@@ -127,4 +127,13 @@ public class PathfindingManager : MonoBehaviour
     {
         return walkableMap;
     }
+
+    public void SetTileWalkability(Vector3Int cellPosition, bool isWalkable)
+    {
+        if (cellPosition.y >= 0 && cellPosition.y < walkableMap.GetLength(0) &&
+            cellPosition.x >= 0 && cellPosition.x < walkableMap.GetLength(1))
+        {
+            walkableMap[cellPosition.y, cellPosition.x] = isWalkable;
+        }
+    }
 }

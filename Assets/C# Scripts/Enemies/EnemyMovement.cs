@@ -5,23 +5,32 @@ using UnityEngine;
 using System.Threading.Tasks;
 using AStar.Algolgorithms;
 using AStar;
+using UnityEngine.Tilemaps;
 
 public class EnemyMovement : MonoBehaviour
 {
 
-    public PathfindingManager pathfindingManager;
-    public EnemyProperties enemyProperties;
+    PathfindingManager pathfindingManager;
+    EnemyProperties enemyProperties;
+
+    Tilemap groundTilemap;
 
     public int moveMoney = 2; 
     public float moveDuration = 0.1f;
 
     bool hasMoved = false;
     bool hasCompletedAllMovements = false;
-
-    public GameObject pathfindingErrorPrefab;
     
     public enum Direction { Up, Down, Left, Right }
     
+    void Awake(){
+        GameObject groundTilemapObject = GameObject.FindWithTag("GroundTilemap");
+        groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
+
+        pathfindingManager = FindObjectOfType<PathfindingManager>();
+        enemyProperties = GetComponent<EnemyProperties>();
+    }
+
     public void Move()
     {
         Debug.Log("Beginning Enemy Movement");
@@ -39,12 +48,9 @@ public class EnemyMovement : MonoBehaviour
 
     void SetStartingPointWalkable()
     {
-        Debug.Log("Beginning Setting Starting Point as Walkable");
-        int startX = Mathf.FloorToInt(transform.position.x);
-        int startY = Mathf.FloorToInt(transform.position.y);
-        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-        walkableMap[startY, startX] = true;
-        Debug.Log("Finished Setting Starting Point as Walkable");
+        Debug.Log("Setting Starting Point as Walkable");
+        Vector3Int cellPosition = groundTilemap.WorldToCell(transform.position);
+        pathfindingManager.SetTileWalkability(cellPosition, true); 
     }
 
     public void ResetMovement()
@@ -90,8 +96,10 @@ public class EnemyMovement : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-
         transform.position = endPosition; 
+
+        Vector3Int endCellPosition = groundTilemap.WorldToCell(transform.position + direction);
+        pathfindingManager.SetTileWalkability(endCellPosition, false);
     }
 
     public void Shove(Direction direction)

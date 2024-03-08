@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems; 
 
 public class BallProperties : MonoBehaviour
 {
+        static bool IsMouseOverLaunchButton = false;
+
+
     public bool ShoveMode = false;
 
     public bool ShoveGagged = false;
     public bool AttackGagged = false;
+
 
     [Header("HighSpeed vars")]
     public bool HighSpeed;
@@ -16,12 +21,14 @@ public class BallProperties : MonoBehaviour
 
 
     public void SetShoveMode(){
-        if(ShoveGagged == true) ShoveMode = false;
+        if(ShoveGagged || IsMouseOverLaunchButton) 
+            return;
         ShoveMode = true;
     }
 
     public void SetAttackMode(){
-        if(AttackGagged == true) ShoveMode = true;
+        if(AttackGagged || IsMouseOverLaunchButton) 
+            return;
         ShoveMode = false;
     }
 
@@ -44,6 +51,14 @@ public class BallProperties : MonoBehaviour
     public void UngagAll(){
         ShoveGagged = false;
         AttackGagged = false;
+    }
+
+    public static void MouseEnterLaunchButton(){
+        IsMouseOverLaunchButton = true;
+    }
+
+    public static void MouseExitLaunchButton(){
+        IsMouseOverLaunchButton = false;
     }
 
 }

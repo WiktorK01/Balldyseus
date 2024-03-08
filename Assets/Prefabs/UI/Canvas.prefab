@@ -239,7 +239,7 @@ MonoBehaviour:
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 469
+  m_DynamicPixelsPerUnit: 400
   m_PresetInfoIsWorld: 1
 --- !u!114 &7336694914249576774
 MonoBehaviour:

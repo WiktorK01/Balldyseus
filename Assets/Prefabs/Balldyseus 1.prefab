@@ -451,8 +451,8 @@ MonoBehaviour:
   ShoveGagged: 0
   AttackGagged: 0
   HighSpeed: 0
-  highSpeedThreshold: 10
-  delayToTurnOffHighSpeed: 0.7
+  highSpeedThreshold: 29
+  delayToTurnOffHighSpeed: 0.3
 --- !u!1 &6500817122697128397
 GameObject:
   m_ObjectHideFlags: 0

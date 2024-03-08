@@ -29,6 +29,8 @@ public class BallMovement : MonoBehaviour
 
     Vector2 dragVector;
 
+    private float forcePercentage;
+
     void Start()
     {
         BallVisuals = GetComponent<BallVisuals>(); 
@@ -90,8 +92,11 @@ public class BallMovement : MonoBehaviour
             if (dragVector.magnitude > maxDragDistance)
             {
                 dragVector = dragVector.normalized * maxDragDistance;
-                currentPoint = startPoint - dragVector;
+                
             }
+            currentPoint = startPoint - dragVector;
+
+            forcePercentage = Mathf.Round(Mathf.Clamp01(dragVector.magnitude / maxDragDistance) * 100f);
 
             BallVisuals.UpdatePullLineRendererPosition(currentPoint);
             BallVisuals.UpdateTrajectory(startPoint, currentPoint, forceMultiplier);
@@ -99,27 +104,41 @@ public class BallMovement : MonoBehaviour
             // Perform movement only if the released button corresponds to the current mode
             if (BallProperties.ShoveMode && Input.GetMouseButtonUp(1))
             {
+                Debug.Log(forcePercentage);
                 isDragging = false;
+                BallVisuals.DisablePullLineRenderer();
                 //PerformMovement(dragVector);
             }
             else if (!BallProperties.ShoveMode && Input.GetMouseButtonUp(0))
             {
+                Debug.Log(forcePercentage);
                 isDragging = false;
+                BallVisuals.DisablePullLineRenderer();
                 //PerformMovement(dragVector);
             }
         }
     }
 
+    public void PerformMovementButtonWrapper()
+    {
+        PerformMovement(dragVector);
+    }
+
     public void PerformMovement(Vector2 dragVector)
     {
+        rb.WakeUp();
+        Debug.Log($"Attempting to perform movement with vector: {dragVector}");
         Vector2 force = dragVector * forceMultiplier;
         rb.AddForce(force, ForceMode2D.Impulse);
+        Debug.Log($"Force applied: {force}");
 
         DisableLineRenderers();
 
         isDragging = false;
         isMoving = true;
         hasMovedThisTurn = true;
+
+        this.dragVector = Vector2.zero;
     }
 
     private void DisableLineRenderers(){
@@ -175,6 +194,9 @@ public class BallMovement : MonoBehaviour
     public void ResetMovement()
     {
         hasMovedThisTurn = false;
+        isMoving = false; 
+        isDragging = false; 
+        rb.velocity = Vector2.zero; 
     }
 
     public bool HasStopped()
@@ -209,6 +231,11 @@ public class BallMovement : MonoBehaviour
 
     public Vector2 GetCurrentVelocity(){
         return rb.velocity; 
+    }
+
+    public float GetForcePercentage()
+    {
+        return forcePercentage;
     }
 
 }

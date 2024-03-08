@@ -10,17 +10,26 @@ public class UIManager : MonoBehaviour
     public Text speedNumberText;
     public Image highSpeedImage;
     public Text TurnNumberText;
+    public Button launchingUI;
+    public Text forcePercentageText;
 
-    public BallCollision BallCollision;
-    public BallMovement BallMovement;
-    public BallProperties BallProperties;
-    public TurnManager turnManager;
+    BallCollision BallCollision;
+    BallMovement BallMovement;
+    BallProperties BallProperties;
 
+    TurnManager turnManager;
 
     private Color grayColor = Color.gray;
 
+    bool ShoveMode = false;
+
     void Start()
     {
+        BallCollision = FindObjectOfType<BallCollision>();
+        BallMovement = FindObjectOfType<BallMovement>();
+        BallProperties = FindObjectOfType<BallProperties>();
+        turnManager = FindObjectOfType<TurnManager>();
+
         // Turn off the highSpeedImage at the start
         if (highSpeedImage != null)
         {
@@ -32,6 +41,8 @@ public class UIManager : MonoBehaviour
     {
         if (BallProperties != null)
         {
+            ShoveMode = BallProperties.ShoveMode;
+
             if (impulseCountNumber != null)
             {
                 if(BallProperties.ShoveGagged){
@@ -50,8 +61,8 @@ public class UIManager : MonoBehaviour
 
             if (speedNumberText != null)
             {
-                //float currentSpeed = ballMovement.GetCurrentVelocity().magnitude;
-                //speedNumberText.text = currentSpeed.ToString("F2");
+                float currentSpeed = BallMovement.GetCurrentVelocity().magnitude;
+                speedNumberText.text = currentSpeed.ToString("F2");
             }
 
             if (BallProperties.HighSpeed)
@@ -69,10 +80,23 @@ public class UIManager : MonoBehaviour
                 }
             }
         }
+
+        if(turnManager.currentState == TurnManager.GameState.PlayerTurn && BallMovement.IsMoving() == false){
+            launchingUI.gameObject.SetActive(true);
+        }
+        else{
+            launchingUI.gameObject.SetActive(false);
+        }
+
         float currentTurnNumber = turnManager.GetTurnNumber();
         if(TurnNumberText != null)
         {
             TurnNumberText.text = "It took you " + currentTurnNumber + " turns!";
+        }
+
+        float forcePercentageNumber = BallMovement.GetForcePercentage();
+        if(forcePercentageText != null){
+            forcePercentageText.text = forcePercentageNumber.ToString() + '%';
         }
     }
 }
