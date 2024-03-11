@@ -43,11 +43,7 @@ public class TurnManager : MonoBehaviour
     public GameObject playerTurnUI;
     public GameObject enemyTurnUI;
 
-    public GameObject winUI;
-    public GameObject lossUI;
-
     public GameObject OuterCanvasUI;
-    public GameObject pauseMenuUI;
 
     bool endingCutsceneBegan = false;
 
@@ -62,7 +58,7 @@ public class TurnManager : MonoBehaviour
     void Start()
     {
         ResumeGame();
-        TurnOffAllUI();
+        UIManager2.Instance.DestroyAllUIElements(); 
         CheckForBeginningCutscene();
     }
 
@@ -124,15 +120,14 @@ public class TurnManager : MonoBehaviour
 
     void PauseGame()
     {
-        previousState = currentState; 
-        pauseMenuUI.SetActive(true); 
+        UIManager2.Instance.ShowUIElement("PauseMenuUI");
         Time.timeScale = 0f; 
         currentState = GameState.Paused; 
     }
 
     public void ResumeGame()
     {
-        pauseMenuUI.SetActive(false); 
+        UIManager2.Instance.DestroyUIElement("PauseMenuUI");
         Time.timeScale = 1f; 
         currentState = previousState; 
     }
@@ -191,14 +186,12 @@ public class TurnManager : MonoBehaviour
                 RemoveEnemy(enemyGameObject);
                 continue;
             }
-            UpdateEnemiesList();
             int moves = enemyMovement.moveMoney;
             UpdateEnemiesList();
             for (int i = 0; i < moves; i++)
             {
                 UpdateEnemiesList();
                 enemyMovement.Move();
-                UpdateEnemiesList();
                 yield return new WaitUntil(() => enemyMovement.HasMoved());
                 UpdateEnemiesList();
                 yield return new WaitForSeconds(secondsBetweenEnemyMoves);
@@ -208,9 +201,7 @@ public class TurnManager : MonoBehaviour
                     break;
                 }
             }
-            UpdateEnemiesList();
             enemyMovement.CompletedAllMovements();
-            UpdateEnemiesList();
             enemyMovement.ResetAllMovements();
             UpdateEnemiesList();
         }
@@ -295,7 +286,7 @@ public class TurnManager : MonoBehaviour
         enemyTurnUI.SetActive(false);
 
         yield return new WaitForSeconds(1);
-        lossUI.SetActive(true);
+        UIManager2.Instance.ShowUIElement("LossUI"); 
     }
 
     private void CheckForWin(){
@@ -308,23 +299,15 @@ public class TurnManager : MonoBehaviour
 
 
     public IEnumerator HandleWin(){
+        yield return new WaitForSeconds(1);
+        
         playerTurnUI.SetActive(false);
         enemyTurnUI.SetActive(false);
-
-        yield return new WaitForSeconds(1);
-        winUI.SetActive(true);
+        UIManager2.Instance.ShowUIElement("WinUI");
     }
 
     public float GetTurnNumber(){
         return TurnNumber;
-    }
-
-    void TurnOffAllUI(){
-        winUI.SetActive(false);
-        lossUI.SetActive(false);
-        playerTurnUI.SetActive(false);
-        enemyTurnUI.SetActive(false);
-        OuterCanvasUI.SetActive(false);
     }
 
     public void TurnOnAllUI(){
