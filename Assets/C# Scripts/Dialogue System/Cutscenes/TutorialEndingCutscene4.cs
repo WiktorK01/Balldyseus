@@ -46,7 +46,7 @@ public class TutorialEndingCutscene3 : BaseCutscene
     }
 
     void EndCutsceneAndStartLevel(){
-        TurnManager.Instance.StartPlayerTurn();
+        TurnManager.Instance.ChangeGameState("PlayerTurn");
     }
     void EndCutsceneAndEndLevel(){
         TurnManager.Instance.BeginHandlingWinCoroutine();

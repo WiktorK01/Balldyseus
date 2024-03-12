@@ -15,14 +15,23 @@ public class UIFactory
     {
         switch (elementType)
         {
-            case "OuterUI":
-                return Instantiate(definitions.outerUI);
+
             case "WinUI":
                 return Instantiate(definitions.winUI);
             case "LossUI":
                 return Instantiate(definitions.lossUI);
             case "PauseMenuUI":
                 return Instantiate(definitions.pauseMenuUI);
+            case "HighSpeedUI":
+                return Instantiate(definitions.highSpeedUI);
+            case "ImpulseCountUI":
+                return Instantiate(definitions.impulseCountUI);
+            case "LaunchUI":
+                return Instantiate(definitions.launchUI);
+            case "EnemyTurnUI":
+                return Instantiate(definitions.enemyTurnUI);
+            case "PlayerTurnUI":
+                return Instantiate(definitions.playerTurnUI);
             default:
                 return null;
         }

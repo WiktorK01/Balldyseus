@@ -39,7 +39,7 @@ public class TutorialBeginningCutscene3 : BaseCutscene
 
     void EndCutsceneAndStartLevel(){
         cutsceneFinished = true;
-        TurnManager.Instance.StartPlayerTurn();
+        TurnManager.Instance.ChangeGameState("PlayerTurn");
     }
 
     IEnumerator MoveObjectSmoothly(GameObject objectToMove, Vector3 targetPosition, float duration)

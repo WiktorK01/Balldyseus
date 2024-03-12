@@ -38,6 +38,7 @@ public class BallMovement : MonoBehaviour
         BallProperties = GetComponent<BallProperties>();
 
         rb = GetComponent<Rigidbody2D>();
+
     }
 
     void Update()
@@ -236,6 +237,10 @@ public class BallMovement : MonoBehaviour
     public float GetForcePercentage()
     {
         return forcePercentage;
+    }
+
+    public Vector2 GetDragVector(){
+        return dragVector;
     }
 
 }

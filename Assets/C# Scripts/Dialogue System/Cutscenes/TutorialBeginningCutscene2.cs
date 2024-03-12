@@ -40,7 +40,7 @@ public class TutorialBeginningCutscene2 : BaseCutscene
         BallProperties BallProperties = Balldyseus.GetComponent<BallProperties>();
         BallProperties.GagAttack();
         
-        TurnManager.Instance.StartPlayerTurn();
+        TurnManager.Instance.ChangeGameState("PlayerTurn");
     }
 
     IEnumerator MoveObjectSmoothly(GameObject objectToMove, Vector3 targetPosition, float duration)

@@ -4,10 +4,14 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - outerUI: {fileID: 6398188669138797686, guid: 4f5ee53eef886e849bd2301dcf907971, type: 3}
   - winUI: {fileID: 86391058947003696, guid: 0e161587d9fe5e74fb1d6a3f4478b205, type: 3}
   - lossUI: {fileID: 4220283532893947389, guid: b729efa0dca2ad04f9b96281e8fe8739, type: 3}
   - pauseMenuUI: {fileID: 5372251363941596856, guid: 38daf0ccaa9b3ff4ba13bcf222eedda4, type: 3}
+  - highSpeedUI: {fileID: 3799234130515580696, guid: ab7a8e5051cc59742b358ebbd87a3227, type: 3}
+  - impulseCountUI: {fileID: 4178012986012687822, guid: 37eb9531a3387c342a21df9151c07e4a, type: 3}
+  - launchUI: {fileID: 4653534570803771530, guid: f468acc1dd8e7ce47ad6c6dba6018f91, type: 3}
+  - enemyTurnUI: {fileID: 1823150131984429805, guid: e0b8cc0a5f898ff43b36bfe6b9422f0d, type: 3}
+  - playerTurnUI: {fileID: 1823150131984429805, guid: 1b609ce1d1481a94584d774730fbbb70, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

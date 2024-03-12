@@ -40,11 +40,6 @@ public class TurnManager : MonoBehaviour
 
     public PathfindingManager pathfindingManager;
 
-    public GameObject playerTurnUI;
-    public GameObject enemyTurnUI;
-
-    public GameObject OuterCanvasUI;
-
     bool endingCutsceneBegan = false;
 
     public float TurnNumber = 0;
@@ -71,14 +66,15 @@ public class TurnManager : MonoBehaviour
             CheckForWin();
             if (Balldyseus.GetComponent<BallMovement>().HasStopped()){
                 UpdateEnemiesList();
-                StartEnemyTurn();
+                ChangeGameState("EnemyTurn");
             }
 
         }
 
+
         if (Input.GetKeyDown(KeyCode.Escape) && !Balldyseus.GetComponent<BallMovement>().IsMoving()){
             if (currentState != GameState.Paused){
-                PauseGame();
+                ChangeGameState("Paused");
             }
             else{
                 ResumeGame();
@@ -88,17 +84,72 @@ public class TurnManager : MonoBehaviour
         //Debug.Log(currentState);
     }
 /*--------------------------------------------------------------------------------------------------*/
+    public void ChangeGameState(string stateString){
+        
+        UIManager2.Instance.DestroyAllUIElements(); 
+
+        switch (stateString){
+            case "Null":
+                currentState = GameState.Null;
+                break;
+
+            case "Cutscene":
+                currentState = GameState.Cutscene;
+                break;
+
+            case "PlayerTurn":
+                UIManager2.Instance.InstantiatePlayerTurnUI();
+                UpdateEnemiesList();
+                CheckForWin();
+                currentState = GameState.PlayerTurn;
+                TurnNumber++;
+                Balldyseus.GetComponent<BallMovement>().ResetMovement();
+                break;
+
+            case "EnemyTurn":
+                if(enemies.Count == 0){
+                    CheckForWin();
+                }
+                else{
+                    currentState = GameState.EnemyTurn;
+                    UIManager2.Instance.InstantiateEnemyTurnUI();
+                    StartCoroutine(EnemyTurnRoutine());
+                }
+                break;
+
+            case "Win":
+                StartCoroutine(HandleWin());
+                break;
+
+            case "Loss":
+                StartCoroutine(HandleLoss());
+                break;
+
+            case "Paused":
+                currentState = GameState.Paused;
+                break;
+
+            case "PreviousState":
+                currentState = previousState;
+                break;
+        }
+
+        if(currentState != GameState.Paused){
+            previousState = currentState;
+        }
+    }
+
 
     void CheckForBeginningCutscene()
     {
         if (beginningCutscene != null)
         {
-            currentState = GameState.Cutscene;
+            ChangeGameState("Cutscene");
             beginningCutscene.StartCutscene();
         }
         else
         {
-            StartPlayerTurn();
+            ChangeGameState("PlayerTurn");
         }
     }
 
@@ -106,13 +157,12 @@ public class TurnManager : MonoBehaviour
         if (endingCutscene != null)
         {
             endingCutsceneBegan = true;
-            currentState = GameState.Cutscene;
+            ChangeGameState("Cutscene");
             endingCutscene.StartCutscene();
         }
         else
         {
-            currentState = GameState.Win;
-            StartCoroutine(HandleWin());
+            ChangeGameState("Win");
         }
     }
 
@@ -121,8 +171,8 @@ public class TurnManager : MonoBehaviour
     void PauseGame()
     {
         UIManager2.Instance.ShowUIElement("PauseMenuUI");
-        Time.timeScale = 0f; 
-        currentState = GameState.Paused; 
+        Time.timeScale = 0f;
+        ChangeGameState("Paused");
     }
 
     public void ResumeGame()
@@ -130,44 +180,11 @@ public class TurnManager : MonoBehaviour
         UIManager2.Instance.DestroyUIElement("PauseMenuUI");
         Time.timeScale = 1f; 
         currentState = previousState; 
+        ChangeGameState("PreviousState");
     }
 
 /*--------------------------------------------------------------------------------------------------*/
-
-    //start player's turn
-    public void StartPlayerTurn()
-    {
-        currentState = GameState.PlayerTurn;
-        TurnOnAllUI();
-        UpdateEnemiesList();
-        CheckForWin();
-        
-        TurnNumber++;
-
-        playerTurnUI.SetActive(true);
-        enemyTurnUI.SetActive(false);
-
-        Balldyseus.GetComponent<BallMovement>().ResetMovement();
-        // center camera on Balldyseus
-    }
-
-    // begin Enemy Turn Routine
-    public void StartEnemyTurn()
-    {
-        if(enemies.Count == 0){
-            CheckForWin();
-        }
-        else{
-            currentState = GameState.EnemyTurn;
-
-            playerTurnUI.SetActive(false);
-            enemyTurnUI.SetActive(true);
-
-            StartCoroutine(EnemyTurnRoutine());
-        }
-
-    }
-
+    
     //for every enemy, for moveMoney times, call move & wait secondsBetweenEnemyMoves
     IEnumerator EnemyTurnRoutine()
     {
@@ -208,7 +225,7 @@ public class TurnManager : MonoBehaviour
         UpdateEnemiesList();
 
         // After all enemies have moved
-        StartPlayerTurn();
+        ChangeGameState("PlayerTurn");
     }
 
     void DoThisBeforeEnemyMoves(GameObject enemyGameObject){
@@ -216,7 +233,7 @@ public class TurnManager : MonoBehaviour
         Fire.ApplyFireDamageIfOnFire(enemyProps);
     }
 
-/*--------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------
 
     private bool CheckIfAllEnemiesHaveMoved()
     {
@@ -239,7 +256,7 @@ public class TurnManager : MonoBehaviour
         enemiesHaveMoved = false;
     }
 
-/*----------------------------------------------------------------------------------------------------*/
+----------------------------------------------------------------------------------------------------*/
     
     //MANAGING THE EXISTING ENEMIES
     public void UpdateEnemiesList()
@@ -269,26 +286,28 @@ public class TurnManager : MonoBehaviour
     }
 /*--------------------------------------------------------------------------------------------------*/
 
-    //WIN/LOSS STUFF
+    //LOSS STUFF
 
     public void OnEnemyReachedObjective()
     {
         if (currentState != GameState.Loss)
         {
-            currentState = GameState.Loss;
-            StartCoroutine(HandleLoss());
+            ChangeGameState("Loss");
         }
     }
 
     IEnumerator HandleLoss(){
         Balldyseus.SetActive(false);
-        playerTurnUI.SetActive(false);
-        enemyTurnUI.SetActive(false);
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(.5f);
+        UIManager2.Instance.HideAllUIElements();
         UIManager2.Instance.ShowUIElement("LossUI"); 
+        currentState = GameState.Loss;
     }
 
+/*--------------------------------------------------------------------------------------------------*/
+
+    //WIN STUFF
     private void CheckForWin(){
         if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss && !endingCutsceneBegan)
         {
@@ -297,28 +316,23 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-
-    public IEnumerator HandleWin(){
-        yield return new WaitForSeconds(1);
+    private IEnumerator HandleWin(){
+        yield return new WaitForSeconds(0f);
         
-        playerTurnUI.SetActive(false);
-        enemyTurnUI.SetActive(false);
+        UIManager2.Instance.HideAllUIElements();
         UIManager2.Instance.ShowUIElement("WinUI");
+        currentState = GameState.Win;
     }
+
+/*--------------------------------------------------------------------------------------------------*/
+
+    //public functions
 
     public float GetTurnNumber(){
         return TurnNumber;
     }
 
-    public void TurnOnAllUI(){
-        OuterCanvasUI.SetActive(true);
-    }
-
-    public void BeginHandlingWinCoroutine(){
-        StartCoroutine(HandleWin());
-    }
-
-    public void ResetGameState(){
-        currentState = GameState.Null;
-    }
+    public void BeginHandlingWinCoroutine()
+{
+        StartCoroutine(HandleWin());}
 }

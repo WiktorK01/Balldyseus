@@ -201,9 +201,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: BallMovement, Assembly-CSharp
-        m_MethodName: PerformMovementButtonWrapper
+      - m_Target: {fileID: 65411796733338504, guid: d701bfa2c9ecd584fad17b6f2d9a59f5, type: 3}
+        m_TargetAssemblyTypeName: LaunchButtonWrapper, Assembly-CSharp
+        m_MethodName: PerformMovementWrapper
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -366,7 +366,7 @@ GameObject:
   - component: {fileID: 7602758363006423297}
   - component: {fileID: 4953330750739664489}
   m_Layer: 5
-  m_Name: LaunchButtonUI
+  m_Name: LaunchUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,17 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class DynamicUIManager : MonoBehaviour
 {
-    public Text impulseCountText;
-    public Text impulseCountNumber;
-    public Text speedNumberText;
-    public Image highSpeedImage;
-    public Text TurnNumberText;
-    public Button launchingUI;
-    public Text forcePercentageText;
+    //This Manager controls UI elements that change dynamically based on the current state of the game
+    //This generally does not control instantiation of UI Canvases.
 
     BallCollision BallCollision;
     BallMovement BallMovement;
@@ -19,9 +15,7 @@ public class UIManager : MonoBehaviour
 
     TurnManager turnManager;
 
-    private Color grayColor = Color.gray;
-
-    bool ShoveMode = false;
+    //bool ShoveMode;
 
     void Start()
     {
@@ -29,74 +23,71 @@ public class UIManager : MonoBehaviour
         BallMovement = FindObjectOfType<BallMovement>();
         BallProperties = FindObjectOfType<BallProperties>();
         turnManager = FindObjectOfType<TurnManager>();
-
-        // Turn off the highSpeedImage at the start
-        if (highSpeedImage != null)
-        {
-            highSpeedImage.gameObject.SetActive(false);
-        }
     }
 
     void Update()
     {
-        if (BallProperties != null)
-        {
-            ShoveMode = BallProperties.ShoveMode;
 
-            if (impulseCountNumber != null)
-            {
+        //ShoveMode = BallProperties.ShoveMode;
+        if(BallProperties !=null){
+            //Remove the Impulse Count UI when the shove is gagged
+            if(turnManager.currentState == TurnManager.GameState.PlayerTurn){
                 if(BallProperties.ShoveGagged){
-                    impulseCountNumber.gameObject.SetActive(false);
-                    impulseCountText.gameObject.SetActive(false);
+                    UIManager2.Instance.HideUIElement("ImpulseCountUI");
                 }
+                //edit the Impulse Count
                 else{
                     float remainingImpulses = BallCollision.GetRemainingShoveCount();
-                    impulseCountNumber.text = remainingImpulses.ToString();
-                    if(remainingImpulses == 0){
-                        impulseCountNumber.color = grayColor;
-                    }
+                    string impulseCountString = remainingImpulses.ToString();
+                    UIManager2.Instance.SetTextValueInUIElement("ImpulseCountUI", "ImpulseCountNumber", impulseCountString);
                 }
-
             }
 
-            if (speedNumberText != null)
-            {
-                float currentSpeed = BallMovement.GetCurrentVelocity().magnitude;
-                speedNumberText.text = currentSpeed.ToString("F2");
-            }
 
-            if (BallProperties.HighSpeed)
+            //HighSpeed Instantiator
+            if (BallProperties.HighSpeed && BallMovement.IsMoving())
             {
-                if (highSpeedImage != null && !highSpeedImage.gameObject.activeSelf)
-                {
-                    highSpeedImage.gameObject.SetActive(true);
-                }
+                UIManager2.Instance.ShowUIElement("HighSpeedUI");
             }
             else
             {
-                if (highSpeedImage != null && highSpeedImage.gameObject.activeSelf)
-                {
-                    highSpeedImage.gameObject.SetActive(false);
-                }
+                UIManager2.Instance.HideUIElement("HighSpeedUI");
             }
         }
 
-        if(turnManager.currentState == TurnManager.GameState.PlayerTurn && BallMovement.IsMoving() == false){
-            launchingUI.gameObject.SetActive(true);
-        }
-        else{
-            launchingUI.gameObject.SetActive(false);
+        if(BallMovement != null){
+            //Hides the LaunchUI while the player is moving on their turn
+            if(turnManager.currentState == TurnManager.GameState.PlayerTurn && BallMovement.IsMoving() == false){
+                UIManager2.Instance.ShowUIElement("LaunchUI");
+            }
+            else{
+                UIManager2.Instance.HideUIElement("LaunchUI");
+            }
+            
+            //set the changing forcePercentage number on the PlayerTurn for the LaunchUI
+            if(turnManager.currentState == TurnManager.GameState.PlayerTurn){
+                float forcePercentageNumber = BallMovement.GetForcePercentage();
+                string forcePercentageText = forcePercentageNumber.ToString() + '%';
+                UIManager2.Instance.SetTextValueInUIElement("LaunchUI", "ForcePercentageNumber", forcePercentageText);
+            }
         }
 
-        float currentTurnNumber = turnManager.GetTurnNumber();
-        if(TurnNumberText != null)
+
+
+        //edits the winning text to display the total amount of turns needed to win
+        if(turnManager.currentState == TurnManager.GameState.Win){
+            float currentTurnNumber = turnManager.GetTurnNumber();   
+            string winText = "It took you " + currentTurnNumber + " turns!";
+            UIManager2.Instance.SetTextValueInUIElement("WinUI", "TurnNumberText", winText);
+        }
+
+
+
+
+        /*if (speedNumberText != null)
         {
-            TurnNumberText.text = "It took you " + currentTurnNumber + " turns!";
-        }
-
-        float forcePercentageNumber = BallMovement.GetForcePercentage();
-        if(forcePercentageText != null){
-            forcePercentageText.text = forcePercentageNumber.ToString() + '%';
-        }
+            float currentSpeed = BallMovement.GetCurrentVelocity().magnitude;
+            speedNumberText.text = currentSpeed.ToString("F2");
+        }*/
     }
 }

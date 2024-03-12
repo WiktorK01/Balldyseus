@@ -20,7 +20,7 @@ public class EmptyCutscene : BaseCutscene
     }
 
     void EndCutsceneAndStartLevel(){        
-        TurnManager.Instance.StartPlayerTurn();
+        TurnManager.Instance.ChangeGameState("PlayerTurn");
     }
 
 }

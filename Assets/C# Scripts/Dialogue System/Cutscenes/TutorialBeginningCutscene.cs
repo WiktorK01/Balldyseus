@@ -69,7 +69,7 @@ public class TestCutscene : BaseCutscene
         BallProperties BallProperties = Balldyseus.GetComponent<BallProperties>();
         BallProperties.GagShove();
         
-        TurnManager.Instance.StartPlayerTurn();
+        TurnManager.Instance.ChangeGameState("PlayerTurn");
     }
 
     IEnumerator MoveObjectSmoothly(GameObject objectToMove, Vector3 targetPosition, float duration)
