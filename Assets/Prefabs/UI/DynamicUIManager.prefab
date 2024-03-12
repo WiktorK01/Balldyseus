@@ -44,9 +44,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8b8212b535cb5b49ac09cf2bae30373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  impulseCountText: {fileID: 0}
-  speedNumberText: {fileID: 0}
-  highSpeedImage: {fileID: 0}
-  TurnNumberText: {fileID: 0}
-  ballMovement: {fileID: 0}
-  turnManager: {fileID: 0}

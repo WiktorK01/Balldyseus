@@ -33,6 +33,9 @@ public class TurnManager : MonoBehaviour
     private GameState previousState;
     
     public GameObject Balldyseus;
+    bool BalldyseusStopped;
+    bool BalldyseusIsMoving;
+
     public Camera mainCamera;
 
     List<GameObject> enemies = new List<GameObject>();
@@ -60,19 +63,21 @@ public class TurnManager : MonoBehaviour
     // if player stops, update enemy list + map
     void Update()
     {
+        BalldyseusStopped = Balldyseus.GetComponent<BallMovement>().HasStopped();
+        BalldyseusIsMoving = Balldyseus.GetComponent<BallMovement>().IsMoving();
+        
         //During a Player's Turn
         if (currentState == GameState.PlayerTurn)
         {
             CheckForWin();
-            if (Balldyseus.GetComponent<BallMovement>().HasStopped()){
+            if (BalldyseusStopped){
                 UpdateEnemiesList();
                 ChangeGameState("EnemyTurn");
             }
-
         }
 
 
-        if (Input.GetKeyDown(KeyCode.Escape) && !Balldyseus.GetComponent<BallMovement>().IsMoving()){
+        if (Input.GetKeyDown(KeyCode.Escape) && !BalldyseusIsMoving){
             if (currentState != GameState.Paused){
                 ChangeGameState("Paused");
             }
@@ -98,7 +103,7 @@ public class TurnManager : MonoBehaviour
                 break;
 
             case "PlayerTurn":
-                UIManager2.Instance.InstantiatePlayerTurnUI();
+                InstantiatePlayerTurnUI();
                 UpdateEnemiesList();
                 CheckForWin();
                 currentState = GameState.PlayerTurn;
@@ -112,7 +117,7 @@ public class TurnManager : MonoBehaviour
                 }
                 else{
                     currentState = GameState.EnemyTurn;
-                    UIManager2.Instance.InstantiateEnemyTurnUI();
+                    InstantiateEnemyTurnUI();
                     StartCoroutine(EnemyTurnRoutine());
                 }
                 break;
@@ -127,10 +132,13 @@ public class TurnManager : MonoBehaviour
 
             case "Paused":
                 currentState = GameState.Paused;
+                UIManager2.Instance.ShowUIElement("PauseUI");
+                PauseGame();
                 break;
 
             case "PreviousState":
-                currentState = previousState;
+                string stateName = previousState.ToString();
+                ChangeGameState(stateName);
                 break;
         }
 
@@ -170,21 +178,31 @@ public class TurnManager : MonoBehaviour
 
     void PauseGame()
     {
-        UIManager2.Instance.ShowUIElement("PauseMenuUI");
         Time.timeScale = 0f;
-        ChangeGameState("Paused");
     }
 
     public void ResumeGame()
     {
-        UIManager2.Instance.DestroyUIElement("PauseMenuUI");
         Time.timeScale = 1f; 
-        currentState = previousState; 
         ChangeGameState("PreviousState");
     }
 
 /*--------------------------------------------------------------------------------------------------*/
     
+    public void InstantiatePlayerTurnUI(){
+        UIManager2.Instance.HideAllUIElements();
+        UIManager2.Instance.ShowUIElement("PlayerTurnUI");
+        UIManager2.Instance.ShowUIElement("ImpulseCountUI");
+        UIManager2.Instance.ShowUIElement("LaunchUI");
+    }
+
+    public void InstantiateEnemyTurnUI(){
+        UIManager2.Instance.HideAllUIElements();
+        UIManager2.Instance.ShowUIElement("EnemyTurnUI");
+    }
+
+/*--------------------------------------------------------------------------------------------------*/
+
     //for every enemy, for moveMoney times, call move & wait secondsBetweenEnemyMoves
     IEnumerator EnemyTurnRoutine()
     {
@@ -334,5 +352,6 @@ public class TurnManager : MonoBehaviour
 
     public void BeginHandlingWinCoroutine()
 {
-        StartCoroutine(HandleWin());}
+        StartCoroutine(HandleWin());
+    }
 }

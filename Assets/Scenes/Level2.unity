@@ -1893,28 +1893,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
---- !u!114 &440188546 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5107287664606838169, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-  m_PrefabInstance: {fileID: 440188545}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1832341024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a21843ac793fc2b43a1d4f0aeedaea7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &440188547 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2993666101185895071, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-  m_PrefabInstance: {fileID: 440188545}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1832341024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 391487c9524d4184ca13dc09b98bc48a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &458562247 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 965782507976132006, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
@@ -6681,58 +6659,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2088174235}
     m_Modifications:
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: launchingUI
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: turnManager
-      value: 
-      objectReference: {fileID: 1976255933}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: BallMovement
-      value: 
-      objectReference: {fileID: 440188546}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: ballMovement
-      value: 
-      objectReference: {fileID: 440188546}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: BallCollision
-      value: 
-      objectReference: {fileID: 440188547}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: ballCollision
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: BallProperties
-      value: 
-      objectReference: {fileID: 1832341026}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: TurnNumberText
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: highSpeedImage
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: speedNumberText
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: impulseCountText
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: impulseCountNumber
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3235194972779102267, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
-      propertyPath: forcePercentageText
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 6690911276654100963, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.3298082
@@ -6775,7 +6701,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8362778348271499207, guid: 04b0d6465970e5242b6ced50438b050a, type: 3}
       propertyPath: m_Name
-      value: UIManager
+      value: DynamicUIManager
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7012,17 +6938,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3088457234871761412, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
   m_PrefabInstance: {fileID: 440188545}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1832341026 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8121216698731663183, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
-  m_PrefabInstance: {fileID: 440188545}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1832341024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fee8ba4bdf6212408840958ef665afc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1913025241 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3024298346197650044, guid: 92bac26a62eeecc4e9b5a3676fb36b34, type: 3}
