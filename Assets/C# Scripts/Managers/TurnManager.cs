@@ -132,7 +132,7 @@ public class TurnManager : MonoBehaviour
 
             case "Paused":
                 currentState = GameState.Paused;
-                UIManager2.Instance.ShowUIElement("PauseUI");
+                UIManager2.Instance.ShowUIElement("PauseMenuUI");
                 PauseGame();
                 break;
 
