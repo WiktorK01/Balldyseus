@@ -71,11 +71,11 @@ namespace demo2
 			(int, int)[] path;
 			if (useCostMap)
 			{
-				path = await AStarPathfinding.GeneratePath(startX, startY, goalX, goalY, costMap, manhattanDistance);
+				path = await AStarPathfinding.GeneratePath(startX, startY, goalX, goalY, costMap, manhattanDistance, walkableDiagonals);
 			}
 			else
 			{
-				path = await AStarPathfinding.GeneratePath(startX, startY, goalX, goalY, walkableMap, manhattanDistance);
+				path = await AStarPathfinding.GeneratePath(startX, startY, goalX, goalY, walkableMap, manhattanDistance, walkableDiagonals);
 			}
 
 			stopwatch.Stop();
@@ -147,6 +147,7 @@ namespace demo2
 		public bool ClickPath;
 		public bool manhattanDistance = true;
 		public bool useCostMap = false;
+		public bool walkableDiagonals = false;
 
 		// Update is called once per frame
 		void Update()

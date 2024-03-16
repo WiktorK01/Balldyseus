@@ -63,8 +63,11 @@ public class TurnManager : MonoBehaviour
     // if player stops, update enemy list + map
     void Update()
     {
-        BalldyseusStopped = Balldyseus.GetComponent<BallMovement>().HasStopped();
-        BalldyseusIsMoving = Balldyseus.GetComponent<BallMovement>().IsMoving();
+        if(Balldyseus.GetComponent<BallMovement>().BallExists()){
+            BalldyseusStopped = Balldyseus.GetComponent<BallMovement>().HasStopped();
+            BalldyseusIsMoving = Balldyseus.GetComponent<BallMovement>().IsMoving();
+        }
+
         
         //During a Player's Turn
         if (currentState == GameState.PlayerTurn)
@@ -127,6 +130,7 @@ public class TurnManager : MonoBehaviour
                 break;
 
             case "Loss":
+                currentState = GameState.Loss;
                 StartCoroutine(HandleLoss());
                 break;
 
@@ -210,6 +214,9 @@ public class TurnManager : MonoBehaviour
 
         foreach (var enemyGameObject in enemiesToMove)
         {
+            if(currentState == GameState.Loss){
+                break;
+            }
             UpdateEnemiesList();
             EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
             EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
@@ -251,7 +258,7 @@ public class TurnManager : MonoBehaviour
         Fire.ApplyFireDamageIfOnFire(enemyProps);
     }
 
-/*--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
     private bool CheckIfAllEnemiesHaveMoved()
     {
@@ -274,7 +281,7 @@ public class TurnManager : MonoBehaviour
         enemiesHaveMoved = false;
     }
 
-----------------------------------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------------------------------
     
     //MANAGING THE EXISTING ENEMIES
     public void UpdateEnemiesList()
@@ -320,7 +327,6 @@ public class TurnManager : MonoBehaviour
         yield return new WaitForSeconds(.5f);
         UIManager2.Instance.HideAllUIElements();
         UIManager2.Instance.ShowUIElement("LossUI"); 
-        currentState = GameState.Loss;
     }
 
 /*--------------------------------------------------------------------------------------------------*/
@@ -351,7 +357,7 @@ public class TurnManager : MonoBehaviour
     }
 
     public void BeginHandlingWinCoroutine()
-{
+    {
         StartCoroutine(HandleWin());
     }
 }

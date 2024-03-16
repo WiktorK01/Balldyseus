@@ -43,12 +43,14 @@ public class BallMovement : MonoBehaviour
 
     void Update()
     {
-        CheckForPlayerInput();
-        HandleDrag();
+        if(BallExists()){
+            CheckForPlayerInput();
+            HandleDrag();
 
-        BringToStopWhenTooSlow();
-        KeepSpeedBelowMaxVelocity();
-        CheckForHighSpeed();
+            BringToStopWhenTooSlow();
+            KeepSpeedBelowMaxVelocity();
+            CheckForHighSpeed();
+        }
     }
 
     //this function looks for player input, whether or not the respective mode is gagged, and if the player has moved yet during its turn,
@@ -68,17 +70,13 @@ public class BallMovement : MonoBehaviour
         {
             if (IsMouseOverBalldyseus())
             {
-                if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+                if (Input.GetMouseButtonDown(0) && !BallProperties.AttackGagged || Input.GetMouseButtonDown(1) && !BallProperties.ShoveGagged)
                 {
                     isDragging = true;
                     startPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     BallVisuals.SetPullLineRendererState(true, BallProperties.ShoveMode ? Color.blue : Color.red, startPoint);
                 }
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.K)){
-            PerformMovement(dragVector);
         }
     }
 
@@ -243,4 +241,9 @@ public class BallMovement : MonoBehaviour
         return dragVector;
     }
 
+    public bool BallExists(){
+        if(!gameObject.activeSelf || gameObject==null)
+            return false;
+        else return true;
+    }
 }

@@ -11,6 +11,9 @@ INCLUDED:
 
 		*	async (int, int)[] GeneratePath(int startX, int startY, int goalX, int goalY, float[,] costMap, bool manhattanHeuristic = true)
 		*	(int, int)[] GeneratePathSync(int startX, int startY, int goalX, int goalY, float[,] costMap, bool manhattanHeuristic = true)
+
+	Documentation (AStar/Needed Scripts/AStarPathfinding Documentation.pdf)
+		A documentation in the for of a PDF explaining how to use the included A* methods
 		
 	Examples:
 		Random pathfinding ants (Astar/Example 1):
@@ -45,3 +48,11 @@ A MINIMAL EXAMPLE:
 	path == [(0, 0), (0, 1), (0, 2), (1, 3), (2, 2), (2, 1), (2, 0)]
 
 	The path is a list of cordinates (x, y) that will take you from (startX, startY) to (goalX, goalY)
+
+DEVELOPERS NOTE:
+	If you find this AStarPathfinding asset useful in your Unity projects, 
+	I would greatly appreciate it if you could take a moment to leave a review.
+
+	https://assetstore.unity.com/packages/tools/behavior-ai/astar-2d-grid-pathfinding-250080#reviews
+
+	Your feedback is invaluable to me and allows me to make more informed decisions about how to improve this asset.

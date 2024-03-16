@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class BallProperties : MonoBehaviour
 {
-        static bool IsMouseOverLaunchButton = false;
+    static bool IsMouseOverLaunchButton = false;
 
 
     public bool ShoveMode = false;
@@ -19,6 +19,10 @@ public class BallProperties : MonoBehaviour
     public float highSpeedThreshold = 10f;
     public float delayToTurnOffHighSpeed = 0.7f;
 
+    void Update(){
+        if(ShoveGagged) SetAttackMode();
+        if(AttackGagged) SetShoveMode();
+    }
 
     public void SetShoveMode(){
         if(ShoveGagged || IsMouseOverLaunchButton) 

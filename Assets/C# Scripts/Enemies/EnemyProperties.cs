@@ -42,7 +42,6 @@ public class EnemyProperties : MonoBehaviour
 
 
     void GetDestroyed(){
-        // Add destruction logic here
         enemyUI.DestroyUI();
         Destroy(gameObject);
     }
@@ -61,8 +60,7 @@ public class EnemyProperties : MonoBehaviour
         return isOnFire;
     }
     
-    public void SetOnFire(bool onFire)
-    {
+    public void SetOnFire(bool onFire){
         isOnFire = onFire;
     }
 /*------------------------------------------------------------------*/

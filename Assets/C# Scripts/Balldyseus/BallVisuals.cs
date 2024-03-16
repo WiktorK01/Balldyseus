@@ -6,6 +6,7 @@ public class BallVisuals : MonoBehaviour
 {
     SpriteRenderer spriteRenderer;
     BallProperties BallProperties;
+    BallCollision BallCollision;
     
     [SerializeField] private LineRenderer trajectoryLineRenderer;
     [SerializeField] private LineRenderer pullLineRenderer;
@@ -13,12 +14,13 @@ public class BallVisuals : MonoBehaviour
 
     private GameObject currentContactPointCircle = null; // To keep track of the instantiated prefab
 
-
+    private Color baseModeColor = Color.white; 
     private Color attackModeColor = Color.red; 
     private Color shoveModeColor = Color.blue;
 
     void Start()
     {
+        BallCollision = GetComponent<BallCollision>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         BallProperties = GetComponent<BallProperties>();
 
@@ -37,6 +39,7 @@ public class BallVisuals : MonoBehaviour
     }
 
     void Update(){
+
         SetSpriteColor(BallProperties.ShoveMode);
     }
 
@@ -45,12 +48,13 @@ public class BallVisuals : MonoBehaviour
     /*-------------------------------------------------------------------------*/
     public void SetSpriteColor(bool ShoveMode)
     {
-        if (ShoveMode)
-        {
+        if (ShoveMode && BallCollision.GetRemainingShoveCount() == 0){
+            spriteRenderer.color = baseModeColor;
+        }
+        else if (ShoveMode){
             spriteRenderer.color = shoveModeColor;
         }
-        else
-        {
+        else{
             spriteRenderer.color = attackModeColor;
         }    
     }

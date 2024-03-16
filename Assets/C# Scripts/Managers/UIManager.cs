@@ -12,7 +12,6 @@ public class DynamicUIManager : MonoBehaviour
     BallCollision BallCollision;
     BallMovement BallMovement;
     BallProperties BallProperties;
-
     TurnManager turnManager;
 
     //bool ShoveMode;

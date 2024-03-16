@@ -17,11 +17,12 @@ namespace AStar
 		/// <param name="walkableMap">A 2D array indicating whether a tile is traverable or not. 
 		/// The walkableMap is ordered [rows, collumns] i.e [y, x]</param>
 		/// <param name="manhattanHeuristic">If true the heuristic uses manhattan distance, if false it uses euclidean distance</param>
+		/// <param name="walkableDiagonals">If true diagonal movement is allowed even if it is not reachable via a horizontal and a vertical move</param>
 		/// <returns>Asynchronously returns a (int, int) array representing path cordinates traveling from start to goal. The codniates are ordered (x, y). 
 		/// Returns a empty (int, int) array if no path is found. I.e (int, int)[]</returns>
-		public static async Task<(int, int)[]> GeneratePath(int startX, int startY, int goalX, int goalY, bool[,] walkableMap, bool manhattanHeuristic = true)
+		public static async Task<(int, int)[]> GeneratePath(int startX, int startY, int goalX, int goalY, bool[,] walkableMap, bool manhattanHeuristic = true, bool walkableDiagonals = false)
 		{
-			return await Task.Run(() => AStarBoolMap.GeneratePath(startX, startY, goalX, goalY, walkableMap, manhattanHeuristic));
+			return await Task.Run(() => AStarBoolMap.GeneratePath(startX, startY, goalX, goalY, walkableMap, manhattanHeuristic, walkableDiagonals));
 		}
 
 		/// <summary>
@@ -38,11 +39,12 @@ namespace AStar
 		/// <param name="walkableMap">A 2D array indicating whether a tile is traverable or not. 
 		/// The walkableMap is ordered [rows, collumns] i.e [y, x]</param>
 		/// <param name="manhattanHeuristic">If true the heuristic uses manhattan distance, if false it uses euclidean distance</param>
+		/// <param name="walkableDiagonals">If true diagonal movement is allowed even if it is not reachable via a horizontal and a vertical move</param>
 		/// <returns>Returns a (int, int) array representing path cordinates traveling from start to goal. The codniates are ordered (x, y). 
 		/// Returns a empty (int, int) array if no path is found. I.e (int, int)[]</returns>
-		public static (int, int)[] GeneratePathSync(int startX, int startY, int goalX, int goalY, bool[,] walkableMap, bool manhattanHeuristic = true)
+		public static (int, int)[] GeneratePathSync(int startX, int startY, int goalX, int goalY, bool[,] walkableMap, bool manhattanHeuristic = true, bool walkableDiagonals = false)
 		{
-			return AStarBoolMap.GeneratePath(startX, startY, goalX, goalY, walkableMap, manhattanHeuristic);
+			return AStarBoolMap.GeneratePath(startX, startY, goalX, goalY, walkableMap, manhattanHeuristic, walkableDiagonals);
 		}
 
 		/// <summary>
@@ -58,11 +60,12 @@ namespace AStar
 		/// <param name="costMap">A 2D array indicating the cost of traveling through tiles (-1f if the tile is not walkable). 
 		/// The costMap is ordered [rows, collumns] i.e [y, x]</param>
 		/// <param name="manhattanHeuristic">If true the heuristic uses manhattan distance, if false it uses euclidean distance</param>
+		/// <param name="walkableDiagonals">If true diagonal movement is allowed even if it is not reachable via a horizontal and a vertical move</param>
 		/// <returns>Returns a (int, int) array representing path cordinates traveling from start to goal. The codniates are ordered (x, y). 
 		/// Asynchronously returns a empty (int, int) array if no path is found. I.e (int, int)[]</returns>
-		public static async Task<(int, int)[]> GeneratePath(int startX, int startY, int goalX, int goalY, float[,] costMap, bool manhattanHeuristic = true)
+		public static async Task<(int, int)[]> GeneratePath(int startX, int startY, int goalX, int goalY, float[,] costMap, bool manhattanHeuristic = true, bool walkableDiagonals = false)
 		{
-			return await Task.Run(() => AStarCostMap.GeneratePath(startX, startY, goalX, goalY, costMap, manhattanHeuristic));
+			return await Task.Run(() => AStarCostMap.GeneratePath(startX, startY, goalX, goalY, costMap, manhattanHeuristic, walkableDiagonals));
 		}
 
 		/// <summary>
@@ -80,11 +83,12 @@ namespace AStar
 		/// <param name="costMap">A 2D array indicating the cost of traveling through tiles (-1f if the tile is not walkable). 
 		/// The costMap is ordered [rows, collumns] i.e [y, x]</param>
 		/// <param name="manhattanHeuristic">If true the heuristic uses manhattan distance, if false it uses euclidean distance</param>
+		/// <param name="walkableDiagonals">If true diagonal movement is allowed even if it is not reachable via a horizontal and a vertical move</param>
 		/// <returns>Returns a (int, int) array representing path cordinates traveling from start to goal. The codniates are ordered (x, y). 
 		/// Returns a empty (int, int) array if no path is found. I.e (int, int)[]</returns>
-		public static (int, int)[] GeneratePathSync(int startX, int startY, int goalX, int goalY, float[,] costMap, bool manhattanHeuristic = true)
+		public static (int, int)[] GeneratePathSync(int startX, int startY, int goalX, int goalY, float[,] costMap, bool manhattanHeuristic = true, bool walkableDiagonals = false)
 		{
-			return AStarCostMap.GeneratePath(startX, startY, goalX, goalY, costMap, manhattanHeuristic);
+			return AStarCostMap.GeneratePath(startX, startY, goalX, goalY, costMap, manhattanHeuristic, walkableDiagonals);
 		}
 	}
 }

@@ -1560,7 +1560,7 @@ GameObject:
   - component: {fileID: 1072997872}
   - component: {fileID: 1072997874}
   m_Layer: 0
-  m_Name: wall
+  m_Name: WallTilemap
   m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4263,7 +4263,7 @@ GameObject:
   - component: {fileID: 1414689698}
   - component: {fileID: 1414689697}
   m_Layer: 0
-  m_Name: ground
+  m_Name: GroundTileMap
   m_TagString: GroundTilemap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

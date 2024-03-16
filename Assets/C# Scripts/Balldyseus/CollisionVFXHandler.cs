@@ -15,9 +15,16 @@ public class CollisionVFXHandler : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision) {
 
-        if ((collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Enemy")) && BallProperties.ShoveMode && BallCollision.GetRemainingShoveCount() > 0f) 
+        if ((collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Enemy")) && BallCanShove()) 
         {
             BallBwompAnimator.Play("ballBwomp", -1, 0);
         }
+    }
+
+    bool BallCanShove(){
+        if(BallProperties.ShoveMode && BallCollision.GetRemainingShoveCount() > 0f){
+            return true;
+        }
+        else return false;
     }
 }

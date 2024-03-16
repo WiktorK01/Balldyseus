@@ -94,7 +94,23 @@ public class PathfindingManager : MonoBehaviour
         return walkableMap[y, x];
     }
 
-    // Unity Gizmo to draw the walkable tiles
+
+    public bool[,] GetWalkableMap()
+    {
+        return walkableMap;
+    }
+
+    public void SetTileWalkability(Vector3Int cellPosition, bool isWalkable)
+    {
+        if (cellPosition.y >= 0 && cellPosition.y < walkableMap.GetLength(0) &&
+            cellPosition.x >= 0 && cellPosition.x < walkableMap.GetLength(1))
+        {
+            walkableMap[cellPosition.y, cellPosition.x] = isWalkable;
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////
+///Gizmos to Draw Walkable Tiles in scene viewer
     void OnDrawGizmos()
     {
         if (groundTilemap != null && walkableMap != null)
@@ -120,20 +136,6 @@ public class PathfindingManager : MonoBehaviour
                     }
                 }
             }
-        }
-    }
-
-    public bool[,] GetWalkableMap()
-    {
-        return walkableMap;
-    }
-
-    public void SetTileWalkability(Vector3Int cellPosition, bool isWalkable)
-    {
-        if (cellPosition.y >= 0 && cellPosition.y < walkableMap.GetLength(0) &&
-            cellPosition.x >= 0 && cellPosition.x < walkableMap.GetLength(1))
-        {
-            walkableMap[cellPosition.y, cellPosition.x] = isWalkable;
         }
     }
 }

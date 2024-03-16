@@ -137,7 +137,7 @@ public class EnemyMovement : MonoBehaviour
         GameObject objective = FindObjective();
         if (objective == null)
         {
-            Debug.LogError("No objective found");
+            Debug.Log("No objective found");
             return null;
         }
         Debug.Log("Closest Objective Found");
@@ -179,7 +179,7 @@ public class EnemyMovement : MonoBehaviour
         Debug.Log("Moving to the Next Space");
         if (path == null || path.Length <= 0)
         {
-            Debug.LogError("Path is null or empty");
+            Debug.Log("Path is null or empty");
             return;
         }
 
