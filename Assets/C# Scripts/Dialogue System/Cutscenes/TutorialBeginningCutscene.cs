@@ -67,7 +67,7 @@ public class TestCutscene : BaseCutscene
         yield return new WaitForSeconds(.00f);
         S1.SetActive(false);
         S2.SetActive(true);
-        DialogueManager.AddDialogue("Elpenor", "Then drag your mouse to aim at him!");
+        DialogueManager.AddDialogue("Elpenor", "Then drag your mouse to aim at the enemy!");
         yield return new WaitUntil(() => DialogueManager.IsDialogueAcknowledged());
         yield return new WaitForSeconds(.00f);
         S2.SetActive(false);
