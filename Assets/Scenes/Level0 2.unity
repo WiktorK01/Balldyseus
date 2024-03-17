@@ -7490,6 +7490,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 5182748719182324006, guid: d2057fe0d02a60849a447949ecd5d4c6, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182748719182324006, guid: d2057fe0d02a60849a447949ecd5d4c6, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182748719182324006, guid: d2057fe0d02a60849a447949ecd5d4c6, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
+      objectReference: {fileID: 0}
     - target: {fileID: 8641700812667643868, guid: d2057fe0d02a60849a447949ecd5d4c6, type: 3}
       propertyPath: m_Pivot.x
       value: 0
