@@ -36,18 +36,23 @@ public class TurnManager : MonoBehaviour
     bool BalldyseusIsMoving;
 
     public Camera mainCamera;
+    private CameraManager cameraManager;
 
     List<GameObject> enemies = new List<GameObject>();
 
-    public PathfindingManager pathfindingManager;
+    private PathfindingManager pathfindingManager;
 
     public float TurnNumber = 0;
     [SerializeField] float secondsBetweenEnemyMoves = 0.5f;
 
 /*--------------------------------------------------------------------------------------------------*/
+
     // Initialize enemy list, update the walkable map, start the player's turn
     void Start()
     {
+        cameraManager = FindObjectOfType<CameraManager>();
+        pathfindingManager = FindObjectOfType<PathfindingManager>();
+
         ResumeGame();
         UIManager2.Instance.DestroyAllUIElements(); 
         ChangeGameState("PlayerTurn");
@@ -91,22 +96,30 @@ public class TurnManager : MonoBehaviour
                 break;
 
             case "PlayerTurn":
-                InstantiatePlayerTurnUI();
-                UpdateEnemiesList();
-                CheckForWin();
-                currentState = GameState.PlayerTurn;
-                TurnNumber++;
-                Balldyseus.GetComponent<BallMovement>().ResetMovement();
+                if(currentState != GameState.Loss){
+                    UpdateEnemiesList();
+                    CheckForWin();
+                    cameraManager.SetCameraForPlayerTurn(Balldyseus.transform);
+                    InstantiatePlayerTurnUI();
+                    if(currentState != GameState.Win){
+                        currentState = GameState.PlayerTurn;
+                        TurnNumber++;
+                        Balldyseus.GetComponent<BallMovement>().ResetMovement();
+                    }
+                }
                 break;
 
             case "EnemyTurn":
-                if(enemies.Count == 0){
-                    CheckForWin();
-                }
-                else{
-                    currentState = GameState.EnemyTurn;
-                    InstantiateEnemyTurnUI();
-                    StartCoroutine(EnemyTurnRoutine());
+                if(currentState != GameState.Loss){
+                    cameraManager.SetCameraForEnemyTurn();
+                    if(enemies.Count == 0){
+                        CheckForWin();
+                    }
+                    else{
+                        currentState = GameState.EnemyTurn;
+                        InstantiateEnemyTurnUI();
+                        StartCoroutine(EnemyTurnRoutine());
+                    }
                 }
                 break;
 
@@ -223,6 +236,9 @@ public class TurnManager : MonoBehaviour
             int moveCount = enemyMovement.moveMoney;
             for (int i = 0; i < moveCount; i++)
             {
+                if(currentState == GameState.Loss){
+                    break;
+                }
                 enemyMovement.Move();
                 yield return new WaitUntil(() => enemyMovement.HasMoved());
                 UpdateEnemiesList();

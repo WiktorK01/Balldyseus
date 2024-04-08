@@ -47,11 +47,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Wall
-    uniqueID: 261076321
-    locked: 0
   - name: Ground
     uniqueID: 648083707
+    locked: 0
+  - name: Wall
+    uniqueID: 261076321
     locked: 0
   - name: Obstacles
     uniqueID: 3602620075
