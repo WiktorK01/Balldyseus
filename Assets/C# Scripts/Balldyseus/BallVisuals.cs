@@ -14,7 +14,7 @@ public class BallVisuals : MonoBehaviour
 
     private GameObject currentContactPointCircle = null; // To keep track of the instantiated prefab
 
-    private Color baseModeColor = Color.white; 
+    private Color baseModeColor = Color.cyan; 
     private Color attackModeColor = Color.red; 
     private Color shoveModeColor = Color.blue;
 
@@ -83,6 +83,8 @@ public class BallVisuals : MonoBehaviour
     
     //TRAJECTORY LINE
     /*-------------------------------------------------------------------------*/
+    public LayerMask collisionLayerMask;
+
     public void UpdateTrajectory(Vector2 start, Vector2 end, float forceMultiplier)
     {
         Vector2 direction = start - end;
@@ -91,33 +93,43 @@ public class BallVisuals : MonoBehaviour
         List<Vector3> points = new List<Vector3>();
 
         bool hitDetected = false;
-        Vector2 lastPosition = transform.position; // Start from the GameObject's current position
+        Vector2 lastPosition = transform.position;
+        points.Add(lastPosition);
 
-        points.Add(lastPosition); // Ensure the first point is the GameObject's position
-
-        for (int i = 1; i < numPoints; i++) // Start loop from 1 since the first point is already added
+        for (int i = 1; i < numPoints; i++)
         {
             float simulationTime = i * 0.1f;
             Vector2 displacement = force * simulationTime;
             Vector2 currentPosition = (Vector2)transform.position + displacement;
-            RaycastHit2D hit = Physics2D.Linecast(lastPosition, currentPosition);
 
-            if (hit.collider != null && !hit.collider.CompareTag("Player") && !hit.collider.CompareTag("Objective") && !hit.collider.CompareTag("PassableObstacle"))
+            // Perform the linecast with the specific layer mask
+            RaycastHit2D hit = Physics2D.Linecast(lastPosition, currentPosition, collisionLayerMask);
+
+            // Check if the hit object is not null and is not tagged as "Player"
+            if (hit.collider != null && !hit.collider.CompareTag("Player"))
             {
                 points.Add(hit.point);
-                if (currentContactPointCircle != null) Destroy(currentContactPointCircle); // Destroy existing circle if any
-                currentContactPointCircle = Instantiate(contactPointCirclePrefab, hit.point, Quaternion.identity); // Instantiate new circle at hit point
+                if (currentContactPointCircle != null) Destroy(currentContactPointCircle);
+                currentContactPointCircle = Instantiate(contactPointCirclePrefab, hit.point, Quaternion.identity);
                 hitDetected = true;
                 break;
             }
 
-            points.Add(new Vector3(currentPosition.x, currentPosition.y, 0));
+            if (!hitDetected)
+            {
+                points.Add(new Vector3(currentPosition.x, currentPosition.y, 0));
+            }
+            else
+            {
+                break;
+            }
+
             lastPosition = currentPosition;
         }
 
         if (!hitDetected && currentContactPointCircle != null)
         {
-            Destroy(currentContactPointCircle); // Destroy the circle if no collision is detected
+            Destroy(currentContactPointCircle);
         }
 
         trajectoryLineRenderer.positionCount = points.Count;

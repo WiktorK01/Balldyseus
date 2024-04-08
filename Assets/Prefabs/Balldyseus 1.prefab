@@ -407,6 +407,9 @@ MonoBehaviour:
   trajectoryLineRenderer: {fileID: 6772329230206796350}
   pullLineRenderer: {fileID: 4984548907284499094}
   contactPointCirclePrefab: {fileID: 6565391829700723548, guid: dc6a04c7837f37c49aa9d575aed382b9, type: 3}
+  collisionLayerMask:
+    serializedVersion: 2
+    m_Bits: 768
 --- !u!114 &3646283871834573475
 MonoBehaviour:
   m_ObjectHideFlags: 0

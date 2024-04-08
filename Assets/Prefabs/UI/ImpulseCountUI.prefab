@@ -260,4 +260,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Shoves\n Remaining:"
+  m_Text: "Bounces\n Remaining:"

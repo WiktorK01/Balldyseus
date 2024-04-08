@@ -18,71 +18,144 @@ public class EnemyMovement : MonoBehaviour
     public int moveMoney = 2; 
     public float moveDuration = 0.1f;
 
-    bool hasMoved = false;
-    bool hasCompletedAllMovements = false;
-    
+    bool EnemyHasMoved = false;
+
     public enum Direction { Up, Down, Left, Right }
+
+    public Color pathColor = Color.blue;
+
     
-    void Awake(){
+    void Awake()
+    {
         GameObject groundTilemapObject = GameObject.FindWithTag("GroundTilemap");
         groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
-
         pathfindingManager = FindObjectOfType<PathfindingManager>();
         enemyProperties = GetComponent<EnemyProperties>();
     }
 
     public void Move()
     {
-        Debug.Log("Beginning Enemy Movement");
-        SetStartingPointWalkable();
-        var path = FindPathSync(); // Updated call here
+        var path = FindPathSync();
         if (path == null || path.Length == 0)
         {
             Debug.LogError("Failed to find path");
             return;
         }
-
         MoveToNextSpace(path);
-        EndMovement();
     }
 
-    void SetStartingPointWalkable()
+    (int, int)[] FindPathSync()
     {
-        Debug.Log("Setting Starting Point as Walkable");
-        Vector3Int cellPosition = groundTilemap.WorldToCell(transform.position);
-        pathfindingManager.SetTileWalkability(cellPosition, true); 
+        GameObject objective = FindObjective();
+        if (objective == null)
+        {
+            Debug.Log("No objective found");
+            return null;
+        }
+        int startX = Mathf.FloorToInt(transform.position.x);
+        int startY = Mathf.FloorToInt(transform.position.y);
+        int goalX = Mathf.FloorToInt(objective.transform.position.x);
+        int goalY = Mathf.FloorToInt(objective.transform.position.y);
+        
+        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
+        if (walkableMap == null)
+        {
+            Debug.LogError("Walkable map data is null.");
+            return null;
+        }
+        return AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true);
     }
 
-    public void ResetMovement()
+    void MoveToNextSpace((int, int)[] path)
     {
-        hasMoved = false;
+        Debug.Log("Moving to the Next Space");
+        for (int i = 0; i < path.Length - 1; i++)
+        {
+            Vector3 start = groundTilemap.CellToWorld(new Vector3Int(path[i].Item1, path[i].Item2, 0)) + new Vector3(0.5f, 0.5f, 0);
+            Vector3 end = groundTilemap.CellToWorld(new Vector3Int(path[i + 1].Item1, path[i + 1].Item2, 0)) + new Vector3(0.5f, 0.5f, 0);
+            Debug.DrawLine(start, end, pathColor, 10.0f, false);
+        }
+
+        if (path.Length < 2)
+        {
+            Debug.LogError("Path is too short to move.");
+            return;
+        }
+
+        (int, int) nextPos = path[1];
+        int deltaX = nextPos.Item1 - Mathf.FloorToInt(transform.position.x);
+        int deltaY = nextPos.Item2 - Mathf.FloorToInt(transform.position.y);
+
+        // Check if horizontal movement is possible
+        if (deltaX != 0)
+        {
+            Vector3 horizontalTarget = transform.position + new Vector3(deltaX, 0, 0);
+            if (CanMove(Mathf.FloorToInt(horizontalTarget.x), Mathf.FloorToInt(transform.position.y)))
+            {
+                MoveInDirection(DirectionToVector(deltaX > 0 ? Direction.Right : Direction.Left));
+                EndMovement();
+                return;
+            }
+        }
+
+        // Check if vertical movement is needed if horizontal is blocked
+        if (deltaY != 0)
+        {
+            Vector3 verticalTarget = transform.position + new Vector3(0, deltaY, 0);
+            if (CanMove(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(verticalTarget.y)))
+            {
+                MoveInDirection(DirectionToVector(deltaY > 0 ? Direction.Up : Direction.Down));
+                EndMovement();
+                return;
+            }
+        }
+        Debug.LogError("Both horizontal and vertical moves are blocked or unnecessary.");
     }
 
-    public void EndMovement()
+    bool CanMove(int x, int y)
     {
-        FindObjectOfType<TurnManager>().UpdateEnemiesList();
-        hasMoved = true;
+        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
+        if (walkableMap == null || y >= walkableMap.GetLength(0) || x >= walkableMap.GetLength(1) || y < 0 || x < 0)
+        {
+            Debug.LogError("Invalid walkable map data or out of bounds access attempted.");
+            return false;
+        }
+        return walkableMap[y, x] && !IsObstacleTriggerUnwalkableAt(new Vector3(x, y, 0));
     }
 
-    public bool HasMoved()
+    private Vector3 DirectionToVector(Direction direction)
     {
-        return hasMoved;
-    }
-
-    public void ResetAllMovements()
-    {
-        hasCompletedAllMovements = false;
-    }
-
-    public void CompletedAllMovements()
-    {
-        hasCompletedAllMovements = true;
+        switch (direction)
+        {
+            case Direction.Up: return new Vector3(0, 1, 0);
+            case Direction.Down: return new Vector3(0, -1, 0);
+            case Direction.Left: return new Vector3(-1, 0, 0);
+            case Direction.Right: return new Vector3(1, 0, 0);
+            default: return Vector3.zero;
+        }
     }
 
     void MoveInDirection(Vector3 direction)
     {
         StartCoroutine(MoveOverSeconds(direction));
     }
+
+    /*bool IsMovePossible((int, int) nextPos)
+    {
+        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
+        if (walkableMap == null)
+        {
+            Debug.LogError("Walkable map data is null.");
+            return false;
+        }
+
+        if (!walkableMap[nextPos.Item2, nextPos.Item1] || IsObstacleTriggerUnwalkableAt(new Vector3(nextPos.Item1, nextPos.Item2, 0)))
+        {
+            Debug.Log($"Move to ({nextPos.Item1}, {nextPos.Item2}) blocked.");
+            return false;
+        }
+        return true;
+    }*/
 
     IEnumerator MoveOverSeconds(Vector3 direction)
     {
@@ -96,11 +169,42 @@ public class EnemyMovement : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        transform.position = endPosition; 
-
-        Vector3Int endCellPosition = groundTilemap.WorldToCell(transform.position + direction);
-        pathfindingManager.SetTileWalkability(endCellPosition, false);
+        transform.position = endPosition;
     }
+
+    private bool IsObstacleTriggerUnwalkableAt(Vector3 position)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero);
+        if (hit.collider != null)
+        {
+            ObstacleTriggerUnwalkable obstacle = hit.collider.GetComponent<ObstacleTriggerUnwalkable>();
+            return obstacle != null;
+        }
+        return false;
+    }
+
+    public GameObject CheckForEnemyAtPosition(Vector3 position)
+    {
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+        int layerMask = 1 << enemyLayer;
+
+        Collider2D collider = Physics2D.OverlapPoint(position, layerMask);
+
+        if (collider != null && collider.gameObject.CompareTag("Enemy"))
+        {
+            return collider.gameObject;
+        }
+
+        return null;
+    }
+
+    /*void SetStartingPointWalkable()
+    {
+        Debug.Log("Setting Starting Point as Walkable");
+        Vector3Int cellPosition = groundTilemap.WorldToCell(transform.position);
+        pathfindingManager.SetTileWalkability(cellPosition, true); 
+    }*/
+
 
     public void Shove(Direction direction)
     {
@@ -116,44 +220,14 @@ public class EnemyMovement : MonoBehaviour
         }
         else
         {
+            if(CheckForEnemyAtPosition(newPosition) != null){
+                EnemyProperties otherEnemyProperties = CheckForEnemyAtPosition(newPosition).GetComponent<EnemyProperties>();
+                otherEnemyProperties.TakeDamage(1f);
+            }
             enemyProperties.TakeDamage(1f);
         }
     }
 
-    private bool IsObstacleTriggerUnwalkableAt(Vector3 position)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero);
-        if (hit.collider != null)
-        {
-            ObstacleTriggerUnwalkable obstacle = hit.collider.GetComponent<ObstacleTriggerUnwalkable>();
-            return obstacle != null;
-        }
-        return false;
-    }
-
-    (int, int)[] FindPathSync()
-    {
-        Debug.Log("Finding a Path");
-        GameObject objective = FindObjective();
-        if (objective == null)
-        {
-            Debug.Log("No objective found");
-            return null;
-        }
-        Debug.Log("Closest Objective Found");
-
-        int startX = Mathf.FloorToInt(transform.position.x);
-        int startY = Mathf.FloorToInt(transform.position.y);
-        int goalX = Mathf.FloorToInt(objective.transform.position.x);
-        int goalY = Mathf.FloorToInt(objective.transform.position.y);
-        
-        Debug.Log("Getting Walkable Map");
-        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-
-        Debug.Log("Generating Path");
-        // Call the synchronous pathfinding method here
-        return AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true);
-    }
 
     GameObject FindObjective()
     {
@@ -174,36 +248,18 @@ public class EnemyMovement : MonoBehaviour
         return closest;
     }
 
-    void MoveToNextSpace((int, int)[] path)
+    public void ResetMovement()
     {
-        Debug.Log("Moving to the Next Space");
-        if (path == null || path.Length <= 0)
-        {
-            Debug.Log("Path is null or empty");
-            return;
-        }
-
-        (int, int) nextPos = path[1];
-        int deltaX = nextPos.Item1 - Mathf.FloorToInt(transform.position.x);
-        int deltaY = nextPos.Item2 - Mathf.FloorToInt(transform.position.y);
-
-        if (deltaX > 0) MoveInDirection(DirectionToVector(Direction.Right));
-        else if (deltaX < 0) MoveInDirection(DirectionToVector(Direction.Left));
-        else if (deltaY > 0) MoveInDirection(DirectionToVector(Direction.Up));
-        else if (deltaY < 0) MoveInDirection(DirectionToVector(Direction.Down));
+        EnemyHasMoved = false;
     }
 
-    private Vector3 DirectionToVector(Direction direction)
+    void EndMovement()
     {
-        switch (direction)
-        {
-            case Direction.Up: return new Vector3(0, 1, 0);
-            case Direction.Down: return new Vector3(0, -1, 0);
-            case Direction.Left: return new Vector3(-1, 0, 0);
-            case Direction.Right: return new Vector3(1, 0, 0);
-            default: return Vector3.zero;
-        }
+        EnemyHasMoved = true;
+    }
+
+    public bool HasMoved()
+    {
+        return EnemyHasMoved;
     }
 }
-
-

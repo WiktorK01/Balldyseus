@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class EnemyProperties : MonoBehaviour
 {
+    private EnemyUI EnemyUI;
+
     public float health = 3f;
     public float startingImpulse = 2f;
     public float endingImpulse = 5f;
+    public bool isThisEnemyTurn;
     bool isOnFire = false;
     bool isDefeated = false;
 
-    float currentImpulse;
     [SerializeField]float maxHealth = 3f;
     
     public EnemyUI enemyUI;
 
     void Start(){
-        currentImpulse = startingImpulse;
+        EnemyUI = gameObject.GetComponent<EnemyUI>();
     }
 
+    //Everything That Occurs when an enemy takes damage
     public void TakeDamage(float amount)
     {
         Debug.Log(health);
@@ -30,28 +33,8 @@ public class EnemyProperties : MonoBehaviour
         }
 
         else{
-            UpdateImpulse();
+            enemyUI.PerformAttackActionsUI();
         }
-    }
-
-    void UpdateImpulse(){
-        float healthRatio = (health - 1) / (maxHealth - 1); 
-        currentImpulse = Mathf.Lerp(startingImpulse, endingImpulse, 1 - healthRatio);
-        Debug.Log("Current Impulse: " + currentImpulse);
-    }
-
-
-    void GetDestroyed(){
-        enemyUI.DestroyUI();
-        Destroy(gameObject);
-    }
-
-    public float GetCurrentImpulse(){
-        return currentImpulse;
-    }
-
-    public bool IsDefeated(){
-        return isDefeated;
     }
 
 /*------------------------------------------------------------------*/
@@ -64,5 +47,21 @@ public class EnemyProperties : MonoBehaviour
         isOnFire = onFire;
     }
 /*------------------------------------------------------------------*/
+    void GetDestroyed(){
+        enemyUI.DestroyUI();
+        Destroy(gameObject);
+    }
+
+    public bool IsDefeated(){
+        return isDefeated;
+    }
+    
+    public void ThisEnemyTurnBegins(){
+        isThisEnemyTurn = true;
+    }
+
+    public void ThisEnemyTurnEnds(){
+        isThisEnemyTurn = false;
+    }
 
 }

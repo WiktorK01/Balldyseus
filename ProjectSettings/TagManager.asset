@@ -19,12 +19,12 @@ TagManager:
   - UI
   - Walls
   - Ground
-  - Obstacles
+  - PhysicalObstacles
   - Entities
   - UI2
-  - 
-  - 
-  - 
+  - Player
+  - TriggerObstacle
+  - Enemy
   - 
   - 
   - 

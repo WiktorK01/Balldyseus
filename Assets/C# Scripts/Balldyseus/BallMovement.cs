@@ -31,14 +31,12 @@ public class BallMovement : MonoBehaviour
 
     private float forcePercentage;
 
-    void Start()
+    void Awake()
     {
         BallVisuals = GetComponent<BallVisuals>(); 
         BallCollision = GetComponent<BallCollision>();
         BallProperties = GetComponent<BallProperties>();
-
         rb = GetComponent<Rigidbody2D>();
-
     }
 
     void Update()

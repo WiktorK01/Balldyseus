@@ -8,13 +8,15 @@ using AStar;
 
 public class PathfindingManager : MonoBehaviour
 {
-    public Tilemap groundTilemap;
+    private Tilemap groundTilemap;
 
     private bool[,] walkableMap;
     private bool[,] walkableMapReference;
 
     void Start()
     {
+        GameObject groundTilemapObject = GameObject.FindWithTag("GroundTilemap");
+        groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
         InitializeReferenceWalkableMap();
         InitializeWalkableMap();
     }
@@ -27,11 +29,12 @@ public class PathfindingManager : MonoBehaviour
 
         walkableMapReference = new bool[bounds.size.y, bounds.size.x];
 
-        for (int x = bounds.xMin; x < bounds.size.x; x++)
+        for (int x = 0; x < bounds.size.x; x++)
         {
-            for (int y = bounds.yMin; y < bounds.size.y; y++)
+            for (int y = 0; y < bounds.size.y; y++)
             {
-                TileBase tile = allTiles[x + y * bounds.size.x];
+                int index = (x + bounds.xMin) + (y + bounds.yMin) * bounds.size.x;
+                TileBase tile = allTiles[index];
                 if (tile != null)
                 {
                     walkableMapReference[y, x] = true; // Walkable
@@ -72,6 +75,10 @@ public class PathfindingManager : MonoBehaviour
     //Resets walkableMap back to it's reference then updates it based on Enemy Positions
     public void UpdateWalkableMap(List<GameObject> enemies)
     {
+        if (enemies == null) {
+            Debug.LogError("Enemies list is null.");
+            return;
+        }
         Array.Copy(walkableMapReference, walkableMap, walkableMapReference.Length);
 
         foreach (var enemy in enemies)

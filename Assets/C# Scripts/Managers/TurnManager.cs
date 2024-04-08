@@ -21,7 +21,6 @@ public class TurnManager : MonoBehaviour
     public enum GameState
     {
         Null,
-        Cutscene,
         PlayerTurn,
         EnemyTurn,
         Win,
@@ -39,28 +38,22 @@ public class TurnManager : MonoBehaviour
     public Camera mainCamera;
 
     List<GameObject> enemies = new List<GameObject>();
-    bool enemiesHaveMoved = false;
 
     public PathfindingManager pathfindingManager;
-
-    bool endingCutsceneBegan = false;
 
     public float TurnNumber = 0;
     [SerializeField] float secondsBetweenEnemyMoves = 0.5f;
 
-    [SerializeField] BaseCutscene beginningCutscene;
-    [SerializeField] BaseCutscene endingCutscene;
-
 /*--------------------------------------------------------------------------------------------------*/
-    // initialize enemy list, update the walkable map, start the player's turn
+    // Initialize enemy list, update the walkable map, start the player's turn
     void Start()
     {
         ResumeGame();
         UIManager2.Instance.DestroyAllUIElements(); 
-        CheckForBeginningCutscene();
+        ChangeGameState("PlayerTurn");
     }
 
-    // if player stops, update enemy list + map
+    // If player stops, update enemy list + map
     void Update()
     {
         if(Balldyseus.GetComponent<BallMovement>().BallExists()){
@@ -68,8 +61,7 @@ public class TurnManager : MonoBehaviour
             BalldyseusIsMoving = Balldyseus.GetComponent<BallMovement>().IsMoving();
         }
 
-        
-        //During a Player's Turn
+        // During a Player's Turn
         if (currentState == GameState.PlayerTurn)
         {
             CheckForWin();
@@ -79,7 +71,6 @@ public class TurnManager : MonoBehaviour
             }
         }
 
-
         if (Input.GetKeyDown(KeyCode.Escape) && !BalldyseusIsMoving){
             if (currentState != GameState.Paused){
                 ChangeGameState("Paused");
@@ -88,8 +79,6 @@ public class TurnManager : MonoBehaviour
                 ResumeGame();
             }
         }
-
-        //Debug.Log(currentState);
     }
 /*--------------------------------------------------------------------------------------------------*/
     public void ChangeGameState(string stateString){
@@ -99,10 +88,6 @@ public class TurnManager : MonoBehaviour
         switch (stateString){
             case "Null":
                 currentState = GameState.Null;
-                break;
-
-            case "Cutscene":
-                currentState = GameState.Cutscene;
                 break;
 
             case "PlayerTurn":
@@ -151,33 +136,6 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-
-    void CheckForBeginningCutscene()
-    {
-        if (beginningCutscene != null)
-        {
-            ChangeGameState("Cutscene");
-            beginningCutscene.StartCutscene();
-        }
-        else
-        {
-            ChangeGameState("PlayerTurn");
-        }
-    }
-
-    private void CheckForEndingCutscene(){
-        if (endingCutscene != null)
-        {
-            endingCutsceneBegan = true;
-            ChangeGameState("Cutscene");
-            endingCutscene.StartCutscene();
-        }
-        else
-        {
-            ChangeGameState("Win");
-        }
-    }
-
 /*--------------------------------------------------------------------------------------------------*/
 
     void PauseGame()
@@ -196,8 +154,11 @@ public class TurnManager : MonoBehaviour
     public void InstantiatePlayerTurnUI(){
         UIManager2.Instance.HideAllUIElements();
         UIManager2.Instance.ShowUIElement("PlayerTurnUI");
-        UIManager2.Instance.ShowUIElement("ImpulseCountUI");
         UIManager2.Instance.ShowUIElement("LaunchUI");
+
+        if(!Balldyseus.GetComponent<BallProperties>().ShoveGagged){
+            UIManager2.Instance.ShowUIElement("ImpulseCountUI");
+        }
     }
 
     public void InstantiateEnemyTurnUI(){
@@ -206,83 +167,6 @@ public class TurnManager : MonoBehaviour
     }
 
 /*--------------------------------------------------------------------------------------------------*/
-
-    //for every enemy, for moveMoney times, call move & wait secondsBetweenEnemyMoves
-    IEnumerator EnemyTurnRoutine()
-    {
-        var enemiesToMove = new List<GameObject>(enemies);
-
-        foreach (var enemyGameObject in enemiesToMove)
-        {
-            if(currentState == GameState.Loss){
-                break;
-            }
-            UpdateEnemiesList();
-            EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
-            EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
-
-            DoThisBeforeEnemyMoves(enemyGameObject);
-
-            if (enemyProps.IsDefeated())
-            {
-                RemoveEnemy(enemyGameObject);
-                continue;
-            }
-            int moves = enemyMovement.moveMoney;
-            UpdateEnemiesList();
-            for (int i = 0; i < moves; i++)
-            {
-                UpdateEnemiesList();
-                enemyMovement.Move();
-                yield return new WaitUntil(() => enemyMovement.HasMoved());
-                UpdateEnemiesList();
-                yield return new WaitForSeconds(secondsBetweenEnemyMoves);
-                UpdateEnemiesList();
-
-                if(currentState == GameState.Loss){
-                    break;
-                }
-            }
-            enemyMovement.CompletedAllMovements();
-            enemyMovement.ResetAllMovements();
-            UpdateEnemiesList();
-        }
-        UpdateEnemiesList();
-
-        // After all enemies have moved
-        ChangeGameState("PlayerTurn");
-    }
-
-    void DoThisBeforeEnemyMoves(GameObject enemyGameObject){
-        EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
-        Fire.ApplyFireDamageIfOnFire(enemyProps);
-    }
-
-//--------------------------------------------------------------------------------------------------
-
-    private bool CheckIfAllEnemiesHaveMoved()
-    {
-        foreach (var enemy in enemies)
-        {
-            if (!enemy.GetComponent<EnemyMovement>().HasMoved())
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void ResetEnemyMovements()
-    {
-        foreach (var enemy in enemies)
-        {
-            enemy.GetComponent<EnemyMovement>().ResetMovement();
-        }
-        enemiesHaveMoved = false;
-    }
-
-//----------------------------------------------------------------------------------------------------
-    
     //MANAGING THE EXISTING ENEMIES
     public void UpdateEnemiesList()
     {
@@ -309,9 +193,93 @@ public class TurnManager : MonoBehaviour
         }
         CheckForWin();
     }
-/*--------------------------------------------------------------------------------------------------*/
 
-    //LOSS STUFF
+    // For every enemy, for moveMoney times, call move & wait secondsBetweenEnemyMoves
+    IEnumerator EnemyTurnRoutine()
+    {
+        var enemiesToMove = new List<GameObject>(enemies);
+
+        foreach (var enemyGameObject in enemiesToMove)
+        {
+            if(currentState == GameState.Loss){
+                break;
+            }
+
+            EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
+            EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
+
+            enemyProps.ThisEnemyTurnBegins();
+
+            UpdateEnemiesList();
+
+            DoThisBeforeEnemyMoves(enemyGameObject);
+
+            if (enemyProps.IsDefeated())
+            {
+                RemoveEnemy(enemyGameObject);
+                continue;
+            }
+            UpdateEnemiesList();
+            int moveCount = enemyMovement.moveMoney;
+            for (int i = 0; i < moveCount; i++)
+            {
+                enemyMovement.Move();
+                yield return new WaitUntil(() => enemyMovement.HasMoved());
+                UpdateEnemiesList();
+                yield return new WaitForSeconds(secondsBetweenEnemyMoves);
+            }
+            UpdateEnemiesList();
+            enemyProps.ThisEnemyTurnEnds();
+        }
+
+        // After all enemies have moved
+        ResolveCollisionsWithEnemies();
+        ChangeGameState("PlayerTurn");
+    }
+
+    void DoThisBeforeEnemyMoves(GameObject enemyGameObject){
+        EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
+        Fire.ApplyFireDamageIfOnFire(enemyProps);
+    }
+
+    void ResolveCollisionsWithEnemies()
+    {
+        Collider2D balldyseusCollider = Balldyseus.GetComponent<Collider2D>();
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(Balldyseus.transform.position, balldyseusCollider.bounds.extents.x);
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.gameObject.CompareTag("Enemy"))
+            {
+                Vector3 directionToEnemy = hitCollider.transform.position - Balldyseus.transform.position;
+                Balldyseus.transform.position -= directionToEnemy.normalized * 0.05f; 
+                break; 
+            }
+        }
+    }
+
+//--------------------------------------------------------------------------------------------------
+
+    private void CheckForWin(){
+        if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss)
+        {
+            currentState = GameState.Win;
+            StartCoroutine(HandleWin());
+        }
+    }
+
+    IEnumerator HandleWin(){
+        yield return new WaitForSeconds(0f);
+        UIManager2.Instance.HideAllUIElements();
+        UIManager2.Instance.ShowUIElement("WinUI");
+        currentState = GameState.Win;
+    }
+
+    IEnumerator HandleLoss(){
+        Balldyseus.SetActive(false);
+        yield return new WaitForSeconds(.5f);
+        UIManager2.Instance.HideAllUIElements();
+        UIManager2.Instance.ShowUIElement("LossUI");
+    }
 
     public void OnEnemyReachedObjective()
     {
@@ -320,37 +288,6 @@ public class TurnManager : MonoBehaviour
             ChangeGameState("Loss");
         }
     }
-
-    IEnumerator HandleLoss(){
-        Balldyseus.SetActive(false);
-
-        yield return new WaitForSeconds(.5f);
-        UIManager2.Instance.HideAllUIElements();
-        UIManager2.Instance.ShowUIElement("LossUI"); 
-    }
-
-/*--------------------------------------------------------------------------------------------------*/
-
-    //WIN STUFF
-    private void CheckForWin(){
-        if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss && !endingCutsceneBegan)
-        {
-            CheckForEndingCutscene();
-            
-        }
-    }
-
-    private IEnumerator HandleWin(){
-        yield return new WaitForSeconds(0f);
-        
-        UIManager2.Instance.HideAllUIElements();
-        UIManager2.Instance.ShowUIElement("WinUI");
-        currentState = GameState.Win;
-    }
-
-/*--------------------------------------------------------------------------------------------------*/
-
-    //public functions
 
     public float GetTurnNumber(){
         return TurnNumber;
