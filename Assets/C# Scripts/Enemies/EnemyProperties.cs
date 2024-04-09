@@ -33,7 +33,7 @@ public class EnemyProperties : MonoBehaviour
         }
 
         else{
-            enemyUI.PerformAttackActionsUI();
+            enemyUI.FeedbackEnemyHealthTextBounce();
         }
     }
 

@@ -409,7 +409,7 @@ MonoBehaviour:
   contactPointCirclePrefab: {fileID: 6565391829700723548, guid: dc6a04c7837f37c49aa9d575aed382b9, type: 3}
   collisionLayerMask:
     serializedVersion: 2
-    m_Bits: 768
+    m_Bits: 8960
 --- !u!114 &3646283871834573475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -482,7 +482,7 @@ Transform:
   m_GameObject: {fileID: 6500817122697128397}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.40260887, y: 7.0264635, z: -10.9694605}
+  m_LocalPosition: {x: 0, y: 0, z: -10.9694605}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

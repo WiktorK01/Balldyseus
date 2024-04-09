@@ -26,13 +26,15 @@ public class CameraManager : MonoBehaviour
 
     public void SetCameraForPlayerTurn(Transform playerTransform)
     {
+        cinemachineCamera = GetComponent<CinemachineVirtualCamera>(); //getting the component in this function ensure no oddities upon a scene restart
         StartCoroutine(TransitionOrthographicSize(playerOrthoSize));
-        SetDamping(playerDamp);
         cinemachineCamera.Follow = playerTransform;
+        SetDamping(playerDamp);
     }
 
     public void SetCameraForEnemyTurn()
     {
+        cinemachineCamera = GetComponent<CinemachineVirtualCamera>();
         StartCoroutine(TransitionOrthographicSize(enemyOrthoSize));
         SetDamping(enemyDamp);
         cinemachineCamera.Follow = centerObject.transform;

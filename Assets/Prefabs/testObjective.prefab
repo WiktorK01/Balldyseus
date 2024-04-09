@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5045660581273528364}
   - component: {fileID: 4042979349256454442}
   - component: {fileID: 4210854526781544510}
-  m_Layer: 9
+  m_Layer: 12
   m_Name: testObjective
   m_TagString: Objective
   m_Icon: {fileID: 0}
@@ -98,7 +98,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d344f24fea62943a794ce3728b45dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnManager: {fileID: 0}
 --- !u!61 &4210854526781544510
 BoxCollider2D:
   m_ObjectHideFlags: 0
