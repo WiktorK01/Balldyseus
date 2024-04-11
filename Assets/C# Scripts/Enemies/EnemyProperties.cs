@@ -6,6 +6,8 @@ public class EnemyProperties : MonoBehaviour
 {
     private EnemyUI EnemyUI;
 
+    private EnemyFeedback EnemyFeedback;
+
     public float health = 3f;
     public float startingImpulse = 2f;
     public float endingImpulse = 5f;
@@ -15,10 +17,10 @@ public class EnemyProperties : MonoBehaviour
 
     [SerializeField]float maxHealth = 3f;
     
-    public EnemyUI enemyUI;
 
     void Start(){
         EnemyUI = gameObject.GetComponent<EnemyUI>();
+        EnemyFeedback = gameObject.GetComponent<EnemyFeedback>();
     }
 
     //Everything That Occurs when an enemy takes damage
@@ -33,7 +35,7 @@ public class EnemyProperties : MonoBehaviour
         }
 
         else{
-            enemyUI.FeedbackEnemyHealthTextBounce();
+            EnemyFeedback.EnemyHealthTextBounce();
         }
     }
 
@@ -48,7 +50,6 @@ public class EnemyProperties : MonoBehaviour
     }
 /*------------------------------------------------------------------*/
     void GetDestroyed(){
-        enemyUI.DestroyUI();
         Destroy(gameObject);
     }
 

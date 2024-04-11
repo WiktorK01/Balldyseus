@@ -15,7 +15,8 @@ public class EnemyMovement : MonoBehaviour
 
     Tilemap groundTilemap;
 
-    public int moveMoney = 2; 
+    public int moveMoney = 2;
+    public int moveMoneyDecrement; //this is a version of moveMoney that will decrement upon every movement.
     public float moveDuration = 0.1f;
 
     bool EnemyHasMoved = false;
@@ -31,6 +32,7 @@ public class EnemyMovement : MonoBehaviour
         groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
         pathfindingManager = FindObjectOfType<PathfindingManager>();
         enemyProperties = GetComponent<EnemyProperties>();
+        moveMoneyDecrement = moveMoney;
     }
 
     public void Move()
@@ -44,6 +46,11 @@ public class EnemyMovement : MonoBehaviour
         MoveToNextSpace(path);
     }
 
+
+
+    //This shit is a mess atm but it works. 
+    //can be greatly improved once i get a pathfinding algorithm that can detect movements via horizontal/vertical movements only.
+    //or maybe without that even idk maybe i'm not thinking hard enough
     (int, int)[] FindPathSync()
     {
         GameObject objective = FindObjective();
@@ -139,23 +146,6 @@ public class EnemyMovement : MonoBehaviour
     {
         StartCoroutine(MoveOverSeconds(direction));
     }
-
-    /*bool IsMovePossible((int, int) nextPos)
-    {
-        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-        if (walkableMap == null)
-        {
-            Debug.LogError("Walkable map data is null.");
-            return false;
-        }
-
-        if (!walkableMap[nextPos.Item2, nextPos.Item1] || IsObstacleTriggerUnwalkableAt(new Vector3(nextPos.Item1, nextPos.Item2, 0)))
-        {
-            Debug.Log($"Move to ({nextPos.Item1}, {nextPos.Item2}) blocked.");
-            return false;
-        }
-        return true;
-    }*/
 
     IEnumerator MoveOverSeconds(Vector3 direction)
     {
