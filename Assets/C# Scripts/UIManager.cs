@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UIManager2 : MonoBehaviour
 {
@@ -87,26 +88,21 @@ public class UIManager2 : MonoBehaviour
     {
         if(activeUIElements.TryGetValue(uiElementName, out GameObject uiElement))
         {
-            // Find the child GameObject by name.
             Transform textTransform = uiElement.transform.Find(textName);
             if (textTransform != null)
             {
-                // Once the child is found, try to get the Text component.
-                Text exampleText = textTransform.GetComponent<Text>();
+                TMP_Text exampleText = textTransform.GetComponent<TMP_Text>();
                 if (exampleText != null)
                 {
-                    // If the Text component is found, set its text value.
                     exampleText.text = newValue;
                 }
                 else
                 {
-                    // If the child does not have a Text component, log a warning.
-                    Debug.LogWarning($"Text component not found on '{textName}' in UI element '{uiElementName}'.");
+                    Debug.LogWarning($"TMP_Text component not found on '{textName}' in UI element '{uiElementName}'.");
                 }
             }
             else
             {
-                // If no child with the given name is found, log a warning.
                 Debug.LogWarning($"Child named '{textName}' not found in UI element '{uiElementName}'.");
             }
         }
