@@ -6,29 +6,22 @@ public class EnemyUI : MonoBehaviour
 {
     private EnemyProperties enemyProperties;
     private EnemyMovement enemyMovement;
-    private TextMeshProUGUI healthText; 
-    private TextMeshProUGUI moveMoneyText; 
-    private Image fireIndicatorImage;
+    [SerializeField] TextMeshProUGUI healthText; 
+    [SerializeField] TextMeshProUGUI moveMoneyText; 
+    [SerializeField] Image fireIndicatorImage;
 
-    void Start()
+    void Awake()
     {
-        AssignComponents();
+        enemyProperties = GetComponent<EnemyProperties>();
+        enemyMovement = GetComponent<EnemyMovement>();
     }
 
     void Update()
     {
         healthText.text = enemyProperties.health.ToString();
         moveMoneyText.text = enemyMovement.moveMoney.ToString();
-        fireIndicatorImage.enabled = enemyProperties.GetCurrentFireState();
+
+        fireIndicatorImage.enabled = enemyProperties.GetCurrentFireState(); //turns on or off based on enemy's fire state
     }
 
-    private void AssignComponents()
-    {
-        healthText = transform.Find("HealthText").GetComponent<TextMeshProUGUI>();
-        moveMoneyText = transform.Find("MoveMoneyText").GetComponent<TextMeshProUGUI>(); 
-        fireIndicatorImage = transform.Find("FireIndicator").GetComponent<Image>();
-
-        enemyProperties = GetComponent<EnemyProperties>();
-        enemyMovement = GetComponent<EnemyMovement>();
-    }
 }

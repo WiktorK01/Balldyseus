@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BallVisuals : MonoBehaviour
 {
+    [SerializeField]GameObject SpriteObject;
+
     SpriteRenderer spriteRenderer;
     BallProperties BallProperties;
     BallCollision BallCollision;
@@ -21,7 +23,7 @@ public class BallVisuals : MonoBehaviour
     void Start()
     {
         BallCollision = GetComponent<BallCollision>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer = SpriteObject.GetComponent<SpriteRenderer>();
         BallProperties = GetComponent<BallProperties>();
 
         if (pullLineRenderer == null)

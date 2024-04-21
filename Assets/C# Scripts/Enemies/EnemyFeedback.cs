@@ -5,11 +5,7 @@ using MoreMountains.Feedbacks;
 
 public class EnemyFeedback : MonoBehaviour
 {
-    private MMF_Player FeedbackHealthTextBounce;
-
-    void Start(){
-        FeedbackHealthTextBounce = gameObject.transform.Find("FeedbackHealthTextBounce").GetComponent<MMF_Player>();
-    }
+    [SerializeField] MMF_Player FeedbackHealthTextBounce;
 
     public void EnemyHealthTextBounce()
     {
