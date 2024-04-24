@@ -214,9 +214,7 @@ public class TurnManager : MonoBehaviour
 
         foreach (var enemyGameObject in enemiesToMove)
         {
-            if(currentState == GameState.Loss){
-                break;
-            }
+            if(currentState == GameState.Loss) break;
 
             EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
             EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
@@ -232,7 +230,9 @@ public class TurnManager : MonoBehaviour
                 RemoveEnemy(enemyGameObject);
                 continue;
             }
+
             UpdateEnemiesList();
+            
             int moveCount = enemyMovement.moveMoney;
             for (int i = 0; i < moveCount; i++)
             {
@@ -249,6 +249,11 @@ public class TurnManager : MonoBehaviour
         }
 
         // After all enemies have moved
+        foreach (var enemyGameObject in enemiesToMove){
+            EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
+            enemyMovement.ResetMoveMoney();
+        }
+
         ResolveCollisionsWithEnemies();
         ChangeGameState("PlayerTurn");
     }
@@ -258,6 +263,7 @@ public class TurnManager : MonoBehaviour
         Fire.ApplyFireDamageIfOnFire(enemyProps);
     }
 
+    //moves Balldyeus away from an enemy by a small amount if colliding when turn starts, to allow Balldyeus to attack the enemy if desired
     void ResolveCollisionsWithEnemies()
     {
         Collider2D balldyseusCollider = Balldyseus.GetComponent<Collider2D>();

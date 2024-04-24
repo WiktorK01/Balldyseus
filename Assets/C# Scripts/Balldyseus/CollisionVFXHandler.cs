@@ -4,25 +4,28 @@ using UnityEngine;
 
 public class CollisionVFXHandler : MonoBehaviour
 {
-    BallCollision BallCollision;
-    BallProperties BallProperties;
-    public Animator BallBwompAnimator;
+    BallCollision ballCollision;
+    BallProperties ballProperties;
+    BallFeedback ballFeedback;
+    public Animator ballBwompAnimator;
 
     void Start(){
-        BallCollision = GetComponent<BallCollision>();
-        BallProperties = GetComponent<BallProperties>();
+        ballFeedback = GetComponent<BallFeedback>();
+        ballCollision = GetComponent<BallCollision>();
+        ballProperties = GetComponent<BallProperties>();
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
 
         if ((collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Enemy")) && BallCanShove()) 
         {
-            BallBwompAnimator.Play("ballBwomp", -1, 0);
+            ballFeedback.FloatingBounceNumber();
+            ballBwompAnimator.Play("ballBwomp", -1, 0);
         }
     }
 
     bool BallCanShove(){
-        if(BallProperties.ShoveMode && BallCollision.GetRemainingShoveCount() > 0f){
+        if(ballProperties.ShoveMode && ballCollision.GetRemainingShoveCount() > 0f){
             return true;
         }
         else return false;

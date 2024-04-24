@@ -19,7 +19,7 @@ public class EnemyUI : MonoBehaviour
     void Update()
     {
         healthText.text = enemyProperties.health.ToString();
-        moveMoneyText.text = enemyMovement.moveMoney.ToString();
+        moveMoneyText.text = enemyMovement.moveMoneyDecrement.ToString();
 
         fireIndicatorImage.enabled = enemyProperties.GetCurrentFireState(); //turns on or off based on enemy's fire state
     }

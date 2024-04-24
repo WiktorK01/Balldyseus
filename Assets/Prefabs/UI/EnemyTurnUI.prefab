@@ -169,8 +169,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Enemy Turn
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a26cadc03a6dbeb428e5974b83360107, type: 2}
-  m_sharedMaterial: {fileID: -4163977285882576016, guid: a26cadc03a6dbeb428e5974b83360107, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}
+  m_sharedMaterial: {fileID: -1067965472908962537, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -230,7 +230,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -103.66032, y: 0, z: -43.348724, w: -26.386145}
+  m_margin: {x: -55.5371, y: 0, z: -43.348724, w: -26.386145}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

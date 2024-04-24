@@ -9,9 +9,9 @@ using UnityEngine.Tilemaps;
 
 public class EnemyMovement : MonoBehaviour
 {
-
     PathfindingManager pathfindingManager;
     EnemyProperties enemyProperties;
+    EnemyFeedback enemyFeedback;
 
     Tilemap groundTilemap;
 
@@ -30,8 +30,11 @@ public class EnemyMovement : MonoBehaviour
     {
         GameObject groundTilemapObject = GameObject.FindWithTag("GroundTilemap");
         groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
+
+        enemyFeedback = GetComponent<EnemyFeedback>();
         pathfindingManager = FindObjectOfType<PathfindingManager>();
         enemyProperties = GetComponent<EnemyProperties>();
+
         moveMoneyDecrement = moveMoney;
     }
 
@@ -43,12 +46,16 @@ public class EnemyMovement : MonoBehaviour
             Debug.LogError("Failed to find path");
             return;
         }
+        DecrementMoveMoney();
         MoveToNextSpace(path);
     }
 
+    void DecrementMoveMoney(){
+        moveMoneyDecrement--;
+        enemyFeedback.MoveTextBounce();
+    }
 
-
-    //This shit is a mess atm but it works. 
+    //This shit is a mess atm but it works. just threw chatGPT at it as a temp fix until i feel like handling it 
     //can be greatly improved once i get a pathfinding algorithm that can detect movements via horizontal/vertical movements only.
     //or maybe without that even idk maybe i'm not thinking hard enough
     (int, int)[] FindPathSync()
@@ -99,7 +106,7 @@ public class EnemyMovement : MonoBehaviour
             Vector3 horizontalTarget = transform.position + new Vector3(deltaX, 0, 0);
             if (CanMove(Mathf.FloorToInt(horizontalTarget.x), Mathf.FloorToInt(transform.position.y)))
             {
-                MoveInDirection(DirectionToVector(deltaX > 0 ? Direction.Right : Direction.Left));
+                HandleMoveFeedback(DirectionToVector(deltaX > 0 ? Direction.Right : Direction.Left));
                 EndMovement();
                 return;
             }
@@ -111,7 +118,7 @@ public class EnemyMovement : MonoBehaviour
             Vector3 verticalTarget = transform.position + new Vector3(0, deltaY, 0);
             if (CanMove(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(verticalTarget.y)))
             {
-                MoveInDirection(DirectionToVector(deltaY > 0 ? Direction.Up : Direction.Down));
+                HandleMoveFeedback(DirectionToVector(deltaY > 0 ? Direction.Up : Direction.Down));
                 EndMovement();
                 return;
             }
@@ -142,25 +149,26 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-    void MoveInDirection(Vector3 direction)
+    void HandleMoveFeedback(Vector3 direction)
     {
-        StartCoroutine(MoveOverSeconds(direction));
-    }
-
-    IEnumerator MoveOverSeconds(Vector3 direction)
-    {
-        Vector3 startPosition = transform.position;
-        Vector3 endPosition = startPosition + direction;
-        float elapsedTime = 0;
-
-        while (elapsedTime < moveDuration)
+        if (direction == Vector3.up)
         {
-            transform.position = Vector3.Lerp(startPosition, endPosition, (elapsedTime / moveDuration));
-            elapsedTime += Time.deltaTime;
-            yield return null;
+            enemyFeedback.MoveUp();
         }
-        transform.position = endPosition;
+        else if (direction == Vector3.down)
+        {
+            enemyFeedback.MoveDown();
+        }
+        else if (direction == Vector3.left)
+        {
+            enemyFeedback.MoveLeft();
+        }
+        else if (direction == Vector3.right)
+        {
+            enemyFeedback.MoveRight();
+        }
     }
+
 
     private bool IsObstacleTriggerUnwalkableAt(Vector3 position)
     {
@@ -204,20 +212,52 @@ public class EnemyMovement : MonoBehaviour
         int newY = Mathf.FloorToInt(newPosition.y);
 
         bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-        if (walkableMap[newY, newX] || IsObstacleTriggerUnwalkableAt(newPosition))
-        {
-            transform.position = newPosition;
+        
+        //if it's walkable or there's an unwalkable triggger obstacle, allow the shove
+        if (walkableMap[newY, newX] || IsObstacleTriggerUnwalkableAt(newPosition)){
+            HandleShoveFeedback(direction);
         }
+
+        //otherwise, if shoved into an enemy
         else
         {
-            if(CheckForEnemyAtPosition(newPosition) != null){
+            if (CheckForEnemyAtPosition(newPosition) != null){
                 EnemyProperties otherEnemyProperties = CheckForEnemyAtPosition(newPosition).GetComponent<EnemyProperties>();
                 otherEnemyProperties.TakeDamage(1f);
             }
+
+            HandleSquashFeedback(direction);
             enemyProperties.TakeDamage(1f);
         }
     }
 
+    void HandleSquashFeedback(Direction direction){
+        if (direction == Direction.Up)
+            enemyFeedback.SquashUp();
+
+        else if (direction == Direction.Down)
+            enemyFeedback.SquashDown();
+
+        else if (direction == Direction.Left)
+            enemyFeedback.SquashLeft();
+
+        else if (direction == Direction.Right)
+            enemyFeedback.SquashRight();
+    }
+
+    void HandleShoveFeedback(Direction direction) {
+        if (direction == Direction.Up)
+            enemyFeedback.ShoveUp();
+
+        else if (direction == Direction.Down)
+            enemyFeedback.ShoveDown();
+
+        else if (direction == Direction.Left)
+            enemyFeedback.ShoveLeft();
+
+        else if (direction == Direction.Right)
+            enemyFeedback.ShoveRight();
+    }
 
     GameObject FindObjective()
     {
@@ -243,9 +283,13 @@ public class EnemyMovement : MonoBehaviour
         EnemyHasMoved = false;
     }
 
-    void EndMovement()
-    {
+    void EndMovement(){
         EnemyHasMoved = true;
+    }
+
+    public void ResetMoveMoney(){
+        enemyFeedback.MoveTextBounce();
+        moveMoneyDecrement = moveMoney;
     }
 
     public bool HasMoved()

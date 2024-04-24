@@ -25,8 +25,6 @@ public class BallMovement : MonoBehaviour
     [SerializeField] float maxVelocity = 40f;
     [SerializeField] float dampingFactor = 0.95f;
 
-    Coroutine resetHighSpeedCoroutine = null;
-
     Vector2 dragVector;
 
     private float forcePercentage;
@@ -47,7 +45,6 @@ public class BallMovement : MonoBehaviour
 
             BringToStopWhenTooSlow();
             KeepSpeedBelowMaxVelocity();
-            CheckForHighSpeed();
         }
     }
 
@@ -66,14 +63,10 @@ public class BallMovement : MonoBehaviour
 
         if (!hasMovedThisTurn)
         {
-            if (IsMouseOverBalldyseus())
-            {
-                if (Input.GetMouseButtonDown(0) && !BallProperties.AttackGagged || Input.GetMouseButtonDown(1) && !BallProperties.ShoveGagged)
-                {
-                    isDragging = true;
-                    startPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    BallVisuals.SetPullLineRendererState(true, BallProperties.ShoveMode ? Color.blue : Color.red, startPoint);
-                }
+            if (IsMouseOverBalldyseus() && (Input.GetMouseButtonDown(0) && !BallProperties.AttackGagged || Input.GetMouseButtonDown(1) && !BallProperties.ShoveGagged)){
+                isDragging = true;
+                startPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                BallVisuals.SetPullLineRendererState(true, BallProperties.ShoveMode ? Color.blue : Color.red, startPoint);
             }
         }
     }
@@ -158,36 +151,6 @@ public class BallMovement : MonoBehaviour
         }
     }
 
-    private void CheckForHighSpeed(){
-        if(SpeedGreaterThanThreshold())
-        {
-            if (resetHighSpeedCoroutine != null)
-            {
-                StopCoroutine(resetHighSpeedCoroutine);
-                resetHighSpeedCoroutine = null;
-            }
-
-            BallProperties.EnableHighSpeed();
-        }
-
-        //this will ensure that HighSpeed won't immediately disappear after going below the threshold, giving the player extra time to react 
-        if(BallProperties.HighSpeed && !SpeedGreaterThanThreshold() && resetHighSpeedCoroutine == null)
-        {
-            resetHighSpeedCoroutine = StartCoroutine(ResetHighSpeedAfterDelay(BallProperties.delayToTurnOffHighSpeed));
-        }
-    }
-
-    bool SpeedGreaterThanThreshold(){
-        return rb.velocity.magnitude > BallProperties.highSpeedThreshold;
-    }
-
-    private IEnumerator ResetHighSpeedAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        BallProperties.DisableHighSpeed();
-        resetHighSpeedCoroutine = null; // Reset the coroutine reference
-    }
-
     public void ResetMovement()
     {
         hasMovedThisTurn = false;
@@ -217,13 +180,14 @@ public class BallMovement : MonoBehaviour
 
 /*--------------------------------------------------------------------------------------------------*/
 
-    public bool IsMoving(){
-        return isMoving;
-    }
-    
+    //multiplies Balldyseus' velocity by a certain amount. used for obstacles like Fire
     public void MultiplyVelocity(float multiplier){
         originalVelocity = rb.velocity; 
         rb.velocity *= multiplier; 
+    }
+
+    public bool IsMoving(){
+        return isMoving;
     }
 
     public Vector2 GetCurrentVelocity(){
@@ -239,9 +203,11 @@ public class BallMovement : MonoBehaviour
         return dragVector;
     }
 
+    //returns if Balldyseus exists
     public bool BallExists(){
         if(!gameObject.activeSelf || gameObject==null)
             return false;
         else return true;
     }
+
 }
