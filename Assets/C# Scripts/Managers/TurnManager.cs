@@ -43,7 +43,6 @@ public class TurnManager : MonoBehaviour
     private PathfindingManager pathfindingManager;
 
     public float TurnNumber = 0;
-    [SerializeField] float secondsBetweenEnemyMoves = 0.5f;
 
 /*--------------------------------------------------------------------------------------------------*/
 
@@ -233,17 +232,10 @@ public class TurnManager : MonoBehaviour
 
             UpdateEnemiesList();
             
-            int moveCount = enemyMovement.moveMoney;
-            for (int i = 0; i < moveCount; i++)
-            {
-                if(currentState == GameState.Loss){
-                    break;
-                }
-                enemyMovement.Move();
-                yield return new WaitUntil(() => enemyMovement.HasMoved());
-                UpdateEnemiesList();
-                yield return new WaitForSeconds(secondsBetweenEnemyMoves);
-            }
+
+            enemyMovement.Move();
+            yield return new WaitUntil(() => enemyMovement.HasMoved());
+
             UpdateEnemiesList();
             enemyProps.ThisEnemyTurnEnds();
         }
@@ -252,6 +244,7 @@ public class TurnManager : MonoBehaviour
         foreach (var enemyGameObject in enemiesToMove){
             EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
             enemyMovement.ResetMoveMoney();
+            enemyMovement.ResetMovement();
         }
 
         ResolveCollisionsWithEnemies();

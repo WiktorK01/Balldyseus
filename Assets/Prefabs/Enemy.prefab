@@ -21123,7 +21123,7 @@ MonoBehaviour:
   moveMoney: 1
   moveMoneyDecrement: 0
   moveDuration: 0.2
-  pathColor: {r: 0, g: 0, b: 1, a: 1}
+  secondsBetweenEnemyMoves: 0.3
 --- !u!114 &2779471031326694913
 MonoBehaviour:
   m_ObjectHideFlags: 0

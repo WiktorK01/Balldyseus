@@ -849,7 +849,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enemy Turn
+  m_text: Player Turn
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}
   m_sharedMaterial: {fileID: -1067965472908962537, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}

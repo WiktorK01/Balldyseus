@@ -12,18 +12,18 @@ public class EnemyMovement : MonoBehaviour
     PathfindingManager pathfindingManager;
     EnemyProperties enemyProperties;
     EnemyFeedback enemyFeedback;
+    
 
     Tilemap groundTilemap;
 
     public int moveMoney = 2;
     public int moveMoneyDecrement; //this is a version of moveMoney that will decrement upon every movement.
     public float moveDuration = 0.1f;
+    [SerializeField] float secondsBetweenEnemyMoves = 0.6f; // this should be made equal to however long the move feedback is
 
     bool EnemyHasMoved = false;
 
     public enum Direction { Up, Down, Left, Right }
-
-    public Color pathColor = Color.blue;
 
     
     void Awake()
@@ -38,6 +38,8 @@ public class EnemyMovement : MonoBehaviour
         moveMoneyDecrement = moveMoney;
     }
 
+//Move Related Code***************************************************************
+
     public void Move()
     {
         var path = FindPathSync();
@@ -46,18 +48,12 @@ public class EnemyMovement : MonoBehaviour
             Debug.LogError("Failed to find path");
             return;
         }
-        DecrementMoveMoney();
-        MoveToNextSpace(path);
+        StartCoroutine(PerformMovements(path));
     }
 
-    void DecrementMoveMoney(){
-        moveMoneyDecrement--;
-        enemyFeedback.MoveTextBounce();
-    }
 
-    //This shit is a mess atm but it works. just threw chatGPT at it as a temp fix until i feel like handling it 
-    //can be greatly improved once i get a pathfinding algorithm that can detect movements via horizontal/vertical movements only.
-    //or maybe without that even idk maybe i'm not thinking hard enough
+
+    //Gets the starting point, the objective point
     (int, int)[] FindPathSync()
     {
         GameObject objective = FindObjective();
@@ -77,55 +73,98 @@ public class EnemyMovement : MonoBehaviour
             Debug.LogError("Walkable map data is null.");
             return null;
         }
-        return AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true);
+        (int, int)[] currentMap = AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true, false);
+        return FillInDiagonals(currentMap);
     }
 
-    void MoveToNextSpace((int, int)[] path)
+    (int, int)[] FillInDiagonals((int, int)[] path){
+        if (path == null || path.Length == 0) return path;
+
+        List<(int, int)> listPath = new List<(int, int)>(path); //convert the array to a list
+
+        int previousX = listPath[0].Item1;
+        int previousY = listPath[0].Item2;
+
+        for(int i = 1; i < listPath.Count; i++){ 
+            //go through every tuple
+            //if both items in a tuple differ from the previous values, it must be a diagonal movement
+            if(listPath[i].Item1 != previousX && listPath[i].Item2 != previousY){
+
+                if(CanMove(listPath[i-1].Item1, listPath[i].Item2)) 
+                    //if setting to the previous x is viable, insert a diagonal filler there
+                    listPath.Insert(i, (listPath[i-1].Item1, listPath[i].Item2));
+                else 
+                    //else set it to the previous y
+                    listPath.Insert(i, (listPath[i].Item1, listPath[i-1].Item2));
+                i++;
+            }
+            previousX = listPath[i].Item1;
+            previousY = listPath[i].Item2;
+        }
+
+        return listPath.ToArray();
+    }
+
+    //returns the closest Objective to the enemy
+    GameObject FindObjective()
     {
-        Debug.Log("Moving to the Next Space");
-        for (int i = 0; i < path.Length - 1; i++)
-        {
-            Vector3 start = groundTilemap.CellToWorld(new Vector3Int(path[i].Item1, path[i].Item2, 0)) + new Vector3(0.5f, 0.5f, 0);
-            Vector3 end = groundTilemap.CellToWorld(new Vector3Int(path[i + 1].Item1, path[i + 1].Item2, 0)) + new Vector3(0.5f, 0.5f, 0);
-            Debug.DrawLine(start, end, pathColor, 10.0f, false);
-        }
+        GameObject[] objectives = GameObject.FindGameObjectsWithTag("Objective");
+        GameObject closest = null;
+        float minDistance = Mathf.Infinity;
+        Vector3 currentPosition = transform.position;
 
-        if (path.Length < 2)
+        foreach (GameObject obj in objectives)
         {
-            Debug.LogError("Path is too short to move.");
-            return;
-        }
-
-        (int, int) nextPos = path[1];
-        int deltaX = nextPos.Item1 - Mathf.FloorToInt(transform.position.x);
-        int deltaY = nextPos.Item2 - Mathf.FloorToInt(transform.position.y);
-
-        // Check if horizontal movement is possible
-        if (deltaX != 0)
-        {
-            Vector3 horizontalTarget = transform.position + new Vector3(deltaX, 0, 0);
-            if (CanMove(Mathf.FloorToInt(horizontalTarget.x), Mathf.FloorToInt(transform.position.y)))
+            float distance = Vector3.Distance(obj.transform.position, currentPosition);
+            if (distance < minDistance)
             {
-                HandleMoveFeedback(DirectionToVector(deltaX > 0 ? Direction.Right : Direction.Left));
-                EndMovement();
-                return;
+                closest = obj;
+                minDistance = distance;
             }
         }
-
-        // Check if vertical movement is needed if horizontal is blocked
-        if (deltaY != 0)
-        {
-            Vector3 verticalTarget = transform.position + new Vector3(0, deltaY, 0);
-            if (CanMove(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(verticalTarget.y)))
-            {
-                HandleMoveFeedback(DirectionToVector(deltaY > 0 ? Direction.Up : Direction.Down));
-                EndMovement();
-                return;
-            }
-        }
-        Debug.LogError("Both horizontal and vertical moves are blocked or unnecessary.");
+        return closest;
     }
 
+    IEnumerator PerformMovements((int, int)[] path)
+    {
+        if (path == null || path.Length == 0) {
+        Debug.LogError("Path is null or empty in PerformMovements");
+        yield break;
+        }
+        
+        int previousX = path[0].Item1;
+        int previousY = path[0].Item2;
+
+        int minimum = Math.Min(moveMoney, path.Length);
+
+        for(int i = 0; i < minimum; i++){
+            if(TurnManager.Instance.currentState == TurnManager.GameState.Loss){
+                break;
+            }
+
+            DecrementMoveMoney();
+
+            if (path[i+1].Item1 > previousX)
+                enemyFeedback.MoveRight();
+            else if (path[i+1].Item1 < previousX)
+                enemyFeedback.MoveLeft();
+            else if (path[i+1].Item2 > previousY)
+                enemyFeedback.MoveUp();
+            else if (path[i+1].Item2 < previousY)
+                enemyFeedback.MoveDown();
+
+            previousX = path[i].Item1;
+            previousY = path[i].Item2;
+            yield return new WaitForSeconds(secondsBetweenEnemyMoves);
+        }
+        EnemyHasMoved = true;
+    }
+
+
+//Checking Spaces for x***************************************************************
+
+
+    //checks if an enemy can move to a location
     bool CanMove(int x, int y)
     {
         bool[,] walkableMap = pathfindingManager.GetWalkableMap();
@@ -137,40 +176,8 @@ public class EnemyMovement : MonoBehaviour
         return walkableMap[y, x] && !IsObstacleTriggerUnwalkableAt(new Vector3(x, y, 0));
     }
 
-    private Vector3 DirectionToVector(Direction direction)
-    {
-        switch (direction)
-        {
-            case Direction.Up: return new Vector3(0, 1, 0);
-            case Direction.Down: return new Vector3(0, -1, 0);
-            case Direction.Left: return new Vector3(-1, 0, 0);
-            case Direction.Right: return new Vector3(1, 0, 0);
-            default: return Vector3.zero;
-        }
-    }
-
-    void HandleMoveFeedback(Vector3 direction)
-    {
-        if (direction == Vector3.up)
-        {
-            enemyFeedback.MoveUp();
-        }
-        else if (direction == Vector3.down)
-        {
-            enemyFeedback.MoveDown();
-        }
-        else if (direction == Vector3.left)
-        {
-            enemyFeedback.MoveLeft();
-        }
-        else if (direction == Vector3.right)
-        {
-            enemyFeedback.MoveRight();
-        }
-    }
-
-
-    private bool IsObstacleTriggerUnwalkableAt(Vector3 position)
+    //this checks for Obstacles that CANT WALK INTO but CAN SHOVE INTO
+    bool IsObstacleTriggerUnwalkableAt(Vector3 position)
     {
         RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero);
         if (hit.collider != null)
@@ -181,6 +188,8 @@ public class EnemyMovement : MonoBehaviour
         return false;
     }
 
+    //checks if there is another enemy at a position (mainly for shoves)
+    //returns it
     public GameObject CheckForEnemyAtPosition(Vector3 position)
     {
         int enemyLayer = LayerMask.NameToLayer("Enemy");
@@ -196,12 +205,8 @@ public class EnemyMovement : MonoBehaviour
         return null;
     }
 
-    /*void SetStartingPointWalkable()
-    {
-        Debug.Log("Setting Starting Point as Walkable");
-        Vector3Int cellPosition = groundTilemap.WorldToCell(transform.position);
-        pathfindingManager.SetTileWalkability(cellPosition, true); 
-    }*/
+
+//Shove related code***************************************************************
 
 
     public void Shove(Direction direction)
@@ -231,19 +236,21 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-    void HandleSquashFeedback(Direction direction){
-        if (direction == Direction.Up)
-            enemyFeedback.SquashUp();
-
-        else if (direction == Direction.Down)
-            enemyFeedback.SquashDown();
-
-        else if (direction == Direction.Left)
-            enemyFeedback.SquashLeft();
-
-        else if (direction == Direction.Right)
-            enemyFeedback.SquashRight();
+    private Vector3 DirectionToVector(Direction direction)
+    {
+        switch (direction)
+        {
+            case Direction.Up: return new Vector3(0, 1, 0);
+            case Direction.Down: return new Vector3(0, -1, 0);
+            case Direction.Left: return new Vector3(-1, 0, 0);
+            case Direction.Right: return new Vector3(1, 0, 0);
+            default: return Vector3.zero;
+        }
     }
+
+
+//Feedback related code***************************************************************
+
 
     void HandleShoveFeedback(Direction direction) {
         if (direction == Direction.Up)
@@ -259,32 +266,50 @@ public class EnemyMovement : MonoBehaviour
             enemyFeedback.ShoveRight();
     }
 
-    GameObject FindObjective()
-    {
-        GameObject[] objectives = GameObject.FindGameObjectsWithTag("Objective");
-        GameObject closest = null;
-        float minDistance = Mathf.Infinity;
-        Vector3 currentPosition = transform.position;
+    void HandleSquashFeedback(Direction direction){
+        if (direction == Direction.Up)
+            enemyFeedback.SquashUp();
 
-        foreach (GameObject obj in objectives)
-        {
-            float distance = Vector3.Distance(obj.transform.position, currentPosition);
-            if (distance < minDistance)
-            {
-                closest = obj;
-                minDistance = distance;
-            }
-        }
-        return closest;
+        else if (direction == Direction.Down)
+            enemyFeedback.SquashDown();
+
+        else if (direction == Direction.Left)
+            enemyFeedback.SquashLeft();
+
+        else if (direction == Direction.Right)
+            enemyFeedback.SquashRight();
     }
 
-    public void ResetMovement()
+    /*void HandleMoveFeedback(Vector3 direction)
     {
+        if (direction == Vector3.up)
+        {
+            enemyFeedback.MoveUp();
+        }
+        else if (direction == Vector3.down)
+        {
+            enemyFeedback.MoveDown();
+        }
+        else if (direction == Vector3.left)
+        {
+            enemyFeedback.MoveLeft();
+        }
+        else if (direction == Vector3.right)
+        {
+            enemyFeedback.MoveRight();
+        }
+    }*/
+
+
+//Misc***************************************************************
+
+    public void ResetMovement(){
         EnemyHasMoved = false;
     }
 
-    void EndMovement(){
-        EnemyHasMoved = true;
+    void DecrementMoveMoney(){
+        moveMoneyDecrement--;
+        enemyFeedback.MoveTextBounce();
     }
 
     public void ResetMoveMoney(){
