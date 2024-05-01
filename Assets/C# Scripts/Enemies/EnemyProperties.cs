@@ -5,20 +5,20 @@ using UnityEngine;
 public class EnemyProperties : MonoBehaviour
 {
     private EnemyUI EnemyUI;
-    private EnemyFeedback EnemyFeedback;
+    private EnemyFeedback enemyFeedback;
     GameObject balldyseus;
 
     public float health = 3f;
     public float startingImpulse = 2f;
     public float endingImpulse = 5f;
     public bool isThisEnemyTurn;
-    bool isOnFire = false;
+    public bool isOnFire = false;
     bool isDefeated = false;    
 
     void Start(){
         balldyseus = GameObject.Find("Balldyseus");
         EnemyUI = gameObject.GetComponent<EnemyUI>();
-        EnemyFeedback = gameObject.GetComponent<EnemyFeedback>();
+        enemyFeedback = gameObject.GetComponent<EnemyFeedback>();
     }
 
     //Everything That Occurs when an enemy takes damage
@@ -27,16 +27,24 @@ public class EnemyProperties : MonoBehaviour
         Debug.Log(health);
         health -= amount;
 
+        //causes the fire effect when fire damage taken on enemy turn
+        if(isOnFire && TurnManager.Instance.currentState != TurnManager.GameState.PlayerTurn){
+            if(health == 0){
+                enemyFeedback.DeathFire();
+            }
+            enemyFeedback.DamageFire();
+        }
+            
         if (health <= 0){
             isDefeated = true;
-            GetDestroyed();
+            enemyFeedback.DeathFlush();
         }
 
-        else if(amount == 1f){
-            EnemyFeedback.HealthTextBounce();
+        if(amount == 1f){
+            enemyFeedback.HealthTextBounce();
         }
         else if(amount==2f){
-            EnemyFeedback.BigHealthTextBounce();
+            enemyFeedback.BigHealthTextBounce();
         }
     }
 
@@ -77,4 +85,5 @@ public class EnemyProperties : MonoBehaviour
 
         return directionToBalldyseus;
     }
+
 }

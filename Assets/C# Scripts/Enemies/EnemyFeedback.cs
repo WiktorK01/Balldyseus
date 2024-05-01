@@ -5,9 +5,14 @@ using MoreMountains.Feedbacks;
 
 public class EnemyFeedback : MonoBehaviour
 {
+    BallMovement ballMovement;
+
     [SerializeField] MMF_Player healthTextBounce;
     [SerializeField] MMF_Player bigHealthTextBounce;
     [SerializeField] MMF_Player moveTextBounce;
+
+    [SerializeField] MMF_Player hoverTextGrowth;
+    [SerializeField] MMF_Player hoverTextShrink;
 
     [SerializeField] MMF_Player moveDown;
     [SerializeField] MMF_Player moveUp;
@@ -28,11 +33,15 @@ public class EnemyFeedback : MonoBehaviour
     [SerializeField] MMF_Player damageUp;
     [SerializeField] MMF_Player damageLeft;
     [SerializeField] MMF_Player damageRight;
+    [SerializeField] MMF_Player damageFire;
 
-    void Update(){
-        if(Input.GetKeyDown(KeyCode.P)){
-            ShoveLeft();
-        }
+    [SerializeField] MMF_Player deathFire;
+    [SerializeField] MMF_Player deathFlush;
+
+    [SerializeField] MMF_Player onClick;
+
+    void Start(){
+        ballMovement = FindObjectOfType<BallMovement>();
     }
 
     public void HealthTextBounce(){
@@ -48,6 +57,20 @@ public class EnemyFeedback : MonoBehaviour
     public void MoveTextBounce(){
         moveTextBounce.Initialization();
         moveTextBounce.PlayFeedbacks();
+    }
+
+    public void HoverTextGrowth(){
+        if(!ballMovement.IsMoving()){
+            hoverTextGrowth.Initialization();
+            hoverTextGrowth.PlayFeedbacks();
+        }
+
+    }
+
+    public void HoverTextShrink(){
+        hoverTextGrowth.StopFeedbacks();
+        hoverTextShrink.Initialization();
+        hoverTextShrink.PlayFeedbacks();
     }
 
     public void MoveDown(){
@@ -125,5 +148,23 @@ public class EnemyFeedback : MonoBehaviour
     public void DamageRight(){
         damageRight.Initialization();
         damageRight.PlayFeedbacks();
+    }
+    public void DamageFire(){
+        damageFire.Initialization();
+        damageFire.PlayFeedbacks();
+    }
+
+    public void DeathFire(){
+        deathFire.Initialization();
+        deathFire.PlayFeedbacks();
+    }
+    public void DeathFlush(){
+        deathFlush.Initialization();
+        deathFlush.PlayFeedbacks();
+    }
+
+    public void OnClick(){
+        onClick.Initialization();
+        onClick.PlayFeedbacks();
     }
 }

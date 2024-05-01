@@ -9,6 +9,8 @@ public class BallCollision : MonoBehaviour
     BallFeedback ballFeedback;
     Rigidbody2D rb;
 
+    CameraFeedback cameraFeedback;
+
     [SerializeField] private float shoveModeImpulseStrength = 12f;
 
     [SerializeField] private float remainingShoveCount = 5f;
@@ -20,6 +22,8 @@ public class BallCollision : MonoBehaviour
         ballMovement = GetComponent<BallMovement>();
         ballProperties = GetComponent<BallProperties>();
         ballFeedback = GetComponent<BallFeedback>();
+
+        cameraFeedback = FindObjectOfType<CameraFeedback>();
     }
 
     //handles what different things happen when Balldyseus collides with something while moving or not moving
@@ -111,28 +115,36 @@ public class BallCollision : MonoBehaviour
 
         if(Mathf.Abs(direction.x) > Mathf.Abs(direction.y)){
             if(direction.x > 0){
-                if(ballProperties.HighSpeed)
+                if(ballProperties.HighSpeed){
                     ballFeedback.BigSquashLeft();
+                    cameraFeedback.CameraShakeHorizontal();
+                }
                 else 
                     ballFeedback.SquashLeft();
             }
             else{
-                if(ballProperties.HighSpeed)
+                if(ballProperties.HighSpeed){
                     ballFeedback.BigSquashRight();
+                    cameraFeedback.CameraShakeHorizontal();
+                }
                 else 
                     ballFeedback.SquashRight();
             }
         }
         else{
             if(direction.y > 0){
-                if(ballProperties.HighSpeed)
+                if(ballProperties.HighSpeed){
                     ballFeedback.BigSquashDown();
+                    cameraFeedback.CameraShakeVertical();
+                }
                 else 
                     ballFeedback.SquashDown();
             }
             else{
-                if(ballProperties.HighSpeed)
+                if(ballProperties.HighSpeed){
                     ballFeedback.BigSquashUp();
+                    cameraFeedback.CameraShakeVertical();
+                }
                 else 
                     ballFeedback.SquashUp();
             }

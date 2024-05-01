@@ -31,7 +31,8 @@ public class TurnManager : MonoBehaviour
     public GameState currentState = GameState.Null;
     private GameState previousState;
     
-    public GameObject Balldyseus;
+    GameObject Balldyseus;
+    BallMovement ballMovement;
     bool BalldyseusStopped;
     bool BalldyseusIsMoving;
 
@@ -51,18 +52,21 @@ public class TurnManager : MonoBehaviour
     {
         cameraManager = FindObjectOfType<CameraManager>();
         pathfindingManager = FindObjectOfType<PathfindingManager>();
+        
+        Balldyseus = GameObject.Find("Balldyseus");
+        ballMovement = Balldyseus.GetComponent<BallMovement>();
 
         ResumeGame();
-        UIManager2.Instance.DestroyAllUIElements(); 
+        UIManager.Instance.ShowGameplayUI();
         ChangeGameState("PlayerTurn");
     }
 
     // If player stops, update enemy list + map
     void Update()
     {
-        if(Balldyseus.GetComponent<BallMovement>().BallExists()){
-            BalldyseusStopped = Balldyseus.GetComponent<BallMovement>().HasStopped();
-            BalldyseusIsMoving = Balldyseus.GetComponent<BallMovement>().IsMoving();
+        if(ballMovement.BallExists()){
+            BalldyseusStopped = ballMovement.HasStopped();
+            BalldyseusIsMoving = ballMovement.IsMoving();
         }
 
         // During a Player's Turn
@@ -86,8 +90,7 @@ public class TurnManager : MonoBehaviour
     }
 /*--------------------------------------------------------------------------------------------------*/
     public void ChangeGameState(string stateString){
-        
-        UIManager2.Instance.DestroyAllUIElements(); 
+        GameState newState = ReturnGameStateFromString(stateString);
 
         switch (stateString){
             case "Null":
@@ -96,10 +99,10 @@ public class TurnManager : MonoBehaviour
 
             case "PlayerTurn":
                 if(currentState != GameState.Loss){
+                    ballMovement.ResetForcePercentage();
                     UpdateEnemiesList();
                     CheckForWin();
                     cameraManager.SetCameraForPlayerTurn(Balldyseus.transform);
-                    InstantiatePlayerTurnUI();
                     if(currentState != GameState.Win){
                         currentState = GameState.PlayerTurn;
                         TurnNumber++;
@@ -116,24 +119,22 @@ public class TurnManager : MonoBehaviour
                     }
                     else{
                         currentState = GameState.EnemyTurn;
-                        InstantiateEnemyTurnUI();
                         StartCoroutine(EnemyTurnRoutine());
                     }
                 }
                 break;
 
             case "Win":
-                StartCoroutine(HandleWin());
+                HandleWin();
                 break;
 
             case "Loss":
                 currentState = GameState.Loss;
-                StartCoroutine(HandleLoss());
+                HandleLoss();
                 break;
 
             case "Paused":
                 currentState = GameState.Paused;
-                UIManager2.Instance.ShowUIElement("PauseMenuUI");
                 PauseGame();
                 break;
 
@@ -143,8 +144,30 @@ public class TurnManager : MonoBehaviour
                 break;
         }
 
+        //this block here notifies the GameStateEventPublisher of any changes, which will be sent to any other subscribed objects
+        if(previousState != newState){
+            Debug.Log("Notifying of New State " + stateString);
+            currentState = newState;
+            GameStateEventPublisher.NotifyGameStateChange(newState);
+        }
+
         if(currentState != GameState.Paused){
             previousState = currentState;
+        }
+
+    }
+
+    //this returns the gamestate from a given string. this is used for the GameStateEventPublisher which needs to take in a 
+    //GameState variable rather than a string
+    private GameState ReturnGameStateFromString(string stateString) {
+        switch (stateString){
+            case "Null": return GameState.Null;
+            case "PlayerTurn": return GameState.PlayerTurn;
+            case "EnemyTurn": return GameState.EnemyTurn;
+            case "Win": return GameState.Win;
+            case "Loss": return GameState.Loss;
+            case "Paused": return GameState.Paused;
+            default: return previousState;
         }
     }
 
@@ -159,24 +182,7 @@ public class TurnManager : MonoBehaviour
     {
         Time.timeScale = 1f; 
         ChangeGameState("PreviousState");
-    }
-
-/*--------------------------------------------------------------------------------------------------*/
-    
-    public void InstantiatePlayerTurnUI(){
-        UIManager2.Instance.HideAllUIElements();
-        UIManager2.Instance.ShowUIElement("PlayerTurnUI");
-        UIManager2.Instance.ShowUIElement("LaunchUI");
-
-        if(!Balldyseus.GetComponent<BallProperties>().ShoveGagged){
-            UIManager2.Instance.ShowUIElement("ImpulseCountUI");
-        }
-    }
-
-    public void InstantiateEnemyTurnUI(){
-        UIManager2.Instance.HideAllUIElements();
-        UIManager2.Instance.ShowUIElement("EnemyTurnUI");
-    }
+    }    
 
 /*--------------------------------------------------------------------------------------------------*/
     //MANAGING THE EXISTING ENEMIES
@@ -211,18 +217,20 @@ public class TurnManager : MonoBehaviour
     {
         var enemiesToMove = new List<GameObject>(enemies);
 
-        foreach (var enemyGameObject in enemiesToMove)
-        {
+        foreach (var enemyGameObject in enemiesToMove){
             if(currentState == GameState.Loss) break;
-
             EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
             EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
 
             enemyProps.ThisEnemyTurnBegins();
 
-            UpdateEnemiesList();
-
-            DoThisBeforeEnemyMoves(enemyGameObject);
+            //StartCoroutine(DoThisBeforeEnemyMoves(enemyGameObject));
+            //ideally we put all the stuff thats supposed to be checked prior to a movement in its own function here
+            //for now we just put the fire here to easily wait for flame dmg animation
+            if(enemyProps.isOnFire){
+                Fire.ApplyFireDamageIfOnFire(enemyProps);
+                yield return new WaitForSeconds(.4f);
+            }
 
             if (enemyProps.IsDefeated())
             {
@@ -232,29 +240,35 @@ public class TurnManager : MonoBehaviour
 
             UpdateEnemiesList();
             
+            if (enemyGameObject != null){
+                enemyMovement.Move();
+                yield return new WaitUntil(() => enemyMovement.HasMoved());
 
-            enemyMovement.Move();
-            yield return new WaitUntil(() => enemyMovement.HasMoved());
-
-            UpdateEnemiesList();
-            enemyProps.ThisEnemyTurnEnds();
+                UpdateEnemiesList();
+                enemyProps.ThisEnemyTurnEnds();
+            }
         }
 
         // After all enemies have moved
         foreach (var enemyGameObject in enemiesToMove){
-            EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
-            enemyMovement.ResetMoveMoney();
-            enemyMovement.ResetMovement();
+            if(enemyGameObject != null){
+                EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
+                enemyMovement.ResetMoveMoney();
+                enemyMovement.ResetMovement();
+            }
         }
 
         ResolveCollisionsWithEnemies();
         ChangeGameState("PlayerTurn");
     }
 
-    void DoThisBeforeEnemyMoves(GameObject enemyGameObject){
+    /*IEnumerator DoThisBeforeEnemyMoves(GameObject enemyGameObject){
         EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
-        Fire.ApplyFireDamageIfOnFire(enemyProps);
-    }
+        if(enemyProps.isOnFire){
+            Fire.ApplyFireDamageIfOnFire(enemyProps);
+            yield return new WaitForSeconds(1f);
+        }
+    }*/
 
     //moves Balldyeus away from an enemy by a small amount if colliding when turn starts, to allow Balldyeus to attack the enemy if desired
     void ResolveCollisionsWithEnemies()
@@ -278,22 +292,16 @@ public class TurnManager : MonoBehaviour
         if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss)
         {
             currentState = GameState.Win;
-            StartCoroutine(HandleWin());
+            HandleWin();
         }
     }
 
-    IEnumerator HandleWin(){
-        yield return new WaitForSeconds(0f);
-        UIManager2.Instance.HideAllUIElements();
-        UIManager2.Instance.ShowUIElement("WinUI");
+    void HandleWin(){
         currentState = GameState.Win;
     }
 
-    IEnumerator HandleLoss(){
+    void HandleLoss(){
         Balldyseus.SetActive(false);
-        yield return new WaitForSeconds(.5f);
-        UIManager2.Instance.HideAllUIElements();
-        UIManager2.Instance.ShowUIElement("LossUI");
     }
 
     public void OnEnemyReachedObjective()
@@ -306,10 +314,5 @@ public class TurnManager : MonoBehaviour
 
     public float GetTurnNumber(){
         return TurnNumber;
-    }
-
-    public void BeginHandlingWinCoroutine()
-    {
-        StartCoroutine(HandleWin());
     }
 }

@@ -209,5 +209,9 @@ public class BallMovement : MonoBehaviour
             return false;
         else return true;
     }
+    
+    public void ResetForcePercentage(){
+        forcePercentage = 0;
+    }
 
 }
