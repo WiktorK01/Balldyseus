@@ -2851,7 +2851,7 @@ MonoBehaviour:
   AutoPlayOnEnable: 0
   ForceTimescaleMode: 0
   ForcedTimescaleMode: 1
-  DurationMultiplier: 1
+  DurationMultiplier: 0.8
   RandomizeDuration: 0
   RandomDurationMultiplier: {x: 0.5, y: 1.5}
   DisplayFullDurationDetails: 0
@@ -25208,7 +25208,7 @@ MonoBehaviour:
   AutoPlayOnEnable: 0
   ForceTimescaleMode: 0
   ForcedTimescaleMode: 1
-  DurationMultiplier: 1
+  DurationMultiplier: 0.8
   RandomizeDuration: 0
   RandomDurationMultiplier: {x: 0.5, y: 1.5}
   DisplayFullDurationDetails: 0
@@ -30619,7 +30619,7 @@ MonoBehaviour:
   AutoPlayOnEnable: 0
   ForceTimescaleMode: 0
   ForcedTimescaleMode: 1
-  DurationMultiplier: 1
+  DurationMultiplier: 0.8
   RandomizeDuration: 0
   RandomDurationMultiplier: {x: 0.5, y: 1.5}
   DisplayFullDurationDetails: 0
@@ -34729,7 +34729,7 @@ MonoBehaviour:
   moveMoney: 1
   moveMoneyDecrement: 0
   moveDuration: 0.5
-  secondsBetweenEnemyMoves: 0.4
+  secondsBetweenEnemyMoves: 0.32
 --- !u!114 &2779471031326694913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34986,7 +34986,7 @@ MonoBehaviour:
   AutoPlayOnEnable: 0
   ForceTimescaleMode: 0
   ForcedTimescaleMode: 1
-  DurationMultiplier: 1
+  DurationMultiplier: 0.8
   RandomizeDuration: 0
   RandomDurationMultiplier: {x: 0.5, y: 1.5}
   DisplayFullDurationDetails: 0

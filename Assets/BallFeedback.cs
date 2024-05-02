@@ -7,6 +7,7 @@ using MoreMountains.Feedbacks;
 public class BallFeedback : MonoBehaviour
 {
     BallCollision ballCollision;
+    BallProperties ballProperties;
 
     [SerializeField] MMF_Player squashDown;
     [SerializeField] MMF_Player squashUp;
@@ -19,10 +20,19 @@ public class BallFeedback : MonoBehaviour
     [SerializeField] MMF_Player centerSprite;
     [SerializeField] MMF_Player changeModes;
     [SerializeField] MMF_Player floatingBounceNumber;
+    [SerializeField] MMF_Player highSpeedMode;
 
 
     void Awake(){
         ballCollision = GetComponent<BallCollision>();
+        ballProperties  = GetComponent<BallProperties>();
+    }
+
+    void Update(){
+        if(ballProperties.HighSpeed){
+            HighSpeedMode();
+        }
+
     }
 
     public void SquashDown(){
@@ -92,5 +102,9 @@ public class BallFeedback : MonoBehaviour
         }
     }
 
+    public void HighSpeedMode(){
+        highSpeedMode.Initialization();
+        highSpeedMode.PlayFeedbacks();
+    }
 
 }
