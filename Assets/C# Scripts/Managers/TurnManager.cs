@@ -25,7 +25,6 @@ public class TurnManager : MonoBehaviour
         EnemyTurn,
         Win,
         Loss,
-        Paused
     }
 
     public GameState currentState = GameState.Null;
@@ -45,6 +44,7 @@ public class TurnManager : MonoBehaviour
 
     public float TurnNumber = 0;
 
+
 /*--------------------------------------------------------------------------------------------------*/
 
     // Initialize enemy list, update the walkable map, start the player's turn
@@ -52,19 +52,22 @@ public class TurnManager : MonoBehaviour
     {
         cameraManager = FindObjectOfType<CameraManager>();
         pathfindingManager = FindObjectOfType<PathfindingManager>();
-        
         Balldyseus = GameObject.Find("Balldyseus");
-        ballMovement = Balldyseus.GetComponent<BallMovement>();
 
-        ResumeGame();
-        UIManager.Instance.ShowGameplayUI();
-        ChangeGameState("PlayerTurn");
+        if (pathfindingManager == null) Debug.LogError("PathfindingManager not found.");
+        if (cameraManager == null) Debug.LogError("CameraManager not found.");
+        if (Balldyseus == null) Debug.LogError("Balldyseus not found.");
+
+        ballMovement = Balldyseus.GetComponent<BallMovement>();
+        
+        UIManager.Instance.ShowGameplayUI(); //THIS IS CURRENTLY ONLY HERE BECAUSE OF UNIMPLEMENTED BOUNCE COUNT UI. REMOVE THIS ONCE THATS IMPLEMENTED
+
+        ChangeGameState("PlayerTurn"); //Player turn begins
     }
 
-    // If player stops, update enemy list + map
     void Update()
     {
-        if(ballMovement.BallExists()){
+        if(ballMovement != null){
             BalldyseusStopped = ballMovement.HasStopped();
             BalldyseusIsMoving = ballMovement.IsMoving();
         }
@@ -72,89 +75,65 @@ public class TurnManager : MonoBehaviour
         // During a Player's Turn
         if (currentState == GameState.PlayerTurn)
         {
-            CheckForWin();
             if (BalldyseusStopped){
                 UpdateEnemiesList();
-                ChangeGameState("EnemyTurn");
+                CheckForWin();
+                if(currentState != GameState.Win){
+                    ChangeGameState("EnemyTurn");
+                }
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape) && !BalldyseusIsMoving){
-            if (currentState != GameState.Paused){
-                ChangeGameState("Paused");
-            }
-            else{
-                ResumeGame();
-            }
-        }
     }
 /*--------------------------------------------------------------------------------------------------*/
     public void ChangeGameState(string stateString){
         GameState newState = ReturnGameStateFromString(stateString);
 
-        switch (stateString){
-            case "Null":
-                currentState = GameState.Null;
+        if (newState == currentState) return;
+
+        previousState = currentState;
+        
+        currentState = newState; 
+
+        switch (newState){
+            case GameState.Null:
+                // Handle Null state
                 break;
 
-            case "PlayerTurn":
-                if(currentState != GameState.Loss){
+            case GameState.PlayerTurn:
+                if(currentState != GameState.Loss && currentState != GameState.Win){
                     ballMovement.ResetForcePercentage();
                     UpdateEnemiesList();
                     CheckForWin();
                     cameraManager.SetCameraForPlayerTurn(Balldyseus.transform);
-                    if(currentState != GameState.Win){
-                        currentState = GameState.PlayerTurn;
-                        TurnNumber++;
-                        Balldyseus.GetComponent<BallMovement>().ResetMovement();
-                    }
+                    Balldyseus.GetComponent<BallMovement>().ResetMovement();
+                    TurnNumber++;
                 }
                 break;
 
-            case "EnemyTurn":
+            case GameState.EnemyTurn:
                 if(currentState != GameState.Loss){
                     cameraManager.SetCameraForEnemyTurn();
                     if(enemies.Count == 0){
                         CheckForWin();
                     }
                     else{
-                        currentState = GameState.EnemyTurn;
                         StartCoroutine(EnemyTurnRoutine());
                     }
                 }
                 break;
 
-            case "Win":
+            case GameState.Win:
                 HandleWin();
                 break;
 
-            case "Loss":
-                currentState = GameState.Loss;
+            case GameState.Loss:
                 HandleLoss();
                 break;
-
-            case "Paused":
-                currentState = GameState.Paused;
-                PauseGame();
-                break;
-
-            case "PreviousState":
-                string stateName = previousState.ToString();
-                ChangeGameState(stateName);
-                break;
         }
 
-        //this block here notifies the GameStateEventPublisher of any changes, which will be sent to any other subscribed objects
-        if(previousState != newState){
-            Debug.Log("Notifying of New State " + stateString);
-            currentState = newState;
-            GameStateEventPublisher.NotifyGameStateChange(newState);
-        }
-
-        if(currentState != GameState.Paused){
-            previousState = currentState;
-        }
-
+        Debug.Log("Notifying of New State: " + newState.ToString());
+        GameStateEventPublisher.NotifyGameStateChange(newState);
     }
 
     //this returns the gamestate from a given string. this is used for the GameStateEventPublisher which needs to take in a 
@@ -166,23 +145,13 @@ public class TurnManager : MonoBehaviour
             case "EnemyTurn": return GameState.EnemyTurn;
             case "Win": return GameState.Win;
             case "Loss": return GameState.Loss;
-            case "Paused": return GameState.Paused;
             default: return previousState;
         }
     }
 
 /*--------------------------------------------------------------------------------------------------*/
 
-    void PauseGame()
-    {
-        Time.timeScale = 0f;
-    }
 
-    public void ResumeGame()
-    {
-        Time.timeScale = 1f; 
-        ChangeGameState("PreviousState");
-    }    
 
 /*--------------------------------------------------------------------------------------------------*/
     //MANAGING THE EXISTING ENEMIES
@@ -196,8 +165,7 @@ public class TurnManager : MonoBehaviour
 
     public void AddEnemy(GameObject enemy)
     {
-        if (!enemies.Contains(enemy))
-        {
+        if (!enemies.Contains(enemy)){
             enemies.Add(enemy);
             pathfindingManager.UpdateWalkableMap(enemies);
         }
@@ -205,8 +173,7 @@ public class TurnManager : MonoBehaviour
 
     public void RemoveEnemy(GameObject enemy)
     {
-        if (enemies.Remove(enemy))
-        {
+        if (enemies.Remove(enemy)){
             pathfindingManager.UpdateWalkableMap(enemies);
         }
         CheckForWin();
@@ -291,8 +258,8 @@ public class TurnManager : MonoBehaviour
     private void CheckForWin(){
         if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss)
         {
-            currentState = GameState.Win;
-            HandleWin();
+            Debug.Log("WIN DETECTED");
+            ChangeGameState("Win");
         }
     }
 

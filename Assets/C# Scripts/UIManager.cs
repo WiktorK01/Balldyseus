@@ -6,7 +6,7 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
-    //UIManager2.Instance.ShowUIElement("PauseMenuUI");
+    //UIManager.Instance.ShowUIElement("PauseMenuUI");
 
     public static UIManager Instance { get; private set; }
     private UIFactory factory;
@@ -141,16 +141,20 @@ public class UIManager : MonoBehaviour
 
     void OnEnable()
     {
+        //subscribes
         GameStateEventPublisher.GameStateChanged += UpdateUI;
     }
 
     void OnDisable()
     {
+        //unsubscribes to avoid memory leaks
         GameStateEventPublisher.GameStateChanged -= UpdateUI;
     }
 
     private void UpdateUI(TurnManager.GameState newState)
     {
+        HideUIElement("PauseMenuUI");
+
         switch (newState)
         {
             /*case TurnManager.GameState.PlayerTurn:
@@ -165,10 +169,9 @@ public class UIManager : MonoBehaviour
             case TurnManager.GameState.Loss:
                 ShowLossUI();
                 break;
-            case TurnManager.GameState.Paused:
-                ShowPauseMenu();
-                break;
         }
+
+        
     }
 
     public void ShowGameplayUI(){
@@ -183,7 +186,7 @@ public class UIManager : MonoBehaviour
         ShowUIElement("LossUI");
     }
     void ShowPauseMenu() {
-        ShowUIElement("PauseMenu");
+        ShowUIElement("PauseMenuUI");
     }
 
 }

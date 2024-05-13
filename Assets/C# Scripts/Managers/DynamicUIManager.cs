@@ -38,17 +38,6 @@ public class DynamicUIManager : MonoBehaviour
                     UIManager.Instance.SetTextValueInUIElement("ImpulseCountUI", "ImpulseCountNumber", impulseCountString);
                 }
             }
-
-
-            //HighSpeed Instantiator
-            if (BallProperties.HighSpeed && BallMovement.IsMoving())
-            {
-                UIManager.Instance.ShowUIElement("HighSpeedUI");
-            }
-            else
-            {
-                UIManager.Instance.HideUIElement("HighSpeedUI");
-            }
         }
 
         if(BallMovement != null){

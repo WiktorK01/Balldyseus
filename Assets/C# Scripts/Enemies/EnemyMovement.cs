@@ -219,7 +219,7 @@ public class EnemyMovement : MonoBehaviour
         bool[,] walkableMap = pathfindingManager.GetWalkableMap();
         
         //if it's walkable or there's an unwalkable triggger obstacle, allow the shove
-        if (walkableMap[newY, newX] || IsObstacleTriggerUnwalkableAt(newPosition)){
+        if (walkableMap[newY, newX] || IsObstacleTriggerUnwalkableAt(newPosition) && CheckForEnemyAtPosition(newPosition) == null){
             HandleShoveFeedback(direction);
         }
 

@@ -16,7 +16,20 @@ public class PathfindingManager : MonoBehaviour
     void Start()
     {
         GameObject groundTilemapObject = GameObject.FindWithTag("GroundTilemap");
-        groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
+
+        if (groundTilemapObject != null)
+        {
+            groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
+            if (groundTilemap == null)
+            {
+                Debug.LogError("Tilemap component not found on the GameObject with the GroundTilemap tag.");
+            }
+        }
+        else
+        {
+            Debug.LogError("GameObject with the GroundTilemap tag not found.");
+        }
+
         InitializeReferenceWalkableMap();
         InitializeWalkableMap();
     }
@@ -79,6 +92,14 @@ public class PathfindingManager : MonoBehaviour
             Debug.LogError("Enemies list is null.");
             return;
         }
+        if (groundTilemap == null) {
+            Debug.LogError("groundTilemap is null.");
+            return;
+        }
+        if (walkableMap == null) {
+            Debug.LogError("walkableMap is not initialized.");
+            return;
+        } //somehow having these checks makes the script work. it seems there's an issue whenhaving a smaller groundtilemap things happen too quickly and enemies are null when it reaches this point, but adding the null checks slows things down?
         Array.Copy(walkableMapReference, walkableMap, walkableMapReference.Length);
 
         foreach (var enemy in enemies)
