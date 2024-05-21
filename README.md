@@ -29,6 +29,8 @@ The player can also enter a "High Speed Mode" if the Player is moving fast enoug
 While in this mode, the player deals double-damage while in attack-mode.
 The idea here is to use Bounce-Mode to increase you velocity and reach High Speeds, then switch to attack-mode when the time is right to deal greater damage.
 
+Playable [Here](https://wiktork01.itch.io/balldyseus)
+
 ## Features
 - Turn Manager
 - A* Pathfinding for Enemies
