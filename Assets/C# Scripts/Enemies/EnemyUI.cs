@@ -10,7 +10,7 @@ public class EnemyUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI moveMoneyText; 
     [SerializeField] Image fireIndicatorImage;
 
-    void Awake()
+    void OnEnable()
     {
         enemyProperties = GetComponent<EnemyProperties>();
         enemyMovement = GetComponent<EnemyMovement>();

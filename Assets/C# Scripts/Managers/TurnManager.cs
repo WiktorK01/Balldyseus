@@ -6,7 +6,26 @@ public class TurnManager : MonoBehaviour
 {
     public static TurnManager Instance { get; private set; }
 
-    void Awake()
+    public enum GameState
+    {
+        Null,
+        PlayerTurn,
+        EnemyTurn,
+        Win,
+        Loss,
+    }
+
+    [SerializeField] private GameObject balldyseus;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private PathfindingManager pathfindingManager;
+
+    public GameState currentState = GameState.Null;
+    public float TurnNumber { get; private set; }
+
+    private List<GameObject> enemies = new List<GameObject>();
+    private GameState previousState;
+
+    private void Awake()
     {
         if (Instance == null)
         {
@@ -17,109 +36,42 @@ public class TurnManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-/*--------------------------------------------------------------------------------------------------*/
-    public enum GameState
+
+    private void Start()
     {
-        Null,
-        PlayerTurn,
-        EnemyTurn,
-        Win,
-        Loss,
-    }
-
-    public GameState currentState = GameState.Null;
-    private GameState previousState;
-    
-    GameObject Balldyseus;
-    BallMovement ballMovement;
-    bool BalldyseusStopped;
-    bool BalldyseusIsMoving;
-
-    public Camera mainCamera;
-    private CameraManager cameraManager;
-
-    List<GameObject> enemies = new List<GameObject>();
-
-    private PathfindingManager pathfindingManager;
-
-    public float TurnNumber = 0;
-
-
-/*--------------------------------------------------------------------------------------------------*/
-
-    // Initialize enemy list, update the walkable map, start the player's turn
-    void Start()
-    {
-        cameraManager = FindObjectOfType<CameraManager>();
         pathfindingManager = FindObjectOfType<PathfindingManager>();
-        Balldyseus = GameObject.Find("Balldyseus");
+        balldyseus = GameObject.Find("Balldyseus");
 
         if (pathfindingManager == null) Debug.LogError("PathfindingManager not found.");
-        if (cameraManager == null) Debug.LogError("CameraManager not found.");
-        if (Balldyseus == null) Debug.LogError("Balldyseus not found.");
-
-        ballMovement = Balldyseus.GetComponent<BallMovement>();
+        if (balldyseus == null) Debug.LogError("Balldyseus not found.");
         
-        UIManager.Instance.ShowGameplayUI(); //THIS IS CURRENTLY ONLY HERE BECAUSE OF UNIMPLEMENTED BOUNCE COUNT UI. REMOVE THIS ONCE THATS IMPLEMENTED
-
-        ChangeGameState("PlayerTurn"); //Player turn begins
+        ChangeGameState(GameState.PlayerTurn); //Player turn begins
     }
 
-    void Update()
+    public void ChangeGameState(GameState newState)
     {
-        if(ballMovement != null){
-            BalldyseusStopped = ballMovement.HasStopped();
-            BalldyseusIsMoving = ballMovement.IsMoving();
-        }
-
-        // During a Player's Turn
-        if (currentState == GameState.PlayerTurn)
-        {
-            if (BalldyseusStopped){
-                UpdateEnemiesList();
-                CheckForWin();
-                if(currentState != GameState.Win){
-                    ChangeGameState("EnemyTurn");
-                }
-            }
-        }
-
-    }
-/*--------------------------------------------------------------------------------------------------*/
-    public void ChangeGameState(string stateString){
-        GameState newState = ReturnGameStateFromString(stateString);
-
         if (newState == currentState) return;
 
         previousState = currentState;
-        
-        currentState = newState; 
+        currentState = newState;
 
-        switch (newState){
+        switch (newState)
+        {
             case GameState.Null:
-                // Handle Null state
                 break;
 
             case GameState.PlayerTurn:
-                if(currentState != GameState.Loss && currentState != GameState.Win){
-                    ballMovement.ResetForcePercentage();
-                    UpdateEnemiesList();
-                    CheckForWin();
-                    cameraManager.SetCameraForPlayerTurn(Balldyseus.transform);
-                    Balldyseus.GetComponent<BallMovement>().ResetMovement();
-                    TurnNumber++;
-                }
+                HandlePlayerTurnStart();
                 break;
 
             case GameState.EnemyTurn:
-                if(currentState != GameState.Loss){
-                    cameraManager.SetCameraForEnemyTurn();
-                    if(enemies.Count == 0){
-                        CheckForWin();
-                    }
-                    else{
-                        StartCoroutine(EnemyTurnRoutine());
-                    }
+                if (enemies.Count == 0)
+                {
+                    CheckForWin();
+                }
+                else
+                {
+                    StartCoroutine(EnemyTurnRoutine());
                 }
                 break;
 
@@ -132,40 +84,30 @@ public class TurnManager : MonoBehaviour
                 break;
         }
 
-        Debug.Log("Notifying of New State: " + newState.ToString());
-        GameStateEventPublisher.NotifyGameStateChange(newState);
+        GameStatePublisher.NotifyGameStateChange(newState);
     }
 
-    //this returns the gamestate from a given string. this is used for the GameStateEventPublisher which needs to take in a 
-    //GameState variable rather than a string
-    private GameState ReturnGameStateFromString(string stateString) {
-        switch (stateString){
-            case "Null": return GameState.Null;
-            case "PlayerTurn": return GameState.PlayerTurn;
-            case "EnemyTurn": return GameState.EnemyTurn;
-            case "Win": return GameState.Win;
-            case "Loss": return GameState.Loss;
-            default: return previousState;
+    private void HandlePlayerTurnStart()
+    {
+        if (currentState != GameState.Loss && currentState != GameState.Win)
+        {
+            UpdateEnemiesList();
+            CheckForWin();
+            TurnNumber++;
         }
     }
 
-/*--------------------------------------------------------------------------------------------------*/
-
-
-
-/*--------------------------------------------------------------------------------------------------*/
-    //MANAGING THE EXISTING ENEMIES
     public void UpdateEnemiesList()
     {
         enemies.Clear();
         enemies.AddRange(GameObject.FindGameObjectsWithTag("Enemy"));
-
         pathfindingManager.UpdateWalkableMap(enemies);
     }
 
     public void AddEnemy(GameObject enemy)
     {
-        if (!enemies.Contains(enemy)){
+        if (!enemies.Contains(enemy))
+        {
             enemies.Add(enemy);
             pathfindingManager.UpdateWalkableMap(enemies);
         }
@@ -173,30 +115,30 @@ public class TurnManager : MonoBehaviour
 
     public void RemoveEnemy(GameObject enemy)
     {
-        if (enemies.Remove(enemy)){
+        if (enemies.Remove(enemy))
+        {
             pathfindingManager.UpdateWalkableMap(enemies);
         }
         CheckForWin();
     }
 
-    // For every enemy, for moveMoney times, call move & wait secondsBetweenEnemyMoves
-    IEnumerator EnemyTurnRoutine()
+    private IEnumerator EnemyTurnRoutine()
     {
         var enemiesToMove = new List<GameObject>(enemies);
 
-        foreach (var enemyGameObject in enemiesToMove){
-            if(currentState == GameState.Loss) break;
-            EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
-            EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
+        foreach (var enemyGameObject in enemiesToMove)
+        {
+            if (currentState == GameState.Loss) break;
+            
+            var enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
+            var enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
 
             enemyProps.ThisEnemyTurnBegins();
 
-            //StartCoroutine(DoThisBeforeEnemyMoves(enemyGameObject));
-            //ideally we put all the stuff thats supposed to be checked prior to a movement in its own function here
-            //for now we just put the fire here to easily wait for flame dmg animation
-            if(enemyProps.isOnFire){
+            if (enemyProps.isOnFire)
+            {
                 Fire.ApplyFireDamageIfOnFire(enemyProps);
-                yield return new WaitForSeconds(.4f);
+                yield return new WaitForSeconds(0.4f);
             }
 
             if (enemyProps.IsDefeated())
@@ -206,8 +148,9 @@ public class TurnManager : MonoBehaviour
             }
 
             UpdateEnemiesList();
-            
-            if (enemyGameObject != null){
+
+            if (enemyGameObject != null)
+            {
                 enemyMovement.Move();
                 yield return new WaitUntil(() => enemyMovement.HasMoved());
 
@@ -216,70 +159,90 @@ public class TurnManager : MonoBehaviour
             }
         }
 
-        // After all enemies have moved
-        foreach (var enemyGameObject in enemiesToMove){
-            if(enemyGameObject != null){
-                EnemyMovement enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
+        ResetEnemyMovements(enemiesToMove);
+        ResolveCollisionsWithEnemies();
+        ChangeGameState(GameState.PlayerTurn);
+    }
+
+    private void ResetEnemyMovements(List<GameObject> enemiesToMove)
+    {
+        foreach (var enemyGameObject in enemiesToMove)
+        {
+            if (enemyGameObject != null)
+            {
+                var enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
                 enemyMovement.ResetMoveMoney();
                 enemyMovement.ResetMovement();
             }
         }
-
-        ResolveCollisionsWithEnemies();
-        ChangeGameState("PlayerTurn");
     }
 
-    /*IEnumerator DoThisBeforeEnemyMoves(GameObject enemyGameObject){
-        EnemyProperties enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
-        if(enemyProps.isOnFire){
-            Fire.ApplyFireDamageIfOnFire(enemyProps);
-            yield return new WaitForSeconds(1f);
-        }
-    }*/
-
-    //moves Balldyeus away from an enemy by a small amount if colliding when turn starts, to allow Balldyeus to attack the enemy if desired
-    void ResolveCollisionsWithEnemies()
+    private void ResolveCollisionsWithEnemies()
     {
-        Collider2D balldyseusCollider = Balldyseus.GetComponent<Collider2D>();
-        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(Balldyseus.transform.position, balldyseusCollider.bounds.extents.x);
+        var balldyseusCollider = balldyseus.GetComponent<Collider2D>();
+        var hitColliders = Physics2D.OverlapCircleAll(balldyseus.transform.position, balldyseusCollider.bounds.extents.x);
+
         foreach (var hitCollider in hitColliders)
         {
             if (hitCollider.gameObject.CompareTag("Enemy"))
             {
-                Vector3 directionToEnemy = hitCollider.transform.position - Balldyseus.transform.position;
-                Balldyseus.transform.position -= directionToEnemy.normalized * 0.05f; 
-                break; 
+                Vector3 directionToEnemy = hitCollider.transform.position - balldyseus.transform.position;
+                balldyseus.transform.position -= directionToEnemy.normalized * 0.05f;
+                break;
             }
         }
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    private void CheckForWin(){
-        if(enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss)
+    private void CheckForWin()
+    {
+        if (enemies.Count == 0 && currentState != GameState.Win && currentState != GameState.Loss)
         {
             Debug.Log("WIN DETECTED");
-            ChangeGameState("Win");
+            ChangeGameState(GameState.Win);
         }
     }
 
-    void HandleWin(){
+    private void HandleWin()
+    {
         currentState = GameState.Win;
     }
 
-    void HandleLoss(){
-        Balldyseus.SetActive(false);
+    private void HandleLoss()
+    {
+        currentState = GameState.Loss;
+        balldyseus.SetActive(false);
     }
 
     public void OnEnemyReachedObjective()
     {
         if (currentState != GameState.Loss)
         {
-            ChangeGameState("Loss");
+            ChangeGameState(GameState.Loss);
         }
     }
 
-    public float GetTurnNumber(){
-        return TurnNumber;
+
+
+
+//***************OBSERVERS********************
+    private void OnEnable(){
+        MovementStatePublisher.MovementStateChange += OnMovementStateChange;
+    }
+
+    private void OnDisable(){
+        MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
+    }
+
+    private void OnMovementStateChange(BallMovement.MovementState newState)
+    {
+        if (newState == BallMovement.MovementState.HasCompletedMovement && currentState == GameState.PlayerTurn)
+        {
+            UpdateEnemiesList();
+            CheckForWin();
+            if (currentState != GameState.Win)
+            {
+                ChangeGameState(GameState.EnemyTurn);
+            }
+        }
     }
 }

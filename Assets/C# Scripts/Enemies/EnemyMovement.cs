@@ -1,44 +1,51 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Threading.Tasks;
-using AStar.Algolgorithms;
-using AStar;
 using UnityEngine.Tilemaps;
+using AStar;
 
 public class EnemyMovement : MonoBehaviour
 {
-    PathfindingManager pathfindingManager;
-    EnemyProperties enemyProperties;
-    EnemyFeedback enemyFeedback;
-    
-
-    Tilemap groundTilemap;
+    private PathfindingManager pathfindingManager;
+    private EnemyProperties enemyProperties;
+    private EnemyFeedback enemyFeedback;
+    private Tilemap groundTilemap;
 
     public int moveMoney = 2;
-    public int moveMoneyDecrement; //this is a version of moveMoney that will decrement upon every movement.
+    public int moveMoneyDecrement;
     public float moveDuration = 0.1f;
-    [SerializeField] float secondsBetweenEnemyMoves = 0.6f; // this should be made equal to however long the move feedback is
+    [SerializeField] private float secondsBetweenEnemyMoves = 0.6f;
 
-    bool EnemyHasMoved = false;
+    private bool enemyHasMoved = false;
 
     public enum Direction { Up, Down, Left, Right }
 
-    
-    void Awake()
+    private void OnEnable()
     {
-        GameObject groundTilemapObject = GameObject.FindWithTag("GroundTilemap");
-        groundTilemap = groundTilemapObject.GetComponent<Tilemap>();
+        InitializeDependencies();
+    }
+
+    private void InitializeDependencies()
+    {
+        groundTilemap = GameObject.FindWithTag("GroundTilemap")?.GetComponent<Tilemap>();
+        if (groundTilemap == null)
+        {
+            Debug.LogError("GroundTilemap not found or Tilemap component missing.");
+        }
 
         enemyFeedback = GetComponent<EnemyFeedback>();
-        pathfindingManager = FindObjectOfType<PathfindingManager>();
         enemyProperties = GetComponent<EnemyProperties>();
+
+        pathfindingManager = FindObjectOfType<PathfindingManager>();
+        if (pathfindingManager == null)
+        {
+            Debug.LogError("PathfindingManager not found.");
+        }
 
         moveMoneyDecrement = moveMoney;
     }
 
-//Move Related Code***************************************************************
+    // Move Related Code ***************************************************************
 
     public void Move()
     {
@@ -51,10 +58,7 @@ public class EnemyMovement : MonoBehaviour
         StartCoroutine(PerformMovements(path));
     }
 
-
-
-    //Gets the starting point, the objective point
-    (int, int)[] FindPathSync()
+    private (int, int)[] FindPathSync()
     {
         GameObject objective = FindObjective();
         if (objective == null)
@@ -62,40 +66,40 @@ public class EnemyMovement : MonoBehaviour
             Debug.Log("No objective found");
             return null;
         }
+
         int startX = Mathf.FloorToInt(transform.position.x);
         int startY = Mathf.FloorToInt(transform.position.y);
         int goalX = Mathf.FloorToInt(objective.transform.position.x);
         int goalY = Mathf.FloorToInt(objective.transform.position.y);
-        
+
         bool[,] walkableMap = pathfindingManager.GetWalkableMap();
         if (walkableMap == null)
         {
             Debug.LogError("Walkable map data is null.");
             return null;
         }
-        (int, int)[] currentMap = AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true, false);
-        return FillInDiagonals(currentMap);
+
+        var path = AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true, false);
+        return FillInDiagonals(path);
     }
 
-    (int, int)[] FillInDiagonals((int, int)[] path){
+    private (int, int)[] FillInDiagonals((int, int)[] path)
+    {
         if (path == null || path.Length == 0) return path;
 
-        List<(int, int)> listPath = new List<(int, int)>(path); //convert the array to a list
+        var listPath = new List<(int, int)>(path);
 
         int previousX = listPath[0].Item1;
         int previousY = listPath[0].Item2;
 
-        for(int i = 1; i < listPath.Count; i++){ 
-            //go through every tuple
-            //if both items in a tuple differ from the previous values, it must be a diagonal movement
-            if(listPath[i].Item1 != previousX && listPath[i].Item2 != previousY){
-
-                if(CanMove(listPath[i-1].Item1, listPath[i].Item2)) 
-                    //if setting to the previous x is viable, insert a diagonal filler there
-                    listPath.Insert(i, (listPath[i-1].Item1, listPath[i].Item2));
-                else 
-                    //else set it to the previous y
-                    listPath.Insert(i, (listPath[i].Item1, listPath[i-1].Item2));
+        for (int i = 1; i < listPath.Count; i++)
+        {
+            if (listPath[i].Item1 != previousX && listPath[i].Item2 != previousY)
+            {
+                if (CanMove(listPath[i - 1].Item1, listPath[i].Item2))
+                    listPath.Insert(i, (listPath[i - 1].Item1, listPath[i].Item2));
+                else
+                    listPath.Insert(i, (listPath[i].Item1, listPath[i - 1].Item2));
                 i++;
             }
             previousX = listPath[i].Item1;
@@ -105,8 +109,7 @@ public class EnemyMovement : MonoBehaviour
         return listPath.ToArray();
     }
 
-    //returns the closest Objective to the enemy
-    GameObject FindObjective()
+    private GameObject FindObjective()
     {
         GameObject[] objectives = GameObject.FindGameObjectsWithTag("Objective");
         GameObject closest = null;
@@ -125,47 +128,52 @@ public class EnemyMovement : MonoBehaviour
         return closest;
     }
 
-    IEnumerator PerformMovements((int, int)[] path)
+private IEnumerator PerformMovements((int, int)[] path)
+{
+    if (path == null || path.Length < 2)
     {
-        if (path == null || path.Length == 0) {
-        Debug.LogError("Path is null or empty in PerformMovements");
+        Debug.LogError("Path is null or too short in PerformMovements()");
         yield break;
-        }
-        
-        int previousX = path[0].Item1;
-        int previousY = path[0].Item2;
-
-        int minimum = Math.Min(moveMoney, path.Length);
-
-        for(int i = 0; i < minimum; i++){
-            if(TurnManager.Instance.currentState == TurnManager.GameState.Loss){
-                break;
-            }
-
-            DecrementMoveMoney();
-
-            if (path[i+1].Item1 > previousX)
-                enemyFeedback.MoveRight();
-            else if (path[i+1].Item1 < previousX)
-                enemyFeedback.MoveLeft();
-            else if (path[i+1].Item2 > previousY)
-                enemyFeedback.MoveUp();
-            else if (path[i+1].Item2 < previousY)
-                enemyFeedback.MoveDown();
-
-            previousX = path[i].Item1;
-            previousY = path[i].Item2;
-            yield return new WaitForSeconds(secondsBetweenEnemyMoves);
-        }
-        EnemyHasMoved = true;
     }
 
+    for (int i = 0; i < moveMoney && i < path.Length - 1; i++)
+    {
+        if (TurnManager.Instance.currentState == TurnManager.GameState.Loss)
+        {
+            break;
+        }
 
-//Checking Spaces for x***************************************************************
+        int previousX = Mathf.FloorToInt(transform.position.x);
+        int previousY = Mathf.FloorToInt(transform.position.y);
+        int targetX = path[i + 1].Item1;
+        int targetY = path[i + 1].Item2;
+        Vector2 targetPosition = new Vector2(targetX, targetY);
 
+        if (targetX > previousX)
+            enemyFeedback.MoveRight();
+        else if (targetX < previousX)
+            enemyFeedback.MoveLeft();
+        else if (targetY > previousY)
+            enemyFeedback.MoveUp();
+        else if (targetY < previousY)
+            enemyFeedback.MoveDown();
 
-    //checks if an enemy can move to a location
-    bool CanMove(int x, int y)
+        yield return new WaitForSeconds(secondsBetweenEnemyMoves);
+
+        while ((Vector2)transform.position != targetPosition)
+        {
+            yield return null; 
+        }
+
+        transform.position = targetPosition;
+    }
+
+    enemyHasMoved = true;
+}
+
+    // Checking Spaces ***************************************************************
+
+    private bool CanMove(int x, int y)
     {
         bool[,] walkableMap = pathfindingManager.GetWalkableMap();
         if (walkableMap == null || y >= walkableMap.GetLength(0) || x >= walkableMap.GetLength(1) || y < 0 || x < 0)
@@ -176,8 +184,7 @@ public class EnemyMovement : MonoBehaviour
         return walkableMap[y, x] && !IsObstacleTriggerUnwalkableAt(new Vector3(x, y, 0));
     }
 
-    //this checks for Obstacles that CANT WALK INTO but CAN SHOVE INTO
-    bool IsObstacleTriggerUnwalkableAt(Vector3 position)
+    private bool IsObstacleTriggerUnwalkableAt(Vector3 position)
     {
         RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero);
         if (hit.collider != null)
@@ -188,8 +195,6 @@ public class EnemyMovement : MonoBehaviour
         return false;
     }
 
-    //checks if there is another enemy at a position (mainly for shoves)
-    //returns it
     public GameObject CheckForEnemyAtPosition(Vector3 position)
     {
         int enemyLayer = LayerMask.NameToLayer("Enemy");
@@ -205,9 +210,7 @@ public class EnemyMovement : MonoBehaviour
         return null;
     }
 
-
-//Shove related code***************************************************************
-
+    // Shove Related Code ***************************************************************
 
     public void Shove(Direction direction)
     {
@@ -217,17 +220,17 @@ public class EnemyMovement : MonoBehaviour
         int newY = Mathf.FloorToInt(newPosition.y);
 
         bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-        
-        //if it's walkable or there's an unwalkable triggger obstacle, allow the shove
-        if (walkableMap[newY, newX] || IsObstacleTriggerUnwalkableAt(newPosition) && CheckForEnemyAtPosition(newPosition) == null){
+
+        if ((walkableMap[newY, newX] || IsObstacleTriggerUnwalkableAt(newPosition)) && CheckForEnemyAtPosition(newPosition) == null)
+        {
             HandleShoveFeedback(direction);
         }
-
-        //otherwise, if shoved into an enemy
         else
         {
-            if (CheckForEnemyAtPosition(newPosition) != null){
-                EnemyProperties otherEnemyProperties = CheckForEnemyAtPosition(newPosition).GetComponent<EnemyProperties>();
+            GameObject enemyAtPosition = CheckForEnemyAtPosition(newPosition);
+            if (enemyAtPosition != null)
+            {
+                EnemyProperties otherEnemyProperties = enemyAtPosition.GetComponent<EnemyProperties>();
                 otherEnemyProperties.TakeDamage(1f);
             }
 
@@ -238,87 +241,71 @@ public class EnemyMovement : MonoBehaviour
 
     private Vector3 DirectionToVector(Direction direction)
     {
+        return direction switch
+        {
+            Direction.Up => new Vector3(0, 1, 0),
+            Direction.Down => new Vector3(0, -1, 0),
+            Direction.Left => new Vector3(-1, 0, 0),
+            Direction.Right => new Vector3(1, 0, 0),
+            _ => Vector3.zero,
+        };
+    } //??? CHECK HOW THIS WORKS
+
+    // Feedback Related Code ***************************************************************
+
+    private void HandleShoveFeedback(Direction direction)
+    {
         switch (direction)
         {
-            case Direction.Up: return new Vector3(0, 1, 0);
-            case Direction.Down: return new Vector3(0, -1, 0);
-            case Direction.Left: return new Vector3(-1, 0, 0);
-            case Direction.Right: return new Vector3(1, 0, 0);
-            default: return Vector3.zero;
+            case Direction.Up:
+                enemyFeedback.ShoveUp();
+                break;
+            case Direction.Down:
+                enemyFeedback.ShoveDown();
+                break;
+            case Direction.Left:
+                enemyFeedback.ShoveLeft();
+                break;
+            case Direction.Right:
+                enemyFeedback.ShoveRight();
+                break;
         }
     }
 
-
-//Feedback related code***************************************************************
-
-
-    void HandleShoveFeedback(Direction direction) {
-        if (direction == Direction.Up)
-            enemyFeedback.ShoveUp();
-
-        else if (direction == Direction.Down)
-            enemyFeedback.ShoveDown();
-
-        else if (direction == Direction.Left)
-            enemyFeedback.ShoveLeft();
-
-        else if (direction == Direction.Right)
-            enemyFeedback.ShoveRight();
-    }
-
-    void HandleSquashFeedback(Direction direction){
-        if (direction == Direction.Up)
-            enemyFeedback.SquashUp();
-
-        else if (direction == Direction.Down)
-            enemyFeedback.SquashDown();
-
-        else if (direction == Direction.Left)
-            enemyFeedback.SquashLeft();
-
-        else if (direction == Direction.Right)
-            enemyFeedback.SquashRight();
-    }
-
-    /*void HandleMoveFeedback(Vector3 direction)
+    private void HandleSquashFeedback(Direction direction)
     {
-        if (direction == Vector3.up)
+        switch (direction)
         {
-            enemyFeedback.MoveUp();
+            case Direction.Up:
+                enemyFeedback.SquashUp();
+                break;
+            case Direction.Down:
+                enemyFeedback.SquashDown();
+                break;
+            case Direction.Left:
+                enemyFeedback.SquashLeft();
+                break;
+            case Direction.Right:
+                enemyFeedback.SquashRight();
+                break;
         }
-        else if (direction == Vector3.down)
-        {
-            enemyFeedback.MoveDown();
-        }
-        else if (direction == Vector3.left)
-        {
-            enemyFeedback.MoveLeft();
-        }
-        else if (direction == Vector3.right)
-        {
-            enemyFeedback.MoveRight();
-        }
-    }*/
-
-
-//Misc***************************************************************
-
-    public void ResetMovement(){
-        EnemyHasMoved = false;
     }
 
-    void DecrementMoveMoney(){
-        moveMoneyDecrement--;
-        enemyFeedback.MoveTextBounce();
+    // Miscellaneous ***************************************************************
+
+    public void ResetMovement()
+    {
+        enemyHasMoved = false;
     }
 
-    public void ResetMoveMoney(){
+    public void ResetMoveMoney()
+    {
         enemyFeedback.MoveTextBounce();
         moveMoneyDecrement = moveMoney;
     }
 
     public bool HasMoved()
     {
-        return EnemyHasMoved;
+        return enemyHasMoved;
     }
 }

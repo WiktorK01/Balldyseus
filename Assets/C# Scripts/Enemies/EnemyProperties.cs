@@ -6,7 +6,6 @@ public class EnemyProperties : MonoBehaviour
 {
     private EnemyUI EnemyUI;
     private EnemyFeedback enemyFeedback;
-    GameObject balldyseus;
 
     public float health = 3f;
     public float startingImpulse = 2f;
@@ -16,7 +15,6 @@ public class EnemyProperties : MonoBehaviour
     bool isDefeated = false;    
 
     void Start(){
-        balldyseus = GameObject.Find("Balldyseus");
         EnemyUI = gameObject.GetComponent<EnemyUI>();
         enemyFeedback = gameObject.GetComponent<EnemyFeedback>();
     }
@@ -72,18 +70,6 @@ public class EnemyProperties : MonoBehaviour
 
     public void ThisEnemyTurnEnds(){
         isThisEnemyTurn = false;
-    }
-
-    private Vector2 GetDirectionToBalldyseus(){
-        if (balldyseus == null){
-            Debug.LogError("Balldyseus Not Found!");
-            return Vector2.zero;
-        }
-
-        Vector2 balldyseusPosition = balldyseus.transform.position;
-        Vector2 directionToBalldyseus = (balldyseusPosition - (Vector2)transform.position).normalized;
-
-        return directionToBalldyseus;
     }
 
 }

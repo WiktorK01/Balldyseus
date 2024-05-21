@@ -5,10 +5,6 @@ using UnityEngine;
 public class BallVisuals : MonoBehaviour
 {
     [SerializeField]GameObject SpriteObject;
-
-    SpriteRenderer spriteRenderer;
-    BallProperties BallProperties;
-    BallCollision BallCollision;
     
     [SerializeField] private LineRenderer trajectoryLineRenderer;
     [SerializeField] private LineRenderer pullLineRenderer;
@@ -20,12 +16,10 @@ public class BallVisuals : MonoBehaviour
     [SerializeField] GameObject attackModeSprite; 
     [SerializeField] GameObject shoveModeSprite;
 
+    float bounceCount = 5f;
+
     void Start()
     {
-        BallCollision = GetComponent<BallCollision>();
-        spriteRenderer = SpriteObject.GetComponent<SpriteRenderer>();
-        BallProperties = GetComponent<BallProperties>();
-
         if (pullLineRenderer == null)
         {
             pullLineRenderer = GetComponent<LineRenderer>();
@@ -40,32 +34,8 @@ public class BallVisuals : MonoBehaviour
         }
     }
 
-    void Update(){
-
-        SetSpriteColor(BallProperties.ShoveMode);
-    }
-
-
     //PULL LINE
     /*-------------------------------------------------------------------------*/
-    public void SetSpriteColor(bool ShoveMode)
-    {
-        if (ShoveMode && BallCollision.GetRemainingShoveCount() == 0){
-            baseModeSprite.SetActive(true);
-            shoveModeSprite.SetActive(false);
-            attackModeSprite.SetActive(false);
-        }
-        else if (ShoveMode){
-            shoveModeSprite.SetActive(true);
-            baseModeSprite.SetActive(false);
-            attackModeSprite.SetActive(false);
-        }
-        else{
-            attackModeSprite.SetActive(true);
-            baseModeSprite.SetActive(false);
-            shoveModeSprite.SetActive(false);
-        }    
-    }
 
     public void SetPullLineRendererState(bool enabled, Color color, Vector2 startPoint)
     {
@@ -153,5 +123,48 @@ public class BallVisuals : MonoBehaviour
             currentContactPointCircle = null;
         }
     }
+//********************OBSERVERS****************
+
+    bool bounceMode = false;
+
+    void OnEnable(){
+        BounceCountPublisher.BounceCountChange += OnBounceCountChange;
+        BounceModePublisher.BounceModeChange += SpriteChangeOnBounceModeChange;
+    }
+    void OnDisable(){
+        BounceCountPublisher.BounceCountChange -= OnBounceCountChange;
+        BounceModePublisher.BounceModeChange -= SpriteChangeOnBounceModeChange;
+    }
+
+    void OnBounceCountChange(float newBounceCount){
+        bounceCount = newBounceCount;
+
+        if(newBounceCount == 0 && bounceMode){
+            baseModeSprite.SetActive(true);
+            shoveModeSprite.SetActive(false);
+            attackModeSprite.SetActive(false);
+        }
+    }
+
+    void SpriteChangeOnBounceModeChange(bool newBounceMode){
+        bounceMode = newBounceMode;
+
+        if (bounceMode && bounceCount == 0){
+            baseModeSprite.SetActive(true);
+            shoveModeSprite.SetActive(false);
+            attackModeSprite.SetActive(false);
+        }
+        else if (bounceMode){
+            shoveModeSprite.SetActive(true);
+            baseModeSprite.SetActive(false);
+            attackModeSprite.SetActive(false);
+        }
+        else{
+            attackModeSprite.SetActive(true);
+            baseModeSprite.SetActive(false);
+            shoveModeSprite.SetActive(false);
+        }    
+    }
     
+
 }

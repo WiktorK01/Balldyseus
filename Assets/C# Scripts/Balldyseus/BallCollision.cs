@@ -4,33 +4,28 @@ using UnityEngine;
 
 public class BallCollision : MonoBehaviour
 {
-    BallProperties ballProperties;
-    BallMovement ballMovement;
     BallFeedback ballFeedback;
+
     Rigidbody2D rb;
-
     CameraFeedback cameraFeedback;
-
     [SerializeField] private float shoveModeImpulseStrength = 12f;
+    private float remainingBounceCount = 5f;
+    public static float  referenceBounceCount = 5f;
 
-    [SerializeField] private float remainingShoveCount = 5f;
-    [SerializeField] private float referenceShoveCount = 5f;
+    bool isMoving = false;
+    bool bounceMode = false;
+    BallProperties.SpeedState currentSpeedState;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        ballMovement = GetComponent<BallMovement>();
-        ballProperties = GetComponent<BallProperties>();
         ballFeedback = GetComponent<BallFeedback>();
-
         cameraFeedback = FindObjectOfType<CameraFeedback>();
     }
 
     //handles what different things happen when Balldyseus collides with something while moving or not moving
     void OnCollisionEnter2D(Collision2D collision)
     {
-        bool isMoving = ballMovement.IsMoving();
-
         //currently, nothing happens when balldyseus interacts with an object while not moving
         if (!isMoving) return;
 
@@ -49,13 +44,11 @@ public class BallCollision : MonoBehaviour
 
     private void HandleEnemyCollision(Collision2D collision)
     {
-        bool ShoveMode = ballProperties.ShoveMode;
-        bool HighSpeed = ballProperties.HighSpeed;
         EnemyMovement enemyMovement = collision.gameObject.GetComponent<EnemyMovement>();
 
         if (enemyMovement == null) return;
 
-        if (ShoveMode && remainingShoveCount > 0)
+        if (bounceMode && remainingBounceCount > 0)
         {
             Vector2 contactPoint = collision.contacts[0].point;
             Vector2 center = collision.collider.bounds.center;
@@ -84,19 +77,19 @@ public class BallCollision : MonoBehaviour
         }
 
         //IN ATTACK MODE
-        else if (!ShoveMode)
+        else if (!bounceMode)
         {
             EnemyProperties enemy = collision.gameObject.GetComponent<EnemyProperties>();
             HandleEnemyDamageFeedback(collision);
 
-            if(HighSpeed)enemy.TakeDamage(2f);
+            if(HighSpeed())enemy.TakeDamage(2f);
             else enemy.TakeDamage(1f);
         }  
     }
 
     private void HandleWallCollision(Collision2D collision)
     {
-        if(ballProperties.ShoveMode && remainingShoveCount > 0)
+        if(bounceMode && remainingBounceCount > 0)
         {
             Vector2 collisionNormal = collision.contacts[0].normal;
             rb.AddForce(collisionNormal * shoveModeImpulseStrength, ForceMode2D.Impulse);
@@ -111,11 +104,11 @@ public class BallCollision : MonoBehaviour
 
         Vector2 direction = myPosition - collisionPosition;
 
-        if(ballProperties.LowSpeed) return;
+        if(LowSpeed()) return;
 
         if(Mathf.Abs(direction.x) > Mathf.Abs(direction.y)){
             if(direction.x > 0){
-                if(ballProperties.HighSpeed){
+                if(HighSpeed()){
                     ballFeedback.BigSquashLeft();
                     cameraFeedback.CameraShakeHorizontal();
                 }
@@ -123,7 +116,7 @@ public class BallCollision : MonoBehaviour
                     ballFeedback.SquashLeft();
             }
             else{
-                if(ballProperties.HighSpeed){
+                if(HighSpeed()){
                     ballFeedback.BigSquashRight();
                     cameraFeedback.CameraShakeHorizontal();
                 }
@@ -133,7 +126,7 @@ public class BallCollision : MonoBehaviour
         }
         else{
             if(direction.y > 0){
-                if(ballProperties.HighSpeed){
+                if(HighSpeed()){
                     ballFeedback.BigSquashDown();
                     cameraFeedback.CameraShakeVertical();
                 }
@@ -141,7 +134,7 @@ public class BallCollision : MonoBehaviour
                     ballFeedback.SquashDown();
             }
             else{
-                if(ballProperties.HighSpeed){
+                if(HighSpeed()){
                     ballFeedback.BigSquashUp();
                     cameraFeedback.CameraShakeVertical();
                 }
@@ -161,7 +154,7 @@ public class BallCollision : MonoBehaviour
 
         Vector2 direction = myPosition - enemyPosition;
 
-        if(ballProperties.LowSpeed) return;
+        if(LowSpeed()) return;
 
         if(Mathf.Abs(direction.x) > Mathf.Abs(direction.y)){
             if(direction.x > 0){
@@ -183,15 +176,63 @@ public class BallCollision : MonoBehaviour
 
     private void DecrementShoveCount()
     {
-        if (remainingShoveCount > 0)
-            remainingShoveCount--;
+        if (remainingBounceCount > 0){
+            remainingBounceCount--;
+            Debug.Log("New Bounce Count is " + remainingBounceCount);
+            BounceCountPublisher.NotifyBounceCountChange(remainingBounceCount);
+        }
+
+        if (remainingBounceCount == 0) BounceCountPublisher.NotifyBounceCountChange(remainingBounceCount);
     }
 
     public float GetRemainingShoveCount(){
-        return remainingShoveCount;
+        return remainingBounceCount;
     }
 
-    public void CollisionEndOfTurnResetters(){
-        remainingShoveCount = referenceShoveCount;
+    private void EndOfTurnResetters(){
+        remainingBounceCount = referenceBounceCount;
+        BounceCountPublisher.NotifyBounceCountChange(referenceBounceCount);
+    }
+
+    bool HighSpeed(){
+        return currentSpeedState == BallProperties.SpeedState.High;
+    }
+    bool LowSpeed(){
+        return currentSpeedState == BallProperties.SpeedState.Low;
+    }
+
+//*****************************OBSERVERS******************************************
+    void OnEnable(){
+        GameStatePublisher.GameStateChange += OnGameStateChange;
+        MovementStatePublisher.MovementStateChange += OnMovementStateChange;
+        SpeedStatePublisher.SpeedStateChange += OnSpeedStateChange;
+        BounceModePublisher.BounceModeChange += OnBounceModeChange;
+    }
+    void OnDisable(){
+        GameStatePublisher.GameStateChange -= OnGameStateChange;
+        MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
+        SpeedStatePublisher.SpeedStateChange -= OnSpeedStateChange;
+        BounceModePublisher.BounceModeChange -= OnBounceModeChange;
+    }
+
+    void OnGameStateChange(TurnManager.GameState newState){
+        if(newState == TurnManager.GameState.PlayerTurn) 
+            BounceCountPublisher.NotifyBounceCountChange(remainingBounceCount);
+        if (newState == TurnManager.GameState.EnemyTurn)
+            EndOfTurnResetters();
+    }
+
+    private void OnMovementStateChange(BallMovement.MovementState newState)
+    {
+        if(newState == BallMovement.MovementState.IsMoving) isMoving = true;
+        else isMoving = false;
+    }
+
+    void OnBounceModeChange(bool newBounceModeSetting){
+        bounceMode = newBounceModeSetting;
+    }
+
+    void OnSpeedStateChange(BallProperties.SpeedState newSpeedState){
+        currentSpeedState = newSpeedState;
     }
 }

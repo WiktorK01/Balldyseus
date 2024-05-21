@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class PauseManager : MonoBehaviour
 {
-    BallMovement ballMovement;
+    UIManager uiManager;
+
     bool isGamePaused = false;
+    bool isMoving = false;
 
     void Start(){
-        ballMovement = FindObjectOfType<BallMovement>();
-        if (ballMovement == null) Debug.LogError("BallMovement Not Found For PauseManager");
-        GameStateEventPublisher.GameStateChanged += HandleGameStateChange;
+        uiManager = FindObjectOfType<UIManager>();
     }
 
     void Update(){
-        if (Input.GetKeyDown(KeyCode.Escape) && !ballMovement.IsMoving()){
+        if (Input.GetKeyDown(KeyCode.Escape) && !isMoving){
             Debug.Log("PAUSING");
             if (!isGamePaused) 
                 PauseGame();
@@ -24,21 +24,41 @@ public class PauseManager : MonoBehaviour
     }
 
     void PauseGame(){
-        UIManager.Instance.ShowUIElement("PauseMenuUI");
+        uiManager.ShowUIElement("PauseMenuUI");
         isGamePaused = true;
         Time.timeScale = 0f;
     }
 
     public void ResumeGame()
     {
-        UIManager.Instance.HideUIElement("PauseMenuUI");
+        uiManager.HideUIElement("PauseMenuUI");
         isGamePaused = false;
         Time.timeScale = 1f;
     }
 
-    private void HandleGameStateChange(TurnManager.GameState newState) {
+
+
+//****************OBSERVERS***************
+
+    void OnEnable(){
+        GameStatePublisher.GameStateChange += OnGameStateChange;
+        MovementStatePublisher.MovementStateChange += OnMovementStateChange;
+    }
+
+    void OnDisable(){
+        GameStatePublisher.GameStateChange -= OnGameStateChange;
+        MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
+    }
+
+    private void OnGameStateChange(TurnManager.GameState newState) {
         if (isGamePaused && newState == TurnManager.GameState.PlayerTurn) {
             ResumeGame();
         }
+    }
+
+    private void OnMovementStateChange(BallMovement.MovementState newState)
+    {
+        if(newState == BallMovement.MovementState.IsMoving) isMoving = true;
+        else isMoving = false;
     }
 }

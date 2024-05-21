@@ -8,8 +8,7 @@ using AStar;
 
 public class PathfindingManager : MonoBehaviour
 {
-    private Tilemap groundTilemap;
-
+    [SerializeField] private Tilemap groundTilemap;
     private bool[,] walkableMap;
     private bool[,] walkableMapReference;
 
@@ -34,8 +33,7 @@ public class PathfindingManager : MonoBehaviour
         InitializeWalkableMap();
     }
 
-    //starting function to initialize the reference map
-    void InitializeReferenceWalkableMap()
+    private void InitializeReferenceWalkableMap()
     {
         BoundsInt bounds = groundTilemap.cellBounds;
         TileBase[] allTiles = groundTilemap.GetTilesBlock(bounds);
@@ -48,80 +46,71 @@ public class PathfindingManager : MonoBehaviour
             {
                 int index = (x + bounds.xMin) + (y + bounds.yMin) * bounds.size.x;
                 TileBase tile = allTiles[index];
-                if (tile != null)
-                {
-                    walkableMapReference[y, x] = true; // Walkable
-                }
-                else
-                {
-                    walkableMapReference[y, x] = false; // Non-walkable
-                }
+                walkableMapReference[y, x] = tile != null; // Walkable if tile exists
             }
         }
     }
-   
-    //starting function to initialize the walkable map
-    void InitializeWalkableMap()
+
+    private void InitializeWalkableMap()
     {
-        BoundsInt bounds = groundTilemap.cellBounds;
-        TileBase[] allTiles = groundTilemap.GetTilesBlock(bounds);
-
-        walkableMap = new bool[bounds.size.y, bounds.size.x];
-
-        for (int x = bounds.xMin; x < bounds.size.x; x++)
+        if (walkableMapReference == null)
         {
-            for (int y = bounds.yMin; y < bounds.size.y; y++)
-            {
-                TileBase tile = allTiles[x + y * bounds.size.x];
-                if (tile != null)
-                {
-                    walkableMap[y, x] = true; // Walkable
-                }
-                else
-                {
-                    walkableMap[y, x] = false; // Non-walkable
-                }
-            }
+            Debug.LogError("Reference walkable map is not initialized.");
+            return;
         }
+
+        walkableMap = new bool[walkableMapReference.GetLength(0), walkableMapReference.GetLength(1)];
+        Array.Copy(walkableMapReference, walkableMap, walkableMapReference.Length);
     }
-    
-    //Resets walkableMap back to it's reference then updates it based on Enemy Positions
+
     public void UpdateWalkableMap(List<GameObject> enemies)
     {
-        if (enemies == null) {
+        if (walkableMapReference == null)
+        {
+            Debug.LogError("Reference walkable map is not initialized.");
+            return;
+        }
+
+        if (enemies == null)
+        {
             Debug.LogError("Enemies list is null.");
             return;
         }
-        if (groundTilemap == null) {
-            Debug.LogError("groundTilemap is null.");
-            return;
-        }
-        if (walkableMap == null) {
-            Debug.LogError("walkableMap is not initialized.");
-            return;
-        } //somehow having these checks makes the script work. it seems there's an issue whenhaving a smaller groundtilemap things happen too quickly and enemies are null when it reaches this point, but adding the null checks slows things down?
+
         Array.Copy(walkableMapReference, walkableMap, walkableMapReference.Length);
 
         foreach (var enemy in enemies)
         {
-            Vector3 worldPosition = enemy.transform.position;
-            Vector3Int cellPosition = groundTilemap.WorldToCell(worldPosition);
-            walkableMap[cellPosition.y, cellPosition.x] = false; // Mark as unwalkable
+            Vector3Int cellPosition = groundTilemap.WorldToCell(enemy.transform.position);
+            if (IsWithinBounds(cellPosition))
+            {
+                walkableMap[cellPosition.y, cellPosition.x] = false; // Mark as unwalkable
+            }
         }
 
         foreach (var obstacle in FindObjectsOfType<Obstacle>())
         {
-            Vector3 worldPosition = obstacle.transform.position;
-            Vector3Int cellPosition = groundTilemap.WorldToCell(worldPosition);
-            walkableMap[cellPosition.y, cellPosition.x] = false; // Mark as unwalkable
+            Vector3Int cellPosition = groundTilemap.WorldToCell(obstacle.transform.position);
+            if (IsWithinBounds(cellPosition))
+            {
+                walkableMap[cellPosition.y, cellPosition.x] = false; // Mark as unwalkable
+            }
         }
     }
 
-    //Returns whether or not a tile is walkable
-    public bool isTileWalkable(int x, int y){
-        return walkableMap[y, x];
+    private bool IsWithinBounds(Vector3Int position)
+    {
+        return position.y >= 0 && position.y < walkableMap.GetLength(0) && position.x >= 0 && position.x < walkableMap.GetLength(1);
     }
 
+    public bool IsTileWalkable(int x, int y)
+    {
+        if (IsWithinBounds(new Vector3Int(x, y, 0)))
+        {
+            return walkableMap[y, x];
+        }
+        return false;
+    }
 
     public bool[,] GetWalkableMap()
     {
@@ -130,16 +119,13 @@ public class PathfindingManager : MonoBehaviour
 
     public void SetTileWalkability(Vector3Int cellPosition, bool isWalkable)
     {
-        if (cellPosition.y >= 0 && cellPosition.y < walkableMap.GetLength(0) &&
-            cellPosition.x >= 0 && cellPosition.x < walkableMap.GetLength(1))
+        if (IsWithinBounds(cellPosition))
         {
             walkableMap[cellPosition.y, cellPosition.x] = isWalkable;
         }
     }
 
-//////////////////////////////////////////////////////////////////////////////
-///Gizmos to Draw Walkable Tiles in scene viewer
-    void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
         if (groundTilemap != null && walkableMap != null)
         {
@@ -152,16 +138,8 @@ public class PathfindingManager : MonoBehaviour
                     Vector3Int localPlace = new Vector3Int(bounds.x + x, bounds.y + y, 0);
                     Vector3 worldPlace = groundTilemap.CellToWorld(localPlace);
 
-                    if (walkableMap[y, x]) 
-                    {
-                        Gizmos.color = Color.green;
-                        Gizmos.DrawCube(worldPlace, new Vector3(.5f, .5f, .5f));
-                    }
-                    else
-                    {
-                        Gizmos.color = Color.red;
-                        Gizmos.DrawCube(worldPlace, new Vector3(.5f, .5f, .5f));
-                    }
+                    Gizmos.color = walkableMap[y, x] ? Color.green : Color.red;
+                    Gizmos.DrawCube(worldPlace, new Vector3(0.5f, 0.5f, 0.5f));
                 }
             }
         }

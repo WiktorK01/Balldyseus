@@ -4,17 +4,48 @@ using UnityEngine;
 
 public class BallMovement : MonoBehaviour
 {
+//MOVEMENT STATE MACHINE******************************************
+    public enum MovementState
+    {
+        Null,
+        HasNotMoved,
+        IsMoving,
+        HasCompletedMovement
+    }
+    public MovementState currentMovementState = MovementState.HasNotMoved;
+
+    public void ChangeMovementState(MovementState newState){
+        if (newState == currentMovementState) return;
+        
+        switch (newState){
+            case MovementState.HasNotMoved:
+                currentMovementState = MovementState.HasNotMoved;
+                break;
+
+            case MovementState.IsMoving:
+                currentMovementState = MovementState.IsMoving;
+                break;
+
+            case MovementState.HasCompletedMovement:
+                currentMovementState = MovementState.HasCompletedMovement;
+                break;
+        }
+
+        MovementStatePublisher.NotifyMovementStateChange(newState);
+    }
+
+//**********************************************************************
+
+
+
+//**********************************************************************
+
     BallVisuals BallVisuals; 
-    BallCollision BallCollision;
     BallProperties BallProperties;
     Rigidbody2D rb;
 
-    bool isDragging = false;
-    bool isMoving = false;
-    bool hasMovedThisTurn = true;
-
     Vector2 startPoint;
-    Vector2 originalVelocity;
+    Vector2 originalVelocity; //this stores the previous velocity from before MultiplyVelocity(), useless rn but may be needed later
 
     [Header("Drag vars")]
     [SerializeField] float stopThreshold = .1f;
@@ -26,26 +57,27 @@ public class BallMovement : MonoBehaviour
     [SerializeField] float dampingFactor = 0.95f;
 
     Vector2 dragVector;
-
     private float forcePercentage;
+
+    bool isDragging = false;
+    bool hasLaunchedThisRound = true;
 
     void Awake()
     {
         BallVisuals = GetComponent<BallVisuals>(); 
-        BallCollision = GetComponent<BallCollision>();
         BallProperties = GetComponent<BallProperties>();
         rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        if(BallExists()){
-            CheckForPlayerInput();
-            HandleDrag();
+        CheckForPlayerInput();
+        HandleDrag();
 
-            BringToStopWhenTooSlow();
-            KeepSpeedBelowMaxVelocity();
-        }
+        BringToStopWhenTooSlow();
+        KeepSpeedBelowMaxVelocity();
+
+        CheckIfBallStoppedAfterMoving();
     }
 
     //this function looks for player input, whether or not the respective mode is gagged, and if the player has moved yet during its turn,
@@ -53,20 +85,20 @@ public class BallMovement : MonoBehaviour
 
     private void CheckForPlayerInput(){
 
-        if(!hasMovedThisTurn||isMoving){
+        if(currentMovementState != MovementState.HasCompletedMovement){
             if (Input.GetMouseButtonDown(0))
                 BallProperties.SetAttackMode();
 
             else if (Input.GetMouseButtonDown(1))
-                BallProperties.SetShoveMode();
+                BallProperties.SetBounceMode();
         }
 
-        if (!hasMovedThisTurn)
+        if (!hasLaunchedThisRound)
         {
-            if (IsMouseOverBalldyseus() && (Input.GetMouseButtonDown(0) && !BallProperties.AttackGagged || Input.GetMouseButtonDown(1) && !BallProperties.ShoveGagged)){
+            if (IsMouseOverBalldyseus() && (Input.GetMouseButtonDown(0) && !BallProperties.attackGagged || Input.GetMouseButtonDown(1) && !BallProperties.bounceGagged)){
                 isDragging = true;
                 startPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                BallVisuals.SetPullLineRendererState(true, BallProperties.ShoveMode ? Color.blue : Color.red, startPoint);
+                BallVisuals.SetPullLineRendererState(true, BallProperties.bounceMode ? Color.blue : Color.red, startPoint);
             }
         }
     }
@@ -91,21 +123,21 @@ public class BallMovement : MonoBehaviour
             BallVisuals.UpdatePullLineRendererPosition(currentPoint);
             BallVisuals.UpdateTrajectory(startPoint, currentPoint, forceMultiplier);
 
-            // Perform movement only if the released button corresponds to the current mode
-            if (BallProperties.ShoveMode && Input.GetMouseButtonUp(1))
+            if (BallProperties.bounceMode && Input.GetMouseButtonUp(1))
             {
                 Debug.Log(forcePercentage);
                 isDragging = false;
                 BallVisuals.DisablePullLineRenderer();
-                //PerformMovement(dragVector);
             }
-            else if (!BallProperties.ShoveMode && Input.GetMouseButtonUp(0))
+            else if (!BallProperties.bounceMode && Input.GetMouseButtonUp(0))
             {
                 Debug.Log(forcePercentage);
                 isDragging = false;
                 BallVisuals.DisablePullLineRenderer();
-                //PerformMovement(dragVector);
             }
+
+            //OBSERVER NOTIFIER OF FORCE PERCENT CHANGE
+            ForcePercentPublisher.NotifyForcePercentChange(forcePercentage);
         }
     }
 
@@ -117,16 +149,14 @@ public class BallMovement : MonoBehaviour
     public void PerformMovement(Vector2 dragVector)
     {
         rb.WakeUp();
-        Debug.Log($"Attempting to perform movement with vector: {dragVector}");
         Vector2 force = dragVector * forceMultiplier;
         rb.AddForce(force, ForceMode2D.Impulse);
-        Debug.Log($"Force applied: {force}");
 
         DisableLineRenderers();
 
         isDragging = false;
-        isMoving = true;
-        hasMovedThisTurn = true;
+        ChangeMovementState(MovementState.IsMoving);
+        hasLaunchedThisRound = true;
 
         this.dragVector = Vector2.zero;
     }
@@ -139,7 +169,7 @@ public class BallMovement : MonoBehaviour
 /*-------------------------------------------------------------------------------------------*/
 
     private void BringToStopWhenTooSlow(){
-        if (isMoving && rb.velocity.magnitude < stopThreshold){
+        if (currentMovementState == MovementState.IsMoving && rb.velocity.magnitude < stopThreshold){
             rb.velocity *= dampingFactor;
         }
     }
@@ -151,23 +181,21 @@ public class BallMovement : MonoBehaviour
         }
     }
 
-    public void ResetMovement()
+    private void ResetMovement()
     {
-        hasMovedThisTurn = false;
-        isMoving = false; 
+        ChangeMovementState(MovementState.HasNotMoved);
+        hasLaunchedThisRound = false;
         isDragging = false; 
-        rb.velocity = Vector2.zero; 
+        rb.velocity = Vector2.zero;
+
     }
 
-    public bool HasStopped()
+    private void CheckIfBallStoppedAfterMoving()
     {   
-        if (rb.velocity.magnitude < .001f && isMoving)
+        if (rb.velocity.magnitude < .001f && currentMovementState == MovementState.IsMoving)
         {
-            isMoving = false;
-            BallCollision.CollisionEndOfTurnResetters();
-            return true;
+            ChangeMovementState(MovementState.HasCompletedMovement);
         }
-        return false;
     }
 
     private bool IsMouseOverBalldyseus()
@@ -186,32 +214,40 @@ public class BallMovement : MonoBehaviour
         rb.velocity *= multiplier; 
     }
 
-    public bool IsMoving(){
-        return isMoving;
-    }
 
-    public Vector2 GetCurrentVelocity(){
+/*--------------------------------------------------------------------------------------------------*/
+
+    /*public Vector2 GetCurrentVelocity(){
         return rb.velocity; 
-    }
-
-    public float GetForcePercentage()
-    {
-        return forcePercentage;
-    }
+    }*/
 
     public Vector2 GetDragVector(){
         return dragVector;
     }
-
-    //returns if Balldyseus exists
-    public bool BallExists(){
-        if(!gameObject.activeSelf || gameObject==null)
-            return false;
-        else return true;
-    }
     
-    public void ResetForcePercentage(){
+    private void ResetForcePercentage(){
         forcePercentage = 0;
+        ForcePercentPublisher.NotifyForcePercentChange(forcePercentage);
     }
 
+/*-----------------------------------OBSERVERS---------------------------------------------------------------*/
+
+
+    void OnEnable(){
+        GameStatePublisher.GameStateChange += OnGameStateChange;
+    }
+    void OnDisable(){
+        GameStatePublisher.GameStateChange -= OnGameStateChange;
+    }
+
+    private void OnGameStateChange(TurnManager.GameState newState){
+        if(newState == TurnManager.GameState.PlayerTurn){
+            ResetForcePercentage();
+            ResetMovement();
+        }
+
+        else if(newState == TurnManager.GameState.EnemyTurn){
+
+        }
+    }
 }

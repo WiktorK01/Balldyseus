@@ -5,56 +5,99 @@ using UnityEngine.EventSystems;
 
 public class BallProperties : MonoBehaviour
 {
-    BallFeedback ballFeedback;
     Rigidbody2D rb;
 
-    static bool IsMouseOverLaunchButton = false;
+    public bool bounceMode = false;
 
-    public bool ShoveMode = false;
-
-    public bool ShoveGagged = false;
-    public bool AttackGagged = false;
+    static bool isMouseOverLaunchButton = false;
+    
+    public bool bounceGagged = false;
+    public bool attackGagged = false;
 
     [Header("HighSpeed Variables")]
-    public bool HighSpeed;
-    public float highSpeedThreshold = 10f;
-    public float delayToTurnOffHighSpeed = 0.7f;
+    [SerializeField] float highSpeedThreshold = 10f;
+    [SerializeField] float delayToTurnOffHighSpeed = 0.7f;
     Coroutine resetHighSpeedCoroutine = null;
 
     [Header("LowSpeed Variables")]
-    public bool LowSpeed;
-    public float lowSpeedThreshold = 5f;
+    [SerializeField] float lowSpeedThreshold = 5f;
+
+    
 
     void Awake(){
-        ballFeedback = GetComponent<BallFeedback>();
         rb = GetComponent<Rigidbody2D>();
     }
 
     void Update(){
-        if(ShoveGagged) SetAttackMode();
-        if(AttackGagged) SetShoveMode();
-        CheckForHighSpeed();
-        CheckForLowSpeed();
+        if(bounceGagged) SetAttackMode();
+        if(attackGagged) SetBounceMode();
+        
+        ManageSpeedState();
     }
 
-    public void SetShoveMode(){
-        if(!IsMouseOverLaunchButton) ballFeedback.ChangeModes();
-        if(ShoveGagged || IsMouseOverLaunchButton) 
+    public void SetBounceMode(){
+        if(!isMouseOverLaunchButton){
+            bounceMode = true;
+            BounceModePublisher.NotifyBounceModeChange(true);
+        } 
+        if(bounceGagged || isMouseOverLaunchButton) 
             return;
-        ShoveMode = true;
     }
-
     public void SetAttackMode(){
-        if(!IsMouseOverLaunchButton) ballFeedback.ChangeModes();
-        if(AttackGagged || IsMouseOverLaunchButton) 
+        if(!isMouseOverLaunchButton){
+            bounceMode = false;
+            BounceModePublisher.NotifyBounceModeChange(false);
+        } 
+        if(attackGagged || isMouseOverLaunchButton) 
             return;
-        ShoveMode = false;
     }
 
-    //High speed related code**********************************************
+//Gagging related code**********************************************
+    public void GagShove(){
+        bounceGagged = true;
+    }
 
-    private void CheckForHighSpeed(){
-        if(SpeedGreaterThanThreshold())
+    public void GagAttack(){
+        attackGagged = true;
+    }
+
+    public void UngagAll(){
+        bounceGagged = false;
+        attackGagged = false;
+    }
+
+//Mouse Over Launch Button related code**********************************************
+
+
+    //check if mouse is over the launch button to ensure no mode switching during that
+    public static void MouseEnterLaunchButton(){
+        isMouseOverLaunchButton = true;
+    }
+
+    public static void MouseExitLaunchButton(){
+        isMouseOverLaunchButton = false;
+    }
+
+//speed related code**********************************************
+    public enum SpeedState
+    {
+        Low,
+        Normal,
+        High,
+    }
+    public SpeedState currentSpeedState = SpeedState.Low;
+
+    public void ChangeSpeedState(SpeedState newState)
+    {
+        if (newState == currentSpeedState) return;
+
+        currentSpeedState = newState;
+        SpeedStatePublisher.NotifySpeedStateChange(newState);
+    }
+
+    void ManageSpeedState()
+    {
+        if (HighVelocityCheck())
         {
             if (resetHighSpeedCoroutine != null)
             {
@@ -62,53 +105,43 @@ public class BallProperties : MonoBehaviour
                 resetHighSpeedCoroutine = null;
             }
 
-            HighSpeed = true;
+            ChangeSpeedState(SpeedState.High);
         }
-
-        //this will ensure that HighSpeed won't immediately disappear after going below the threshold, giving the player extra time to react 
-        if(HighSpeed && !SpeedGreaterThanThreshold() && resetHighSpeedCoroutine == null)
+        else if (currentSpeedState == SpeedState.High)
         {
-            resetHighSpeedCoroutine = StartCoroutine(ResetHighSpeedAfterDelay(delayToTurnOffHighSpeed));
+            if (resetHighSpeedCoroutine == null)
+            {
+                resetHighSpeedCoroutine = StartCoroutine(ResetHighSpeedAfterDelay(delayToTurnOffHighSpeed));
+            }
+        }
+        else if (NormalVelocityCheck())
+        {
+            ChangeSpeedState(SpeedState.Normal);
+        }
+        else
+        {
+            ChangeSpeedState(SpeedState.Low);
         }
     }
 
-    bool SpeedGreaterThanThreshold(){
+    bool HighVelocityCheck(){
         return rb.velocity.magnitude > highSpeedThreshold;
     }
 
-    private IEnumerator ResetHighSpeedAfterDelay(float delay)
-    {
+    bool LowVelocityCheck(){
+        return rb.velocity.magnitude < lowSpeedThreshold;
+    }
+
+    bool NormalVelocityCheck(){
+        return !HighVelocityCheck() && !LowVelocityCheck();
+    }
+
+    private IEnumerator ResetHighSpeedAfterDelay(float delay){
         yield return new WaitForSeconds(delay);
-        HighSpeed = false;
+        if (!HighVelocityCheck())
+        {
+            ChangeSpeedState(SpeedState.Normal);
+        }
         resetHighSpeedCoroutine = null; // Reset the coroutine reference
     }
-
-    void CheckForLowSpeed(){
-        if(rb.velocity.magnitude < lowSpeedThreshold) LowSpeed = true;
-        else LowSpeed = false;
-    }
-
-    //Gagging related code**********************************************
-    public void GagShove(){
-        ShoveGagged = true;
-    }
-
-    public void GagAttack(){
-        AttackGagged = true;
-    }
-
-    public void UngagAll(){
-        ShoveGagged = false;
-        AttackGagged = false;
-    }
-
-    //check if mouse is over the launch button to ensure no mode switching during that
-    public static void MouseEnterLaunchButton(){
-        IsMouseOverLaunchButton = true;
-    }
-
-    public static void MouseExitLaunchButton(){
-        IsMouseOverLaunchButton = false;
-    }
-
 }

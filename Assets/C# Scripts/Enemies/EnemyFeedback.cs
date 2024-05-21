@@ -5,7 +5,7 @@ using MoreMountains.Feedbacks;
 
 public class EnemyFeedback : MonoBehaviour
 {
-    BallMovement ballMovement;
+    bool isMoving = false;
 
     [SerializeField] MMF_Player healthTextBounce;
     [SerializeField] MMF_Player bigHealthTextBounce;
@@ -40,10 +40,6 @@ public class EnemyFeedback : MonoBehaviour
 
     [SerializeField] MMF_Player onClick;
 
-    void Start(){
-        ballMovement = FindObjectOfType<BallMovement>();
-    }
-
     public void HealthTextBounce(){
         healthTextBounce.Initialization();
         healthTextBounce.PlayFeedbacks();
@@ -60,11 +56,10 @@ public class EnemyFeedback : MonoBehaviour
     }
 
     public void HoverTextGrowth(){
-        if(!ballMovement.IsMoving()){
+        if(!isMoving){
             hoverTextGrowth.Initialization();
             hoverTextGrowth.PlayFeedbacks();
         }
-
     }
 
     public void HoverTextShrink(){
@@ -166,5 +161,22 @@ public class EnemyFeedback : MonoBehaviour
     public void OnClick(){
         onClick.Initialization();
         onClick.PlayFeedbacks();
+    }
+
+
+//****************OBSERVERS***************
+
+    void OnEnable(){
+        MovementStatePublisher.MovementStateChange += OnMovementStateChange;
+    }
+
+    void OnDisable(){
+        MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
+    }
+
+    private void OnMovementStateChange(BallMovement.MovementState newState)
+    {
+        if(newState == BallMovement.MovementState.IsMoving) isMoving = true;
+        else isMoving = false;
     }
 }

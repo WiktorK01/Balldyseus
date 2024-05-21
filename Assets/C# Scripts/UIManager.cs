@@ -6,28 +6,16 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
-    //UIManager.Instance.ShowUIElement("PauseMenuUI");
-
-    public static UIManager Instance { get; private set; }
     private UIFactory factory;
 
     //dictionary to hold all active UI elements
     private Dictionary<string, GameObject> activeUIElements = new Dictionary<string, GameObject>();
-
+    //singleton
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         var uiDefinitions = Resources.Load<UIElementDefinitions>("UIElementDefinitions");
         factory = new UIFactory(uiDefinitions);
+        ShowGameplayUI();
     }
 
     public GameObject ShowUIElement(string elementType){
@@ -142,18 +130,19 @@ public class UIManager : MonoBehaviour
     void OnEnable()
     {
         //subscribes
-        GameStateEventPublisher.GameStateChanged += UpdateUI;
+        GameStatePublisher.GameStateChange += UpdateUI;
     }
 
     void OnDisable()
     {
         //unsubscribes to avoid memory leaks
-        GameStateEventPublisher.GameStateChanged -= UpdateUI;
+        GameStatePublisher.GameStateChange -= UpdateUI;
     }
 
     private void UpdateUI(TurnManager.GameState newState)
     {
         HideUIElement("PauseMenuUI");
+        
 
         switch (newState)
         {
@@ -174,9 +163,9 @@ public class UIManager : MonoBehaviour
         
     }
 
+    //we call this in Awake so that the gameplay UI exists to perform their feedbacks after a turn happens
     public void ShowGameplayUI(){
-        Debug.Log("Instantiating Gameplay UI");
-        ShowUIElement("ImpulseCountUI");
+        Debug.Log("Instantiating Gameplay UI if needed ");
         ShowUIElement("LaunchUI");
     }
     void ShowWinUI(){ 
@@ -185,8 +174,4 @@ public class UIManager : MonoBehaviour
     void ShowLossUI(){
         ShowUIElement("LossUI");
     }
-    void ShowPauseMenu() {
-        ShowUIElement("PauseMenuUI");
-    }
-
 }

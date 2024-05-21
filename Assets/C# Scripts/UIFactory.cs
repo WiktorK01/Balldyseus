@@ -22,10 +22,6 @@ public class UIFactory
                 return Instantiate(definitions.lossUI);
             case "PauseMenuUI":
                 return Instantiate(definitions.pauseMenuUI);
-            case "HighSpeedUI":
-                return Instantiate(definitions.highSpeedUI);
-            case "ImpulseCountUI":
-                return Instantiate(definitions.impulseCountUI);
             case "LaunchUI":
                 return Instantiate(definitions.launchUI);
             case "EnemyTurnUI":
