@@ -8,7 +8,6 @@ public class ObjectiveCollision : MonoBehaviour
     {
         if (other.CompareTag("EnemyCollider"))
         {
-            Debug.Log("ENEMY COLLISION WITH OBJECTIVE DETECTED");
             TurnManager.Instance.OnEnemyReachedObjective();
         }
     }
