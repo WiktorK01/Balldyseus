@@ -39366,6 +39366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d42fe74979496f49a0689fb1ffb467c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myColliderObject: {fileID: 7264873440963694526}
   moveMoney: 2
   moveMoneyDecrement: 0
   moveDuration: 0.5
@@ -39413,6 +39414,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0f4fa41a939eb94b93f36159812e0dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myColliderObject: {fileID: 7264873440963694526}
   healthTextBounce: {fileID: 9010664673962229248}
   bigHealthTextBounce: {fileID: 9098652458392606477}
   moveTextBounce: {fileID: 119231461904391099}

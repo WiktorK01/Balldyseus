@@ -2052,6 +2052,7 @@ GameObject:
   - component: {fileID: 2993666101185895071}
   - component: {fileID: 8121216698731663183}
   - component: {fileID: 6243176815419796858}
+  - component: {fileID: 6738922388562140816}
   m_Layer: 9
   m_Name: Balldyseus 1
   m_TagString: Player
@@ -2153,6 +2154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a21843ac793fc2b43a1d4f0aeedaea7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentMovementState: 1
   stopThreshold: 0.1
   forceMultiplier: 7
   maxDragDistance: 4
@@ -2319,7 +2321,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shoveModeImpulseStrength: 12
-  remainingShoveCount: 5
 --- !u!114 &8121216698731663183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2332,14 +2333,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fee8ba4bdf6212408840958ef665afc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShoveMode: 0
-  ShoveGagged: 0
-  AttackGagged: 0
-  HighSpeed: 0
+  bounceMode: 0
+  bounceGagged: 0
+  attackGagged: 0
   highSpeedThreshold: 29
   delayToTurnOffHighSpeed: 0.3
-  LowSpeed: 0
   lowSpeedThreshold: 5
+  currentSpeedState: 0
 --- !u!114 &6243176815419796858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2364,6 +2364,18 @@ MonoBehaviour:
   floatingBounceNumberBlue: {fileID: 28506025987591160}
   floatingBounceNumberGrey: {fileID: 7460592588171079932}
   highSpeedMode: {fileID: 5145962286075282752}
+--- !u!114 &6738922388562140816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305155721191999777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 497beb49a0b9e4e44bcc2445bb62c57f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1876141636903915186
 GameObject:
   m_ObjectHideFlags: 0
@@ -6997,7 +7009,7 @@ MonoBehaviour:
     - rid: 2963780922406600707
       type: {class: MMF_LooperStart, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks}
       data:
-        Active: 0
+        Active: 1
         UniqueID: -1264440089
         Label: Looper Start
         ChannelMode: 0
@@ -7153,7 +7165,7 @@ MonoBehaviour:
     - rid: 2963780922406600709
       type: {class: MMF_Looper, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks}
       data:
-        Active: 0
+        Active: 1
         UniqueID: -1315846630
         Label: Looper
         ChannelMode: 0

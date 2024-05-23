@@ -6,6 +6,7 @@ using AStar;
 
 public class EnemyMovement : MonoBehaviour
 {
+    [SerializeField] GameObject myColliderObject;
 
     private PathfindingManager pathfindingManager;
     private EnemyProperties enemyProperties;
@@ -23,12 +24,13 @@ public class EnemyMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        InitializeDependencies();
+        Initialize();
 
         GameStatePublisher.GameStateChange += OnGameStateChange;
+        BallCollisionPublisher.BallCollision += OnBallCollision;
     }
 
-    private void InitializeDependencies()
+    private void Initialize()
     {
         groundTilemap = GameObject.FindWithTag("GroundTilemap")?.GetComponent<Tilemap>();
         if (groundTilemap == null)
@@ -314,11 +316,49 @@ private IEnumerator PerformMovements((int, int)[] path)
 
     void OnDisable(){
         GameStatePublisher.GameStateChange -= OnGameStateChange;
+        BallCollisionPublisher.BallCollision -= OnBallCollision;
     }
 
     void OnGameStateChange(TurnManager.GameState newGameState){
         if(newGameState == TurnManager.GameState.PlayerTurn){
             ResetMovement();
+        }
+    }
+
+    void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState){
+        if(myColliderObject == collision.gameObject){
+            //IN BOUNCE MODE
+            if (bounceMode && remainingBounceCount > 0)
+            {
+                Vector2 contactPoint = collision.contacts[0].point;
+                Vector2 center = collision.collider.bounds.center;
+                
+                float deltaX = Mathf.Abs(contactPoint.x - center.x);
+                float deltaY = Mathf.Abs(contactPoint.y - center.y);
+                
+                if (deltaX > deltaY) {
+                    if (contactPoint.x > center.x)
+                        Shove(Direction.Left);
+                    else
+                        Shove(Direction.Right);
+                }
+                else {
+                    if (contactPoint.y > center.y)
+                        Shove(Direction.Down);
+                    else
+                        Shove(Direction.Up);
+                }
+            }
+
+            //IN ATTACK MODE
+            else if (!bounceMode)
+            {
+                if(currentSpeedState == BallProperties.SpeedState.High)
+                    enemyProperties.TakeDamage(2f, EnemyProperties.DamageType.BallImpactCritical);
+
+                else 
+                    enemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallImpact);
+            }  
         }
     }
 

@@ -6,6 +6,12 @@ using MoreMountains.Feedbacks;
 
 public class BallFeedback : MonoBehaviour
 {
+    CameraFeedback cameraFeedback;
+
+    void Start(){
+        cameraFeedback = FindObjectOfType<CameraFeedback>();
+    }
+
     [SerializeField] MMF_Player squashDown;
     [SerializeField] MMF_Player squashUp;
     [SerializeField] MMF_Player squashLeft;
@@ -42,21 +48,25 @@ public class BallFeedback : MonoBehaviour
     public void BigSquashDown(){
         bigSquashDown.Initialization();
         bigSquashDown.PlayFeedbacks();
+        cameraFeedback.CameraShakeVertical();
     }
 
     public void BigSquashUp(){
         bigSquashUp.Initialization();
         bigSquashUp.PlayFeedbacks();
+        cameraFeedback.CameraShakeVertical();
     }
 
     public void BigSquashLeft(){
         bigSquashLeft.Initialization();
         bigSquashLeft.PlayFeedbacks();
+        cameraFeedback.CameraShakeHorizontal();
     }
 
     public void BigSquashRight(){
         bigSquashRight.Initialization();
         bigSquashRight.PlayFeedbacks();
+        cameraFeedback.CameraShakeHorizontal();
     }
 
     public void ChangeModes(){
@@ -84,15 +94,19 @@ public class BallFeedback : MonoBehaviour
 
 
 //*********************************OBSERVERS****************************************
+    BallProperties.SpeedState currentSpeedState = BallProperties.SpeedState.Low;
+    
     void OnEnable(){
         BounceCountPublisher.BounceCountChange += OnBounceCountChange;
         BounceModePublisher.BounceModeChange += OnBounceModeChange;
         SpeedStatePublisher.SpeedStateChange += OnSpeedStateChange;
+        BallCollisionPublisher.BallCollision += OnBallCollision;
     }
     void OnDisable(){
         BounceCountPublisher.BounceCountChange -= OnBounceCountChange;
         BounceModePublisher.BounceModeChange -= OnBounceModeChange;
         SpeedStatePublisher.SpeedStateChange -= OnSpeedStateChange;
+        BallCollisionPublisher.BallCollision -= OnBallCollision;
     }
 
     void OnBounceCountChange(float newBounceCount){
@@ -117,13 +131,50 @@ public class BallFeedback : MonoBehaviour
     }
 
     void OnSpeedStateChange(BallProperties.SpeedState newSpeedState){
+        currentSpeedState = newSpeedState;
+
         if(newSpeedState == BallProperties.SpeedState.High){
             HighSpeedMode();
             Debug.Log("BEGINNING BALL FEEDBACK HIGH SPEED STATE");
         } 
         else StopHighSpeedMode();
     }
+    bool HighSpeed(){
+        return currentSpeedState == BallProperties.SpeedState.High;
+    }
+    bool LowSpeed(){
+        return currentSpeedState == BallProperties.SpeedState.Low;
+    }
 
+    void OnBallCollision(Collision2D collision, Vector2 myPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState){
+        Vector2 collisionPosition = collision.contacts[0].point;
+        Vector2 direction = myPosition - collisionPosition;
+
+        if(LowSpeed()) return;
+
+        bool highSpeed = HighSpeed();
+
+        if(Mathf.Abs(direction.x) > Mathf.Abs(direction.y)){
+            if(direction.x > 0){
+                if(highSpeed) BigSquashLeft();
+                else SquashLeft();
+            }
+            else{
+                if(highSpeed) BigSquashRight();
+                else SquashRight();
+            }
+        }
+        else{
+            if(direction.y > 0){
+                if(highSpeed) BigSquashDown();
+                else SquashDown();
+            }
+            else{
+                if(highSpeed) BigSquashUp();
+                else SquashUp();
+            }
+        }
+    }
     
 }
 

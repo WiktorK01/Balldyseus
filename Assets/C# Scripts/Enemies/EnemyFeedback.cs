@@ -6,6 +6,7 @@ using MoreMountains.Feedbacks;
 public class EnemyFeedback : MonoBehaviour
 {
     bool isMoving = false;
+    [SerializeField] GameObject myColliderObject;
 
     [SerializeField] MMF_Player healthTextBounce;
     [SerializeField] MMF_Player bigHealthTextBounce;
@@ -169,11 +170,13 @@ public class EnemyFeedback : MonoBehaviour
     void OnEnable(){
         MovementStatePublisher.MovementStateChange += OnMovementStateChange;
         EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
+        BallCollisionPublisher.BallCollision += OnBallCollision;
     }
 
     void OnDisable(){
         MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
         EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
+        BallCollisionPublisher.BallCollision -= OnBallCollision;
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newState)
@@ -197,6 +200,30 @@ public class EnemyFeedback : MonoBehaviour
             }
             //Animations that are not Deaths
             else if(damageType == EnemyProperties.DamageType.FireDamage) DamageFire();
+        }
+    }
+    void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState){
+        if(myColliderObject == collision.gameObject && !bounceMode){
+            Vector2 myPosition = transform.position;
+            Vector2 enemyPosition = transform.position;
+
+            Vector2 direction = myPosition - enemyPosition;
+
+            if(currentSpeedState == BallProperties.SpeedState.Low) return;
+
+            if(Mathf.Abs(direction.x) > Mathf.Abs(direction.y)){
+                if(direction.x > 0) 
+                    DamageRight();
+                else 
+                    DamageLeft();
+                
+            }
+            else{
+                if(direction.y > 0) 
+                    DamageUp();
+                else 
+                    DamageDown();
+            }
         }
     }
 }
