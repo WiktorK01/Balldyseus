@@ -168,15 +168,35 @@ public class EnemyFeedback : MonoBehaviour
 
     void OnEnable(){
         MovementStatePublisher.MovementStateChange += OnMovementStateChange;
+        EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
     }
 
     void OnDisable(){
         MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
+        EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newState)
     {
         if(newState == BallMovement.MovementState.IsMoving) isMoving = true;
         else isMoving = false;
+    }
+
+    void OnEnemyHealthChange(GameObject enemyWhoLostDamage, float newHealthCount, float amountLost, EnemyProperties.DamageType damageType){
+        if(gameObject == enemyWhoLostDamage){
+            if(amountLost == 1f) HealthTextBounce();
+            else if(amountLost > 1f) BigHealthTextBounce();
+
+            //Death Checks
+            if(newHealthCount <= 0){
+                if(damageType == EnemyProperties.DamageType.BallImpact 
+                ||damageType == EnemyProperties.DamageType.BallImpactCritical
+                ||damageType == EnemyProperties.DamageType.BallBounce) DeathFlush();
+                
+                else if(damageType == EnemyProperties.DamageType.FireDamage) DeathFire();
+            }
+            //Animations that are not Deaths
+            else if(damageType == EnemyProperties.DamageType.FireDamage) DamageFire();
+        }
     }
 }

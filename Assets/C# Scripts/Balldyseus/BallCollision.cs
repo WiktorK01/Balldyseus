@@ -5,8 +5,8 @@ using UnityEngine;
 public class BallCollision : MonoBehaviour
 {
     BallFeedback ballFeedback;
-
     Rigidbody2D rb;
+
     CameraFeedback cameraFeedback;
     [SerializeField] private float shoveModeImpulseStrength = 12f;
     private float remainingBounceCount = 5f;
@@ -29,7 +29,7 @@ public class BallCollision : MonoBehaviour
         //currently, nothing happens when balldyseus interacts with an object while not moving
         if (!isMoving) return;
 
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("EnemyCollider"))
         {
             HandleBallSquashFeedback(collision);
             HandleEnemyCollision(collision);
@@ -44,7 +44,7 @@ public class BallCollision : MonoBehaviour
 
     private void HandleEnemyCollision(Collision2D collision)
     {
-        EnemyMovement enemyMovement = collision.gameObject.GetComponent<EnemyMovement>();
+        EnemyMovement enemyMovement = collision.gameObject.GetComponentInParent<EnemyMovement>();
 
         if (enemyMovement == null) return;
 
@@ -79,11 +79,11 @@ public class BallCollision : MonoBehaviour
         //IN ATTACK MODE
         else if (!bounceMode)
         {
-            EnemyProperties enemy = collision.gameObject.GetComponent<EnemyProperties>();
+            EnemyProperties enemy = collision.gameObject.GetComponentInParent<EnemyProperties>();
             HandleEnemyDamageFeedback(collision);
 
-            if(HighSpeed())enemy.TakeDamage(2f);
-            else enemy.TakeDamage(1f);
+            if(HighSpeed())enemy.TakeDamage(2f, EnemyProperties.DamageType.BallImpactCritical);
+            else enemy.TakeDamage(1f, EnemyProperties.DamageType.BallImpact);
         }  
     }
 
@@ -150,7 +150,7 @@ public class BallCollision : MonoBehaviour
         Vector2 myPosition = transform.position;
         Vector2 enemyPosition = enemy.transform.position;
 
-        EnemyFeedback enemyFeedback = enemy.GetComponent<EnemyFeedback>();
+        EnemyFeedback enemyFeedback = enemy.GetComponentInParent<EnemyFeedback>();
 
         Vector2 direction = myPosition - enemyPosition;
 
@@ -216,10 +216,13 @@ public class BallCollision : MonoBehaviour
     }
 
     void OnGameStateChange(TurnManager.GameState newState){
-        if(newState == TurnManager.GameState.PlayerTurn) 
+        if(newState == TurnManager.GameState.PlayerTurn){
             BounceCountPublisher.NotifyBounceCountChange(remainingBounceCount);
-        if (newState == TurnManager.GameState.EnemyTurn)
+            ResolveCollisionsWithEnemies();
+        }
+        if (newState == TurnManager.GameState.EnemyTurn) {
             EndOfTurnResetters();
+        }
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newState)
@@ -234,5 +237,21 @@ public class BallCollision : MonoBehaviour
 
     void OnSpeedStateChange(BallProperties.SpeedState newSpeedState){
         currentSpeedState = newSpeedState;
+    }
+
+    private void ResolveCollisionsWithEnemies()
+    {
+        var balldyseusCollider = GetComponent<Collider2D>();
+        var hitColliders = Physics2D.OverlapCircleAll(transform.position, balldyseusCollider.bounds.extents.x);
+
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.gameObject.CompareTag("Enemy"))
+            {
+                Vector3 directionToEnemy = hitCollider.transform.position - transform.position;
+                transform.position -= directionToEnemy.normalized * 0.05f;
+                break;
+            }
+        }
     }
 }

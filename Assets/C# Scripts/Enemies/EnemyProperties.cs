@@ -4,46 +4,26 @@ using UnityEngine;
 
 public class EnemyProperties : MonoBehaviour
 {
-    private EnemyUI EnemyUI;
-    private EnemyFeedback enemyFeedback;
-
     public float health = 3f;
     public float startingImpulse = 2f;
     public float endingImpulse = 5f;
-    public bool isThisEnemyTurn;
     public bool isOnFire = false;
     bool isDefeated = false;    
 
-    void Start(){
-        EnemyUI = gameObject.GetComponent<EnemyUI>();
-        enemyFeedback = gameObject.GetComponent<EnemyFeedback>();
+    public enum DamageType
+    {
+        BallImpact,
+        BallImpactCritical,
+        BallBounce,
+        FireDamage,
     }
 
     //Everything That Occurs when an enemy takes damage
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amountLost, DamageType damageType)
     {
-        Debug.Log(health);
-        health -= amount;
-
-        //causes the fire effect when fire damage taken on enemy turn
-        if(isOnFire && TurnManager.Instance.currentState != TurnManager.GameState.PlayerTurn){
-            if(health == 0){
-                enemyFeedback.DeathFire();
-            }
-            enemyFeedback.DamageFire();
-        }
-            
-        if (health <= 0){
-            isDefeated = true;
-            enemyFeedback.DeathFlush();
-        }
-
-        if(amount == 1f){
-            enemyFeedback.HealthTextBounce();
-        }
-        else if(amount==2f){
-            enemyFeedback.BigHealthTextBounce();
-        }
+        health -= amountLost;
+        if (health <= 0) isDefeated = true;
+        EnemyHealthChangePublisher.NotifyEnemyHealthChange(gameObject, health, amountLost, damageType);
     }
 
 /*------------------------------------------------------------------*/
@@ -55,21 +35,39 @@ public class EnemyProperties : MonoBehaviour
     public void SetOnFire(bool onFire){
         isOnFire = onFire;
     }
-/*------------------------------------------------------------------*/
-    void GetDestroyed(){
-        Destroy(gameObject);
+    
+    public void ApplyFireDamageIfOnFire()
+    {
+        if (isOnFire)
+        {
+            TakeDamage(Fire.fireDamage, DamageType.FireDamage);
+        }
     }
-
+/*------------------------------------------------------------------*/
     public bool IsDefeated(){
         return isDefeated;
     }
-    
-    public void ThisEnemyTurnBegins(){
-        isThisEnemyTurn = true;
+
+/****************OBSERVERS*************/
+
+//this is for if I want a bool that checks if if it's the enemy's turn at the moment. not sure i need this atm, wont delete yet bc we'll see
+    /*void OnEnable(){
+        EnemyTurnPublisher.EnemyTurnChange += OnEnemyTurnChange;
+        GameStatePublisher.GameStateChange += OnGameStateChange;
+    }
+    void OnDisable(){
+        EnemyTurnPublisher.EnemyTurnChange -= OnEnemyTurnChange;
+        GameStatePublisher.GameStateChange -= OnGameStateChange;
     }
 
-    public void ThisEnemyTurnEnds(){
-        isThisEnemyTurn = false;
+    void OnEnemyTurnChange(GameObject enemyWhoseTurnItIs){
+        if(gameObject == enemyWhoseTurnItIs){
+            isMyTurn = true;
+        }
+        else isMyTurn = false;
     }
 
+    void OnGameStateChange(TurnManager.GameState newGameState){
+        isMyTurn = false;
+    }*/
 }

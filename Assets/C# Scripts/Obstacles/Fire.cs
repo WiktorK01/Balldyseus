@@ -11,22 +11,14 @@ public class Fire : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            BallMovement ballMovement = collision.gameObject.GetComponent<BallMovement>();
+            BallMovement ballMovement = collision.gameObject.GetComponentInParent<BallMovement>();
             ballMovement.MultiplyVelocity(velocityMultiplier);
         }
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("EnemyCollider"))
         {
-            EnemyProperties enemy = collision.gameObject.GetComponent<EnemyProperties>();
+            EnemyProperties enemy = collision.gameObject.GetComponentInParent<EnemyProperties>();
             enemy.SetOnFire(true);
         }
     }
 
-    public static void ApplyFireDamageIfOnFire(EnemyProperties enemy)
-    {
-        if (enemy.GetCurrentFireState())
-        {
-            enemy.TakeDamage(fireDamage);
-        }
-        //this is called in "IEnumerator EnemyTurnRoutine()" in the TurnManager
-    }
 }

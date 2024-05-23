@@ -165,7 +165,6 @@ public class UIManager : MonoBehaviour
 
     //we call this in Awake so that the gameplay UI exists to perform their feedbacks after a turn happens
     public void ShowGameplayUI(){
-        Debug.Log("Instantiating Gameplay UI if needed ");
         ShowUIElement("LaunchUI");
     }
     void ShowWinUI(){ 

@@ -10,7 +10,6 @@ public class ForcePercentPublisher : MonoBehaviour
     public static void NotifyForcePercentChange(float newForcePercent)
     {
         ForcePercentChange?.Invoke(newForcePercent);
-        Debug.Log("Notifying of new Force Percent: " + newForcePercent);
     }
 
     /*

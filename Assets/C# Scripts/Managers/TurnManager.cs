@@ -15,15 +15,17 @@ public class TurnManager : MonoBehaviour
         Loss,
     }
 
-    [SerializeField] private GameObject balldyseus;
-    [SerializeField] private Camera mainCamera;
     [SerializeField] private PathfindingManager pathfindingManager;
 
     public GameState currentState = GameState.Null;
     public float TurnNumber { get; private set; }
 
     private List<GameObject> enemies = new List<GameObject>();
+    private List<GameObject> enemiesToRemove = new List<GameObject>();
+
     private GameState previousState;
+
+    bool currentEnemyTurnActive = false;
 
     private void Awake()
     {
@@ -40,10 +42,8 @@ public class TurnManager : MonoBehaviour
     private void Start()
     {
         pathfindingManager = FindObjectOfType<PathfindingManager>();
-        balldyseus = GameObject.Find("Balldyseus");
 
         if (pathfindingManager == null) Debug.LogError("PathfindingManager not found.");
-        if (balldyseus == null) Debug.LogError("Balldyseus not found.");
         
         ChangeGameState(GameState.PlayerTurn); //Player turn begins
     }
@@ -92,6 +92,7 @@ public class TurnManager : MonoBehaviour
         if (currentState != GameState.Loss && currentState != GameState.Win)
         {
             UpdateEnemiesList();
+            UpdateEnemyLocations();
             CheckForWin();
             TurnNumber++;
         }
@@ -99,98 +100,63 @@ public class TurnManager : MonoBehaviour
 
     public void UpdateEnemiesList()
     {
-        enemies.Clear();
-        enemies.AddRange(GameObject.FindGameObjectsWithTag("Enemy"));
-        pathfindingManager.UpdateWalkableMap(enemies);
-    }
+        // Remove any inactive or destroyed enemies
+        enemies.RemoveAll(enemy => enemy == null || !enemy.activeSelf);
 
-    public void AddEnemy(GameObject enemy)
-    {
-        if (!enemies.Contains(enemy))
+        GameObject[] currentEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (var enemy in currentEnemies)
         {
-            enemies.Add(enemy);
-            pathfindingManager.UpdateWalkableMap(enemies);
+            if (!enemies.Contains(enemy))
+            {
+                enemies.Add(enemy);
+            }
         }
     }
 
-    public void RemoveEnemy(GameObject enemy)
+    public void UpdateEnemyLocations(){
+        pathfindingManager.UpdateWalkableMap(enemies);
+    }
+
+    private void RemoveEnemy(GameObject enemy)
     {
         if (enemies.Remove(enemy))
         {
-            pathfindingManager.UpdateWalkableMap(enemies);
+            UpdateEnemyLocations();
         }
         CheckForWin();
     }
 
     private IEnumerator EnemyTurnRoutine()
     {
+        foreach(var enemyToRemove in enemiesToRemove){
+            RemoveEnemy(enemyToRemove);
+            Destroy(enemyToRemove);
+        }
+        enemiesToRemove.Clear();
+
         var enemiesToMove = new List<GameObject>(enemies);
 
         foreach (var enemyGameObject in enemiesToMove)
         {
             if (currentState == GameState.Loss) break;
+            if (enemyGameObject == null) continue;
             
-            var enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
-            var enemyProps = enemyGameObject.GetComponent<EnemyProperties>();
-
-            enemyProps.ThisEnemyTurnBegins();
-
-            if (enemyProps.isOnFire)
-            {
-                Fire.ApplyFireDamageIfOnFire(enemyProps);
-                yield return new WaitForSeconds(0.4f);
-            }
-
-            if (enemyProps.IsDefeated())
-            {
-                RemoveEnemy(enemyGameObject);
-                continue;
-            }
-
-            UpdateEnemiesList();
-
-            if (enemyGameObject != null)
-            {
-                enemyMovement.Move();
-                yield return new WaitUntil(() => enemyMovement.HasMoved());
-
-                UpdateEnemiesList();
-                enemyProps.ThisEnemyTurnEnds();
-            }
+            currentEnemyTurnActive = true;
+            EnemyTurnPublisher.NotifyEnemyTurnChange(enemyGameObject);
+            yield return new WaitUntil(() => !currentEnemyTurnActive);
         }
 
-        ResetEnemyMovements(enemiesToMove);
-        ResolveCollisionsWithEnemies();
+        foreach(var enemyToRemove in enemiesToRemove){
+            RemoveEnemy(enemyToRemove);
+            Destroy(enemyToRemove);
+        }
+
         ChangeGameState(GameState.PlayerTurn);
     }
 
-    private void ResetEnemyMovements(List<GameObject> enemiesToMove)
-    {
-        foreach (var enemyGameObject in enemiesToMove)
-        {
-            if (enemyGameObject != null)
-            {
-                var enemyMovement = enemyGameObject.GetComponent<EnemyMovement>();
-                enemyMovement.ResetMoveMoney();
-                enemyMovement.ResetMovement();
-            }
-        }
-    }
-
-    private void ResolveCollisionsWithEnemies()
-    {
-        var balldyseusCollider = balldyseus.GetComponent<Collider2D>();
-        var hitColliders = Physics2D.OverlapCircleAll(balldyseus.transform.position, balldyseusCollider.bounds.extents.x);
-
-        foreach (var hitCollider in hitColliders)
-        {
-            if (hitCollider.gameObject.CompareTag("Enemy"))
-            {
-                Vector3 directionToEnemy = hitCollider.transform.position - balldyseus.transform.position;
-                balldyseus.transform.position -= directionToEnemy.normalized * 0.05f;
-                break;
-            }
-        }
+    public void FlagEnemyForRemovalAtEndOfRound(GameObject enemyGameObject){
+        enemiesToRemove.Add(enemyGameObject);
     }
 
     private void CheckForWin()
@@ -210,9 +176,9 @@ public class TurnManager : MonoBehaviour
     private void HandleLoss()
     {
         currentState = GameState.Loss;
-        balldyseus.SetActive(false);
     }
 
+    //used by Objective when it detects a collision with enemies
     public void OnEnemyReachedObjective()
     {
         if (currentState != GameState.Loss)
@@ -222,27 +188,39 @@ public class TurnManager : MonoBehaviour
     }
 
 
-
-
 //***************OBSERVERS********************
     private void OnEnable(){
         MovementStatePublisher.MovementStateChange += OnMovementStateChange;
+        EndEnemyTurnPublisher.EndEnemyTurn += OnEndEnemyTurn;
+        EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
     }
 
     private void OnDisable(){
         MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
+        EndEnemyTurnPublisher.EndEnemyTurn -= OnEndEnemyTurn;
+        EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
     }
 
-    private void OnMovementStateChange(BallMovement.MovementState newState)
+    private void OnMovementStateChange(BallMovement.MovementState newMovementState)
     {
-        if (newState == BallMovement.MovementState.HasCompletedMovement && currentState == GameState.PlayerTurn)
+        if (newMovementState == BallMovement.MovementState.HasCompletedMovement && currentState == GameState.PlayerTurn)
         {
             UpdateEnemiesList();
+            UpdateEnemyLocations();
+
             CheckForWin();
             if (currentState != GameState.Win)
             {
                 ChangeGameState(GameState.EnemyTurn);
             }
         }
+    }
+
+    void OnEndEnemyTurn(GameObject enemyWhoseTurnEnded){
+        currentEnemyTurnActive = false;
+    }
+
+    void OnEnemyHealthChange(GameObject enemyWhoLostDamage, float newHealthCount, float amountLost, EnemyProperties.DamageType damageType){
+        if(newHealthCount <= 0f) FlagEnemyForRemovalAtEndOfRound(enemyWhoLostDamage);
     }
 }

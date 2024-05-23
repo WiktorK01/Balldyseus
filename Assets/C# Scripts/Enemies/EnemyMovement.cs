@@ -6,6 +6,7 @@ using AStar;
 
 public class EnemyMovement : MonoBehaviour
 {
+
     private PathfindingManager pathfindingManager;
     private EnemyProperties enemyProperties;
     private EnemyFeedback enemyFeedback;
@@ -23,6 +24,8 @@ public class EnemyMovement : MonoBehaviour
     private void OnEnable()
     {
         InitializeDependencies();
+
+        GameStatePublisher.GameStateChange += OnGameStateChange;
     }
 
     private void InitializeDependencies()
@@ -231,11 +234,11 @@ private IEnumerator PerformMovements((int, int)[] path)
             if (enemyAtPosition != null)
             {
                 EnemyProperties otherEnemyProperties = enemyAtPosition.GetComponent<EnemyProperties>();
-                otherEnemyProperties.TakeDamage(1f);
+                otherEnemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallBounce);
             }
 
             HandleSquashFeedback(direction);
-            enemyProperties.TakeDamage(1f);
+            enemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallBounce);
         }
     }
 
@@ -291,15 +294,11 @@ private IEnumerator PerformMovements((int, int)[] path)
         }
     }
 
-    // Miscellaneous ***************************************************************
+// Miscellaneous ***************************************************************
 
-    public void ResetMovement()
+    private void ResetMovement()
     {
         enemyHasMoved = false;
-    }
-
-    public void ResetMoveMoney()
-    {
         enemyFeedback.MoveTextBounce();
         moveMoneyDecrement = moveMoney;
     }
@@ -308,4 +307,19 @@ private IEnumerator PerformMovements((int, int)[] path)
     {
         return enemyHasMoved;
     }
+
+// OBSERVERS *******************
+
+    //OnEnable is up top!
+
+    void OnDisable(){
+        GameStatePublisher.GameStateChange -= OnGameStateChange;
+    }
+
+    void OnGameStateChange(TurnManager.GameState newGameState){
+        if(newGameState == TurnManager.GameState.PlayerTurn){
+            ResetMovement();
+        }
+    }
+
 }
