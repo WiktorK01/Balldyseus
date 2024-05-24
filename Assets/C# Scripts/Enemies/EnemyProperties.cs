@@ -18,6 +18,10 @@ public class EnemyProperties : MonoBehaviour
         FireDamage,
     }
 
+    void OnEnable(){
+        TakeDamage(0f, DamageType.BallImpact);
+    }
+
     //Everything That Occurs when an enemy takes damage
     public void TakeDamage(float amountLost, DamageType damageType)
     {

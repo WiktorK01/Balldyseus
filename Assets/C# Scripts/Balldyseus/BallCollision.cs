@@ -53,7 +53,6 @@ public class BallCollision : MonoBehaviour
 
     private void EndOfTurnResetters(){
         remainingBounceCount = referenceBounceCount;
-        BounceCountPublisher.NotifyBounceCountChange(referenceBounceCount);
     }
 
 

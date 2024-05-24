@@ -506,7 +506,7 @@ MonoBehaviour:
           m_ColorSpace: -1
           m_NumColorKeys: 2
           m_NumAlphaKeys: 2
-        DestinationColor: {r: 1, g: 0.7803922, b: 0.5529412, a: 1}
+        DestinationColor: {r: 0.9333334, g: 0.7176471, b: 0.4901961, a: 1}
         ColorCurve:
           serializedVersion: 2
           m_Curve:
@@ -634,7 +634,7 @@ MonoBehaviour:
           m_ColorSpace: -1
           m_NumColorKeys: 2
           m_NumAlphaKeys: 2
-        DestinationColor: {r: 1, g: 0.7803922, b: 0.5529412, a: 1}
+        DestinationColor: {r: 0.9333334, g: 0.7176471, b: 0.4901961, a: 1}
         ColorCurve:
           serializedVersion: 2
           m_Curve:

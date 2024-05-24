@@ -39,6 +39,8 @@ public class EnemyFeedback : MonoBehaviour
     [SerializeField] MMF_Player deathFire;
     [SerializeField] MMF_Player deathFlush;
 
+    [SerializeField] MMF_Player lowHealth;
+
     [SerializeField] MMF_Player onClick;
 
     public void HealthTextBounce(){
@@ -159,6 +161,14 @@ public class EnemyFeedback : MonoBehaviour
         deathFlush.PlayFeedbacks();
     }
 
+    public void LowHealth(){
+        lowHealth.Initialization();
+        lowHealth.PlayFeedbacks();
+    }
+    public void StopLowHealth(){
+        lowHealth.StopFeedbacks();
+    }
+
     public void OnClick(){
         onClick.Initialization();
         onClick.PlayFeedbacks();
@@ -200,6 +210,14 @@ public class EnemyFeedback : MonoBehaviour
             }
             //Animations that are not Deaths
             else if(damageType == EnemyProperties.DamageType.FireDamage) DamageFire();
+
+
+            if(newHealthCount == 1){
+                LowHealth();
+            }
+            else{
+                StopLowHealth(); //in case they can heal or something
+            }
         }
     }
     void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState){

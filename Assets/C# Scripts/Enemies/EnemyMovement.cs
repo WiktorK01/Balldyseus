@@ -89,7 +89,7 @@ public class EnemyMovement : MonoBehaviour
             return null;
         }
 
-        var path = AStar.AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true, false);
+        var path = AStarPathfinding.GeneratePathSync(startX, startY, goalX, goalY, walkableMap, true, false);
         return FillInDiagonals(path);
     }
 
@@ -214,9 +214,9 @@ private IEnumerator PerformMovements((int, int)[] path)
 
         Collider2D collider = Physics2D.OverlapPoint(position, layerMask);
 
-        if (collider != null && collider.gameObject.CompareTag("Enemy"))
+        if (collider != null && collider.gameObject.CompareTag("EnemyCollider"))
         {
-            return collider.gameObject;
+            return collider.transform.parent.gameObject;
         }
 
         return null;
