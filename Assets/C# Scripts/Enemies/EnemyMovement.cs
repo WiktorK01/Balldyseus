@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using AStar;
+using MoreMountains.Feedbacks;
+using MoreMountains.Tools;
 
 public class EnemyMovement : MonoBehaviour
 {
@@ -18,6 +20,7 @@ public class EnemyMovement : MonoBehaviour
     public float moveDuration = 0.1f;
     [SerializeField] private float secondsBetweenEnemyMoves = 0.6f;
 
+    private bool currentMovementFeedbackComplete = false;
     private bool enemyHasMoved = false;
 
     public enum Direction { Up, Down, Left, Right }
@@ -28,6 +31,8 @@ public class EnemyMovement : MonoBehaviour
 
         GameStatePublisher.GameStateChange += OnGameStateChange;
         BallCollisionPublisher.BallCollision += OnBallCollision;
+        FeedbackEnemyMovementCompletePublisher.FeedbackEnemyMovementComplete += OnFeedbackEnemyMovementComplete;
+
     }
 
     private void Initialize()
@@ -143,6 +148,8 @@ private IEnumerator PerformMovements((int, int)[] path)
 
     for (int i = 0; i < moveMoney && i < path.Length - 1; i++)
     {
+        currentMovementFeedbackComplete = false;
+
         if (TurnManager.Instance.currentState == TurnManager.GameState.Loss)
         {
             break;
@@ -156,21 +163,21 @@ private IEnumerator PerformMovements((int, int)[] path)
 
         if (targetX > previousX)
             enemyFeedback.MoveRight();
-        else if (targetX < previousX)
+        else if (previousX > targetX)
             enemyFeedback.MoveLeft();
         else if (targetY > previousY)
             enemyFeedback.MoveUp();
-        else if (targetY < previousY)
+        else if (previousY > targetY)
             enemyFeedback.MoveDown();
 
-        yield return new WaitForSeconds(secondsBetweenEnemyMoves);
-
-        while ((Vector2)transform.position != targetPosition)
+        while (!currentMovementFeedbackComplete)
         {
             yield return null; 
         }
 
         transform.position = targetPosition;
+
+        yield return null; 
     }
 
     enemyHasMoved = true;
@@ -246,15 +253,20 @@ private IEnumerator PerformMovements((int, int)[] path)
 
     private Vector3 DirectionToVector(Direction direction)
     {
-        return direction switch
+        switch (direction)
         {
-            Direction.Up => new Vector3(0, 1, 0),
-            Direction.Down => new Vector3(0, -1, 0),
-            Direction.Left => new Vector3(-1, 0, 0),
-            Direction.Right => new Vector3(1, 0, 0),
-            _ => Vector3.zero,
-        };
-    } //??? CHECK HOW THIS WORKS
+            case Direction.Up:
+                return new Vector3(0, 1, 0);
+            case Direction.Down:
+                return new Vector3(0, -1, 0);
+            case Direction.Left:
+                return new Vector3(-1, 0, 0);
+            case Direction.Right:
+                return new Vector3(1, 0, 0);
+            default:
+                return Vector3.zero;
+        }
+    }
 
     // Feedback Related Code ***************************************************************
 
@@ -317,6 +329,7 @@ private IEnumerator PerformMovements((int, int)[] path)
     void OnDisable(){
         GameStatePublisher.GameStateChange -= OnGameStateChange;
         BallCollisionPublisher.BallCollision -= OnBallCollision;
+        FeedbackEnemyMovementCompletePublisher.FeedbackEnemyMovementComplete -= OnFeedbackEnemyMovementComplete;
     }
 
     void OnGameStateChange(TurnManager.GameState newGameState){
@@ -360,6 +373,10 @@ private IEnumerator PerformMovements((int, int)[] path)
                     enemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallImpact);
             }  
         }
+    }
+
+    void OnFeedbackEnemyMovementComplete(){
+        currentMovementFeedbackComplete = true;
     }
 
 }
