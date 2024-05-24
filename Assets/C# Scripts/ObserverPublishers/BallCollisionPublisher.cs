@@ -20,7 +20,7 @@ public class BallCollisionPublisher : MonoBehaviour
         BallCollisionPublisher.BallCollision -= OnBallCollision;
     }
 
-    void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, BallProperties.SpeedState currentSpeedState){
+    void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState){
 
     }
     */
