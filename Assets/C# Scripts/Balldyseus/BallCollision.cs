@@ -101,7 +101,7 @@ public class BallCollision : MonoBehaviour
 
         foreach (var hitCollider in hitColliders)
         {
-            if (hitCollider.gameObject.CompareTag("Enemy"))
+            if (hitCollider.gameObject.CompareTag("EnemyCollider"))
             {
                 Vector3 directionToEnemy = hitCollider.transform.position - transform.position;
                 transform.position -= directionToEnemy.normalized * 0.05f;
