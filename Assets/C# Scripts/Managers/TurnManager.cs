@@ -61,6 +61,7 @@ public class TurnManager : MonoBehaviour
                 break;
 
             case GameState.PlayerTurn:
+                Debug.Log("Player Turn Starting");
                 HandlePlayerTurnStart();
                 break;
 

@@ -35,7 +35,7 @@ public class LaunchUIFeedback : MonoBehaviour
     MMF_SquashAndStretch percentageExitSquash;
 
 
-    void Start(){
+    void Awake(){
         percentageScaleFeedback = percentageScale.GetFeedbackOfType<MMF_Scale>();
         percentageTextValue = percentageScale.GetFeedbackOfType<MMF_TMPText>();
         percentageRotationFeedback = percentageScale.GetFeedbackOfType<MMF_RotationShake>();
@@ -148,6 +148,7 @@ public class LaunchUIFeedback : MonoBehaviour
 
     //subscribing our OnGameStateChanged() function to the GameStateEventPublisher which tracks when the gamestate changes in TurnManager
     void OnEnable(){
+        Debug.Log("LaunchUIFeedback enabled");
         GameStatePublisher.GameStateChange += OnGameStateChange;
         BounceCountPublisher.BounceCountChange += OnBounceCountChange;
         ForcePercentPublisher.ForcePercentChange += OnForcePercentChange;

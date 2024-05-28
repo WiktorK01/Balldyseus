@@ -12,7 +12,7 @@ public class PathfindingManager : MonoBehaviour
     private bool[,] walkableMap;
     private bool[,] walkableMapReference;
 
-    void Start()
+    void Awake()
     {
         GameObject groundTilemapObject = GameObject.FindWithTag("GroundTilemap");
 

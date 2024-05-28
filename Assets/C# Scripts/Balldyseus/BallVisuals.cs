@@ -12,9 +12,7 @@ public class BallVisuals : MonoBehaviour
 
     private GameObject currentContactPointCircle = null; // To keep track of the instantiated prefab
 
-    [SerializeField] GameObject baseModeSprite; 
-    [SerializeField] GameObject attackModeSprite; 
-    [SerializeField] GameObject shoveModeSprite;
+    [SerializeField] private Animator ballAnimator;
 
     float bounceCount = 5f;
 
@@ -140,9 +138,7 @@ public class BallVisuals : MonoBehaviour
         bounceCount = newBounceCount;
 
         if(newBounceCount == 0 && bounceMode){
-            baseModeSprite.SetActive(true);
-            shoveModeSprite.SetActive(false);
-            attackModeSprite.SetActive(false);
+            ballAnimator.Play("BallRegularBlink");
         }
     }
 
@@ -150,19 +146,13 @@ public class BallVisuals : MonoBehaviour
         bounceMode = newBounceMode;
 
         if (bounceMode && bounceCount == 0){
-            baseModeSprite.SetActive(true);
-            shoveModeSprite.SetActive(false);
-            attackModeSprite.SetActive(false);
+            ballAnimator.Play("BallRegularBlink");
         }
         else if (bounceMode){
-            shoveModeSprite.SetActive(true);
-            baseModeSprite.SetActive(false);
-            attackModeSprite.SetActive(false);
+            ballAnimator.Play("BallBounceBlink");
         }
         else{
-            attackModeSprite.SetActive(true);
-            baseModeSprite.SetActive(false);
-            shoveModeSprite.SetActive(false);
+            ballAnimator.Play("BallAttackBlink");
         }    
     }
     

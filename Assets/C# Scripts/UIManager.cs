@@ -169,6 +169,16 @@ public class UIManager : MonoBehaviour
     }
     void ShowWinUI(){ 
         ShowUIElement("WinUI");
+        float currentTurnNumber = TurnManager.Instance.TurnNumber;   
+
+        if(currentTurnNumber == 1f){
+            string winText = "It took you " + currentTurnNumber + " turn!";
+            SetTextValueInUIElement("WinUI", "TurnNumberText", winText);
+        }
+        else{
+            string winText = "It took you " + currentTurnNumber + " turns!";
+            SetTextValueInUIElement("WinUI", "TurnNumberText", winText);
+        }
     }
     void ShowLossUI(){
         ShowUIElement("LossUI");

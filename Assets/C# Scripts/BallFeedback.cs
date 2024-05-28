@@ -12,6 +12,12 @@ public class BallFeedback : MonoBehaviour
         cameraFeedback = FindObjectOfType<CameraFeedback>();
     }
 
+    void Update(){
+        if(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1)){
+            HoverStop();
+        }
+    }
+
     [SerializeField] MMF_Player squashDown;
     [SerializeField] MMF_Player squashUp;
     [SerializeField] MMF_Player squashLeft;
@@ -24,6 +30,8 @@ public class BallFeedback : MonoBehaviour
     [SerializeField] MMF_Player floatingBounceNumberBlue;
     [SerializeField] MMF_Player floatingBounceNumberGrey;
     [SerializeField] MMF_Player highSpeedMode;
+    [SerializeField] MMF_Player hoverStart;
+    [SerializeField] MMF_Player hoverStop;
 
     public void SquashDown(){
         squashDown.Initialization();
@@ -92,21 +100,40 @@ public class BallFeedback : MonoBehaviour
         highSpeedMode.StopFeedbacks();
     }
 
+    public void HoverStart(){
+        if(!Input.GetMouseButton(0) 
+        && !Input.GetMouseButton(1) 
+        && TurnManager.Instance.currentState == TurnManager.GameState.PlayerTurn 
+        && currentMovementState == BallMovement.MovementState.HasNotMoved)
+        {
+            hoverStart.Initialization();
+            hoverStart.PlayFeedbacks();
+        }
+    }
+    public void HoverStop(){
+        hoverStart.StopFeedbacks();
+        hoverStop.Initialization();
+        hoverStop.PlayFeedbacks();
+    }
+
 
 //*********************************OBSERVERS****************************************
     BallProperties.SpeedState currentSpeedState = BallProperties.SpeedState.Low;
+    BallMovement.MovementState currentMovementState = BallMovement.MovementState.HasNotMoved;
     
     void OnEnable(){
         BounceCountPublisher.BounceCountChange += OnBounceCountChange;
         BounceModePublisher.BounceModeChange += OnBounceModeChange;
         SpeedStatePublisher.SpeedStateChange += OnSpeedStateChange;
         BallCollisionPublisher.BallCollision += OnBallCollision;
+        MovementStatePublisher.MovementStateChange += OnMovementStateChange;
     }
     void OnDisable(){
         BounceCountPublisher.BounceCountChange -= OnBounceCountChange;
         BounceModePublisher.BounceModeChange -= OnBounceModeChange;
         SpeedStatePublisher.SpeedStateChange -= OnSpeedStateChange;
         BallCollisionPublisher.BallCollision -= OnBallCollision;
+        MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
     }
 
     void OnBounceCountChange(float newBounceCount){
@@ -174,6 +201,10 @@ public class BallFeedback : MonoBehaviour
                 else SquashUp();
             }
         }
+    }
+
+    void OnMovementStateChange(BallMovement.MovementState newMovementState){
+        currentMovementState = newMovementState;
     }
     
 }

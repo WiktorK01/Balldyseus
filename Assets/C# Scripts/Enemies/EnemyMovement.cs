@@ -27,32 +27,21 @@ public class EnemyMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        Initialize();
-
-        GameStatePublisher.GameStateChange += OnGameStateChange;
-        BallCollisionPublisher.BallCollision += OnBallCollision;
-        FeedbackEnemyMovementCompletePublisher.FeedbackEnemyMovementComplete += OnFeedbackEnemyMovementComplete;
-
-    }
-
-    private void Initialize()
-    {
         groundTilemap = GameObject.FindWithTag("GroundTilemap")?.GetComponent<Tilemap>();
-        if (groundTilemap == null)
-        {
-            Debug.LogError("GroundTilemap not found or Tilemap component missing.");
-        }
+        if (groundTilemap == null)Debug.LogError("GroundTilemap not found or Tilemap component missing.");
 
         enemyFeedback = GetComponent<EnemyFeedback>();
         enemyProperties = GetComponent<EnemyProperties>();
 
         pathfindingManager = FindObjectOfType<PathfindingManager>();
-        if (pathfindingManager == null)
-        {
-            Debug.LogError("PathfindingManager not found.");
-        }
+        if (pathfindingManager == null)Debug.LogError("PathfindingManager not found.");
 
         moveMoneyDecrement = moveMoney;
+
+        GameStatePublisher.GameStateChange += OnGameStateChange;
+        BallCollisionPublisher.BallCollision += OnBallCollision;
+        FeedbackEnemyMovementCompletePublisher.FeedbackEnemyMovementComplete += OnFeedbackEnemyMovementComplete;
+
     }
 
     // Move Related Code ***************************************************************
@@ -148,6 +137,8 @@ private IEnumerator PerformMovements((int, int)[] path)
 
     for (int i = 0; i < moveMoney && i < path.Length - 1; i++)
     {
+        DecrementMoveMoney();
+
         currentMovementFeedbackComplete = false;
 
         if (TurnManager.Instance.currentState == TurnManager.GameState.Loss)
@@ -174,7 +165,6 @@ private IEnumerator PerformMovements((int, int)[] path)
         {
             yield return null; 
         }
-
         transform.position = targetPosition;
 
         yield return null; 
@@ -313,13 +303,18 @@ private IEnumerator PerformMovements((int, int)[] path)
     private void ResetMovement()
     {
         enemyHasMoved = false;
-        enemyFeedback.MoveTextBounce();
         moveMoneyDecrement = moveMoney;
+        EnemyMoveMoneyPublisher.NotifyEnemyMoveMoneyChange(gameObject, moveMoney);
     }
 
     public bool HasMoved()
     {
         return enemyHasMoved;
+    }
+
+    public void DecrementMoveMoney(){
+        moveMoneyDecrement--;
+        EnemyMoveMoneyPublisher.NotifyEnemyMoveMoneyChange(gameObject, moveMoney);
     }
 
 // OBSERVERS *******************

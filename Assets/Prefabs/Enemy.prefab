@@ -9929,8 +9929,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 3
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}
-  m_sharedMaterial: {fileID: -1067965472908962537, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3c2fe89733ff6b547aed5c8a710b7ae2, type: 2}
+  m_sharedMaterial: {fileID: -1067965472908962537, guid: 3c2fe89733ff6b547aed5c8a710b7ae2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -25632,7 +25632,7 @@ MonoBehaviour:
   AutoPlayOnEnable: 0
   ForceTimescaleMode: 0
   ForcedTimescaleMode: 1
-  DurationMultiplier: 0.85
+  DurationMultiplier: 0.8
   RandomizeDuration: 0
   RandomDurationMultiplier: {x: 0.5, y: 1.5}
   DisplayFullDurationDetails: 0
@@ -32677,8 +32677,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 3
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}
-  m_sharedMaterial: {fileID: -1067965472908962537, guid: 23aeac8bb5511004a9c8d104dab4f9a7, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3c2fe89733ff6b547aed5c8a710b7ae2, type: 2}
+  m_sharedMaterial: {fileID: -1067965472908962537, guid: 3c2fe89733ff6b547aed5c8a710b7ae2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -41856,7 +41856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myColliderObject: {fileID: 7264873440963694526}
-  moveMoney: 3
+  moveMoney: 2
   moveMoneyDecrement: 0
   moveDuration: 0.5
   secondsBetweenEnemyMoves: 0.34
@@ -41904,6 +41904,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myColliderObject: {fileID: 7264873440963694526}
+  moveMoneyText: {fileID: 5257739760063737223}
   healthTextBounce: {fileID: 9010664673962229248}
   bigHealthTextBounce: {fileID: 9098652458392606477}
   moveTextBounce: {fileID: 119231461904391099}
@@ -49203,7 +49204,7 @@ MonoBehaviour:
   AutoPlayOnEnable: 0
   ForceTimescaleMode: 0
   ForcedTimescaleMode: 1
-  DurationMultiplier: 0.85
+  DurationMultiplier: 0.8
   RandomizeDuration: 0
   RandomDurationMultiplier: {x: 0.5, y: 1.5}
   DisplayFullDurationDetails: 0

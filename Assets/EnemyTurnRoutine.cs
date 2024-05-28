@@ -7,9 +7,8 @@ public class EnemyTurnRoutine : MonoBehaviour
     EnemyMovement enemyMovement;
     EnemyProperties enemyProperties;
 
-    //In case Future enemies may have their own unique turn routine, i have decoupled this from the turn manager
+    //In case future enemies may have their own unique turn routine, i have decoupled this from the turn manager
     IEnumerator TurnRoutine(){
-        Debug.Log("Starting Enemy turn routine for " + gameObject.ToString());
         if (enemyProperties.isOnFire)
         {
             enemyProperties.ApplyFireDamageIfOnFire();
@@ -44,7 +43,6 @@ public class EnemyTurnRoutine : MonoBehaviour
 
     void OnEnemyTurnChange(GameObject enemyWhoseTurnItIs){
         if(gameObject == enemyWhoseTurnItIs){
-            Debug.Log("Oh! It's My Turn!");
             StartCoroutine(TurnRoutine());
         }
     }

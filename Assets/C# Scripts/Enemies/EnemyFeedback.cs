@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MoreMountains.Feedbacks;
+using TMPro;
 
 public class EnemyFeedback : MonoBehaviour
 {
     bool isMoving = false;
     [SerializeField] GameObject myColliderObject;
+    [SerializeField] TMP_Text moveMoneyText; 
 
     [SerializeField] MMF_Player healthTextBounce;
     [SerializeField] MMF_Player bigHealthTextBounce;
@@ -181,12 +183,14 @@ public class EnemyFeedback : MonoBehaviour
         MovementStatePublisher.MovementStateChange += OnMovementStateChange;
         EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
         BallCollisionPublisher.BallCollision += OnBallCollision;
+        EnemyMoveMoneyPublisher.EnemyMoveMoneyChange += OnEnemyMoveMoneyChange;
     }
 
     void OnDisable(){
         MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
         EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
         BallCollisionPublisher.BallCollision -= OnBallCollision;
+        EnemyMoveMoneyPublisher.EnemyMoveMoneyChange -= OnEnemyMoveMoneyChange;
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newState)
@@ -242,6 +246,13 @@ public class EnemyFeedback : MonoBehaviour
                 else 
                     DamageDown();
             }
+        }
+    }
+
+    void OnEnemyMoveMoneyChange(GameObject enemyWhoLostMoveMoney, float newMoveMoneyCount){
+        if(gameObject == enemyWhoLostMoveMoney){
+            MoveTextBounce();
+            moveMoneyText.text = newMoveMoneyCount.ToString();
         }
     }
 }
