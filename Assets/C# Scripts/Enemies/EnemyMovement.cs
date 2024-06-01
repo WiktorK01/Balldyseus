@@ -333,40 +333,42 @@ private IEnumerator PerformMovements((int, int)[] path)
         }
     }
 
-    void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState){
-        if(myColliderObject == collision.gameObject){
-            //IN BOUNCE MODE
+    void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState)
+    {
+        if (myColliderObject == collision.gameObject)
+        {
+            // Get the enemy's position in world space
+            Vector2 enemyPosition = transform.position;
+
+            // Calculate the direction from the ball to the enemy
+            Vector2 direction = ballPosition - enemyPosition;
+
+            // IN BOUNCE MODE
             if (bounceMode && remainingBounceCount > 0)
             {
-                Vector2 contactPoint = collision.contacts[0].point;
-                Vector2 center = collision.collider.bounds.center;
-                
-                float deltaX = Mathf.Abs(contactPoint.x - center.x);
-                float deltaY = Mathf.Abs(contactPoint.y - center.y);
-                
-                if (deltaX > deltaY) {
-                    if (contactPoint.x > center.x)
+                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+                {
+                    if (direction.x > 0)
                         Shove(Direction.Left);
                     else
                         Shove(Direction.Right);
                 }
-                else {
-                    if (contactPoint.y > center.y)
+                else
+                {
+                    if (direction.y > 0)
                         Shove(Direction.Down);
                     else
                         Shove(Direction.Up);
                 }
             }
-
-            //IN ATTACK MODE
+            // IN ATTACK MODE
             else if (!bounceMode)
             {
-                if(currentSpeedState == BallProperties.SpeedState.High)
+                if (currentSpeedState == BallProperties.SpeedState.High)
                     enemyProperties.TakeDamage(2f, EnemyProperties.DamageType.BallImpactCritical);
-
-                else 
+                else
                     enemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallImpact);
-            }  
+            }
         }
     }
 

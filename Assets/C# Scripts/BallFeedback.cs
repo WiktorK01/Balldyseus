@@ -31,7 +31,6 @@ public class BallFeedback : MonoBehaviour
     [SerializeField] MMF_Player floatingBounceNumberGrey;
     [SerializeField] MMF_Player highSpeedMode;
     [SerializeField] MMF_Player hoverStart;
-    [SerializeField] MMF_Player hoverStop;
 
     public void SquashDown(){
         squashDown.Initialization();
@@ -112,8 +111,7 @@ public class BallFeedback : MonoBehaviour
     }
     public void HoverStop(){
         hoverStart.StopFeedbacks();
-        hoverStop.Initialization();
-        hoverStop.PlayFeedbacks();
+        hoverStart.RestoreInitialValues();
     }
 
 

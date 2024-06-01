@@ -7,6 +7,12 @@ using MoreMountains.Feedbacks;
 public class LaunchUIFeedback : MonoBehaviour
 {
 
+    void Update(){
+        if(Input.GetKeyDown(KeyCode.P)){
+            buttonHover.StopFeedbacks();
+        }
+    }
+
     [SerializeField] MMF_Player buttonEntrance;
     [SerializeField] MMF_Player buttonExit;
     [SerializeField] MMF_Player buttonHover;

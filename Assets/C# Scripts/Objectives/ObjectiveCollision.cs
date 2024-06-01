@@ -6,7 +6,7 @@ public class ObjectiveCollision : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("EnemyCollider"))
+        if (other.CompareTag("EnemyCollider")||other.CompareTag("NoHitEnemyCollider"))
         {
             TurnManager.Instance.OnEnemyReachedObjective();
         }

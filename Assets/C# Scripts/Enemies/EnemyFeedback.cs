@@ -14,6 +14,7 @@ public class EnemyFeedback : MonoBehaviour
     [SerializeField] MMF_Player bigHealthTextBounce;
     [SerializeField] MMF_Player moveTextBounce;
 
+    [SerializeField] MMF_Player shieldShake;
     [SerializeField] MMF_Player hoverTextGrowth;
     [SerializeField] MMF_Player hoverTextShrink;
 
@@ -45,6 +46,8 @@ public class EnemyFeedback : MonoBehaviour
 
     [SerializeField] MMF_Player onClick;
 
+    [SerializeField] MMF_Player rotationResetter;
+
     public void HealthTextBounce(){
         healthTextBounce.Initialization();
         healthTextBounce.PlayFeedbacks();
@@ -60,14 +63,22 @@ public class EnemyFeedback : MonoBehaviour
         moveTextBounce.PlayFeedbacks();
     }
 
+    public void ShieldShake(){
+        shieldShake.Initialization();
+        shieldShake.PlayFeedbacks();
+    }
+    public void ShieldShakeStop(){
+        shieldShake.RestoreInitialValues();
+        shieldShake.StopFeedbacks();
+    }
     public void HoverTextGrowth(){
         if(!isMoving){
             hoverTextGrowth.Initialization();
             hoverTextGrowth.PlayFeedbacks();
         }
     }
-
     public void HoverTextShrink(){
+        //hoverTextGrowth.RestoreInitialValues();
         hoverTextGrowth.StopFeedbacks();
         hoverTextShrink.Initialization();
         hoverTextShrink.PlayFeedbacks();
@@ -176,6 +187,10 @@ public class EnemyFeedback : MonoBehaviour
         onClick.PlayFeedbacks();
     }
 
+    public void RotationResetter(){
+        rotationResetter.Initialization();
+        rotationResetter.PlayFeedbacks();
+    }
 
 //****************OBSERVERS***************
 
@@ -226,10 +241,9 @@ public class EnemyFeedback : MonoBehaviour
     }
     void OnBallCollision(Collision2D collision, Vector2 ballPosition, bool bounceMode, float remainingBounceCount, BallProperties.SpeedState currentSpeedState){
         if(myColliderObject == collision.gameObject && !bounceMode){
-            Vector2 myPosition = transform.position;
             Vector2 enemyPosition = transform.position;
 
-            Vector2 direction = myPosition - enemyPosition;
+            Vector2 direction = ballPosition - enemyPosition;
 
             if(currentSpeedState == BallProperties.SpeedState.Low) return;
 
