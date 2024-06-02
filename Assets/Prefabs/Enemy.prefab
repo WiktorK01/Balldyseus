@@ -10093,10 +10093,10 @@ MonoBehaviour:
         m_Calls: []
   DebugActive: 0
   FeedbacksList:
-  - rid: 2963781529424887834
-  - rid: 2963781529424887835
-  - rid: 2963781529424887836
-  - rid: 2963781529424887837
+  - rid: 5305308578446573568
+  - rid: 5305308578446573569
+  - rid: 5305308578446573570
+  - rid: 5305308578446573571
   KeepPlayModeChanges: 0
   PerformanceMode: 0
   StopFeedbacksOnDisable: 0
@@ -10104,7 +10104,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2963781529424887834
+    - rid: 5305308578446573568
       type: {class: MMF_SquashAndStretch, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks}
       data:
         Active: 1
@@ -10172,7 +10172,7 @@ MonoBehaviour:
         RemapRangeFalloff: {x: 0, y: 1}
         Owner: {fileID: 3745231280091981889}
         DebugActive: 0
-        SquashAndStretchTarget: {fileID: 0}
+        SquashAndStretchTarget: {fileID: 4611078821846405135}
         Mode: 0
         Axis: 1
         AnimateScaleDuration: 0.2
@@ -10215,7 +10215,7 @@ MonoBehaviour:
         AllowAdditivePlays: 0
         DetermineScaleOnPlay: 0
         DestinationScale: 2
-    - rid: 2963781529424887835
+    - rid: 5305308578446573569
       type: {class: MMF_SquashAndStretch, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks}
       data:
         Active: 1
@@ -10283,7 +10283,7 @@ MonoBehaviour:
         RemapRangeFalloff: {x: 0, y: 1}
         Owner: {fileID: 3745231280091981889}
         DebugActive: 0
-        SquashAndStretchTarget: {fileID: 0}
+        SquashAndStretchTarget: {fileID: 7174104057019377515}
         Mode: 0
         Axis: 1
         AnimateScaleDuration: 0.2
@@ -10326,7 +10326,7 @@ MonoBehaviour:
         AllowAdditivePlays: 0
         DetermineScaleOnPlay: 0
         DestinationScale: 2
-    - rid: 2963781529424887836
+    - rid: 5305308578446573570
       type: {class: MMF_Rotation, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks}
       data:
         Active: 1
@@ -10394,7 +10394,7 @@ MonoBehaviour:
         RemapRangeFalloff: {x: 0, y: 1}
         Owner: {fileID: 3745231280091981889}
         DebugActive: 0
-        AnimateRotationTarget: {fileID: 0}
+        AnimateRotationTarget: {fileID: 4611078821846405135}
         Mode: 0
         RotationSpace: 0
         AnimateRotationDuration: 0.3
@@ -10570,7 +10570,7 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2963781529424887837
+    - rid: 5305308578446573571
       type: {class: MMF_Rotation, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks}
       data:
         Active: 1
@@ -10638,7 +10638,7 @@ MonoBehaviour:
         RemapRangeFalloff: {x: 0, y: 1}
         Owner: {fileID: 3745231280091981889}
         DebugActive: 0
-        AnimateRotationTarget: {fileID: 0}
+        AnimateRotationTarget: {fileID: 7174104057019377515}
         Mode: 0
         RotationSpace: 0
         AnimateRotationDuration: 0.3
@@ -37587,6 +37587,7 @@ GameObject:
   - component: {fileID: 4495284835339937166}
   - component: {fileID: 9103932921822903828}
   - component: {fileID: 1406803071999161663}
+  - component: {fileID: 2577211675347187319}
   m_Layer: 13
   m_Name: Enemy
   m_TagString: Enemy
@@ -37717,6 +37718,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1ee7c0d7f0cbbe4f9b397126ebea945, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2577211675347187319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8560854360760187748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cea94b0a2bc157f4891cbb8169f66d5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myColliderObject: {fileID: 7264873440963694526}
 --- !u!1 &8582539030178147748
 GameObject:
   m_ObjectHideFlags: 0

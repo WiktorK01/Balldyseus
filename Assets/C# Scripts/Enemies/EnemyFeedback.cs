@@ -199,6 +199,7 @@ public class EnemyFeedback : MonoBehaviour
         EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
         BallCollisionPublisher.BallCollision += OnBallCollision;
         EnemyMoveMoneyPublisher.EnemyMoveMoneyChange += OnEnemyMoveMoneyChange;
+        EnemyShovePublisher.EnemyShove += OnEnemyShove;
     }
 
     void OnDisable(){
@@ -206,6 +207,7 @@ public class EnemyFeedback : MonoBehaviour
         EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
         BallCollisionPublisher.BallCollision -= OnBallCollision;
         EnemyMoveMoneyPublisher.EnemyMoveMoneyChange -= OnEnemyMoveMoneyChange;
+        EnemyShovePublisher.EnemyShove -= OnEnemyShove;
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newState)
@@ -260,6 +262,7 @@ public class EnemyFeedback : MonoBehaviour
                 else 
                     DamageDown();
             }
+            
         }
     }
 
@@ -267,6 +270,23 @@ public class EnemyFeedback : MonoBehaviour
         if(gameObject == enemyWhoLostMoveMoney){
             MoveTextBounce();
             moveMoneyText.text = newMoveMoneyCount.ToString();
+        }
+    }
+
+    void OnEnemyShove(GameObject enemyWhoGotShoved, EnemyMovement.Direction direction, bool canShoveHere){
+        if(gameObject == enemyWhoGotShoved){
+            if(canShoveHere){
+                if(direction == EnemyMovement.Direction.Up) ShoveUp();
+                else if(direction == EnemyMovement.Direction.Down) ShoveDown();
+                else if(direction == EnemyMovement.Direction.Left) ShoveLeft();
+                else if(direction == EnemyMovement.Direction.Right) ShoveRight();
+            }
+            else{
+                if(direction == EnemyMovement.Direction.Up) SquashUp();
+                else if(direction == EnemyMovement.Direction.Down) SquashDown();
+                else if(direction == EnemyMovement.Direction.Left) SquashLeft();
+                else if(direction == EnemyMovement.Direction.Right) SquashRight();
+            }
         }
     }
 }

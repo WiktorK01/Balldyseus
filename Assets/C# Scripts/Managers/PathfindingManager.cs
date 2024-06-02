@@ -125,6 +125,45 @@ public class PathfindingManager : MonoBehaviour
         }
     }
 
+    // PUBLIC CHECKERS
+
+    public bool CheckIfTileIsWalkable(int x, int y)
+    {
+        bool[,] walkableMap = GetWalkableMap();
+        if (walkableMap == null || y >= walkableMap.GetLength(0) || x >= walkableMap.GetLength(1) || y < 0 || x < 0)
+        {
+            Debug.LogError("Invalid walkable map data or out of bounds access attempted.");
+            return false;
+        }
+        return walkableMap[y, x] && !CheckIfPoisitionHasNonPhysicalUnwalkableObstacle(new Vector3(x, y, 0)) && CheckIfEnemyAtPosition(new Vector3(x, y, 0)) == null;
+    }
+
+    public bool CheckIfPoisitionHasNonPhysicalUnwalkableObstacle(Vector3 position)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero);
+        if (hit.collider != null)
+        {
+            ObstacleTriggerUnwalkable obstacle = hit.collider.GetComponent<ObstacleTriggerUnwalkable>();
+            return obstacle != null;
+        }
+        return false;
+    }
+
+    public GameObject CheckIfEnemyAtPosition(Vector3 position)
+    {
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+        int layerMask = 1 << enemyLayer;
+
+        Collider2D collider = Physics2D.OverlapPoint(position, layerMask);
+
+        if (collider != null && collider.gameObject.CompareTag("EnemyCollider"))
+        {
+            return collider.transform.parent.gameObject;
+        }
+
+        return null;
+    }
+
     private void OnDrawGizmos()
     {
         if (groundTilemap != null && walkableMap != null)

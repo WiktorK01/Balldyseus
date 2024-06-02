@@ -95,7 +95,7 @@ public class EnemyMovement : MonoBehaviour
         {
             if (listPath[i].Item1 != previousX && listPath[i].Item2 != previousY)
             {
-                if (CanMove(listPath[i - 1].Item1, listPath[i].Item2))
+                if (pathfindingManager.CheckIfTileIsWalkable(listPath[i - 1].Item1, listPath[i].Item2))
                     listPath.Insert(i, (listPath[i - 1].Item1, listPath[i].Item2));
                 else
                     listPath.Insert(i, (listPath[i].Item1, listPath[i - 1].Item2));
@@ -173,131 +173,6 @@ private IEnumerator PerformMovements((int, int)[] path)
     enemyHasMoved = true;
 }
 
-    // Checking Spaces ***************************************************************
-
-    private bool CanMove(int x, int y)
-    {
-        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-        if (walkableMap == null || y >= walkableMap.GetLength(0) || x >= walkableMap.GetLength(1) || y < 0 || x < 0)
-        {
-            Debug.LogError("Invalid walkable map data or out of bounds access attempted.");
-            return false;
-        }
-        return walkableMap[y, x] && !IsObstacleTriggerUnwalkableAt(new Vector3(x, y, 0));
-    }
-
-    private bool IsObstacleTriggerUnwalkableAt(Vector3 position)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero);
-        if (hit.collider != null)
-        {
-            ObstacleTriggerUnwalkable obstacle = hit.collider.GetComponent<ObstacleTriggerUnwalkable>();
-            return obstacle != null;
-        }
-        return false;
-    }
-
-    public GameObject CheckForEnemyAtPosition(Vector3 position)
-    {
-        int enemyLayer = LayerMask.NameToLayer("Enemy");
-        int layerMask = 1 << enemyLayer;
-
-        Collider2D collider = Physics2D.OverlapPoint(position, layerMask);
-
-        if (collider != null && collider.gameObject.CompareTag("EnemyCollider"))
-        {
-            return collider.transform.parent.gameObject;
-        }
-
-        return null;
-    }
-
-    // Shove Related Code ***************************************************************
-
-    public void Shove(Direction direction)
-    {
-        Vector3 directionVector = DirectionToVector(direction);
-        Vector3 newPosition = transform.position + directionVector;
-        int newX = Mathf.FloorToInt(newPosition.x);
-        int newY = Mathf.FloorToInt(newPosition.y);
-
-        bool[,] walkableMap = pathfindingManager.GetWalkableMap();
-
-        if ((walkableMap[newY, newX] || IsObstacleTriggerUnwalkableAt(newPosition)) && CheckForEnemyAtPosition(newPosition) == null)
-        {
-            HandleShoveFeedback(direction);
-        }
-        else
-        {
-            GameObject enemyAtPosition = CheckForEnemyAtPosition(newPosition);
-            if (enemyAtPosition != null)
-            {
-                EnemyProperties otherEnemyProperties = enemyAtPosition.GetComponent<EnemyProperties>();
-                otherEnemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallBounce);
-            }
-
-            HandleSquashFeedback(direction);
-            enemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallBounce);
-        }
-    }
-
-    private Vector3 DirectionToVector(Direction direction)
-    {
-        switch (direction)
-        {
-            case Direction.Up:
-                return new Vector3(0, 1, 0);
-            case Direction.Down:
-                return new Vector3(0, -1, 0);
-            case Direction.Left:
-                return new Vector3(-1, 0, 0);
-            case Direction.Right:
-                return new Vector3(1, 0, 0);
-            default:
-                return Vector3.zero;
-        }
-    }
-
-    // Feedback Related Code ***************************************************************
-
-    private void HandleShoveFeedback(Direction direction)
-    {
-        switch (direction)
-        {
-            case Direction.Up:
-                enemyFeedback.ShoveUp();
-                break;
-            case Direction.Down:
-                enemyFeedback.ShoveDown();
-                break;
-            case Direction.Left:
-                enemyFeedback.ShoveLeft();
-                break;
-            case Direction.Right:
-                enemyFeedback.ShoveRight();
-                break;
-        }
-    }
-
-    private void HandleSquashFeedback(Direction direction)
-    {
-        switch (direction)
-        {
-            case Direction.Up:
-                enemyFeedback.SquashUp();
-                break;
-            case Direction.Down:
-                enemyFeedback.SquashDown();
-                break;
-            case Direction.Left:
-                enemyFeedback.SquashLeft();
-                break;
-            case Direction.Right:
-                enemyFeedback.SquashRight();
-                break;
-        }
-    }
-
 // Miscellaneous ***************************************************************
 
     private void ResetMovement()
@@ -337,37 +212,16 @@ private IEnumerator PerformMovements((int, int)[] path)
     {
         if (myColliderObject == collision.gameObject)
         {
-            // Get the enemy's position in world space
             Vector2 enemyPosition = transform.position;
-
-            // Calculate the direction from the ball to the enemy
             Vector2 direction = ballPosition - enemyPosition;
 
-            // IN BOUNCE MODE
-            if (bounceMode && remainingBounceCount > 0)
-            {
-                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
-                {
-                    if (direction.x > 0)
-                        Shove(Direction.Left);
-                    else
-                        Shove(Direction.Right);
-                }
-                else
-                {
-                    if (direction.y > 0)
-                        Shove(Direction.Down);
-                    else
-                        Shove(Direction.Up);
-                }
-            }
             // IN ATTACK MODE
-            else if (!bounceMode)
+            if (!bounceMode)
             {
                 if (currentSpeedState == BallProperties.SpeedState.High)
-                    enemyProperties.TakeDamage(2f, EnemyProperties.DamageType.BallImpactCritical);
+                    EnemyDamagePublisher.NotifyEnemyDamage(gameObject, ballPosition, EnemyProperties.DamageType.BallImpactCritical);
                 else
-                    enemyProperties.TakeDamage(1f, EnemyProperties.DamageType.BallImpact);
+                    EnemyDamagePublisher.NotifyEnemyDamage(gameObject, ballPosition, EnemyProperties.DamageType.BallImpact);
             }
         }
     }

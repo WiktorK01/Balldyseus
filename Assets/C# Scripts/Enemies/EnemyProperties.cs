@@ -15,15 +15,12 @@ public class EnemyProperties : MonoBehaviour
         BallImpact,
         BallImpactCritical,
         BallBounce,
+        GotShovedInto,
         FireDamage,
     }
 
-    void OnEnable(){
-        TakeDamage(0f, DamageType.BallImpact);
-    }
-
     //Everything That Occurs when an enemy takes damage
-    public void TakeDamage(float amountLost, DamageType damageType)
+    private void TakeDamage(float amountLost, DamageType damageType)
     {
         health -= amountLost;
         if (health <= 0) isDefeated = true;
@@ -53,6 +50,24 @@ public class EnemyProperties : MonoBehaviour
     }
 
 /****************OBSERVERS*************/
+
+
+    void OnEnable(){
+        TakeDamage(0f, DamageType.BallImpact);
+        EnemyDamagePublisher.EnemyDamage += OnEnemyDamage;
+    }
+    void OnDisable(){
+        EnemyDamagePublisher.EnemyDamage -= OnEnemyDamage;
+    }
+
+    void OnEnemyDamage(GameObject enemyWhoGotHurt, Vector3 balldyseusLocation, DamageType damageType){
+        if(gameObject == enemyWhoGotHurt){
+            if(damageType == DamageType.BallImpactCritical){
+                TakeDamage(2f, damageType);
+            }
+            else TakeDamage(1f, damageType);
+        }
+    }
 
 //this is for if I want a bool that checks if if it's the enemy's turn at the moment. not sure i need this atm, wont delete yet bc we'll see
     /*void OnEnable(){
