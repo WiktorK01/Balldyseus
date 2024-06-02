@@ -936,6 +936,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Achilles
       objectReference: {fileID: 0}
+    - target: {fileID: 6793341061788511147, guid: 8ea4e69dc0cc18b4dae827a66bb84b6e, type: 3}
+      propertyPath: Direction
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4551,37 +4555,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6500817122697128397, guid: 73c02f84e69e3f94e8e93a2952b63113, type: 3}
   m_PrefabInstance: {fileID: 440188545}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1498229933
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1498229934}
-  m_Layer: 0
-  m_Name: BoxFeedbacks
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1498229934
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1498229933}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.667085, y: 9.943457, z: -0.49051255}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1523563760
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11956,5 +11929,4 @@ SceneRoots:
   - {fileID: 29431954}
   - {fileID: 987294633}
   - {fileID: 1628780095}
-  - {fileID: 1498229934}
   - {fileID: 3992911193295129006}

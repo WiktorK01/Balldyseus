@@ -12,6 +12,7 @@ TagManager:
   - GroundTilemap
   - EnemyCollider
   - NoHitEnemyCollider
+  - ObstacleCollider
   layers:
   - Default
   - TransparentFX

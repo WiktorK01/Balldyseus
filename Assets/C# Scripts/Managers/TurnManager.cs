@@ -77,11 +77,11 @@ public class TurnManager : MonoBehaviour
                 break;
 
             case GameState.Win:
-                HandleWin();
+                currentState = GameState.Win;
                 break;
 
             case GameState.Loss:
-                HandleLoss();
+                currentState = GameState.Loss;
                 break;
         }
 
@@ -153,7 +153,11 @@ public class TurnManager : MonoBehaviour
             Destroy(enemyToRemove);
         }
 
-        ChangeGameState(GameState.PlayerTurn);
+        CheckForWin();
+
+        if(currentState != GameState.Win || currentState != GameState.Loss){
+            ChangeGameState(GameState.PlayerTurn);
+        }
     }
 
     public void FlagEnemyForRemovalAtEndOfRound(GameObject enemyGameObject){
@@ -167,16 +171,6 @@ public class TurnManager : MonoBehaviour
             Debug.Log("WIN DETECTED");
             ChangeGameState(GameState.Win);
         }
-    }
-
-    private void HandleWin()
-    {
-        currentState = GameState.Win;
-    }
-
-    private void HandleLoss()
-    {
-        currentState = GameState.Loss;
     }
 
     //used by Objective when it detects a collision with enemies
