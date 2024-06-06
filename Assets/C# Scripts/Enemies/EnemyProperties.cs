@@ -5,8 +5,6 @@ using UnityEngine;
 public class EnemyProperties : MonoBehaviour
 {
     public float health = 3f;
-    public float startingImpulse = 2f;
-    public float endingImpulse = 5f;
     public bool isOnFire = false;
     bool isDefeated = false;    
 
@@ -49,8 +47,10 @@ public class EnemyProperties : MonoBehaviour
         return isDefeated;
     }
 
-/****************OBSERVERS*************/
 
+
+
+/****************OBSERVERS*************/
 
     void OnEnable(){
         TakeDamage(0f, DamageType.BallImpact);
@@ -68,25 +68,4 @@ public class EnemyProperties : MonoBehaviour
             else TakeDamage(1f, damageType);
         }
     }
-
-//this is for if I want a bool that checks if if it's the enemy's turn at the moment. not sure i need this atm, wont delete yet bc we'll see
-    /*void OnEnable(){
-        EnemyTurnPublisher.EnemyTurnChange += OnEnemyTurnChange;
-        GameStatePublisher.GameStateChange += OnGameStateChange;
-    }
-    void OnDisable(){
-        EnemyTurnPublisher.EnemyTurnChange -= OnEnemyTurnChange;
-        GameStatePublisher.GameStateChange -= OnGameStateChange;
-    }
-
-    void OnEnemyTurnChange(GameObject enemyWhoseTurnItIs){
-        if(gameObject == enemyWhoseTurnItIs){
-            isMyTurn = true;
-        }
-        else isMyTurn = false;
-    }
-
-    void OnGameStateChange(TurnManager.GameState newGameState){
-        isMyTurn = false;
-    }*/
 }

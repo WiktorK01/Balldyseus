@@ -125,7 +125,7 @@ public class PathfindingManager : MonoBehaviour
         }
     }
 
-    // PUBLIC CHECKERS
+    // CHECKERS
 
     public bool CheckIfTileIsWalkable(int x, int y)
     {
@@ -135,36 +135,56 @@ public class PathfindingManager : MonoBehaviour
             Debug.LogError("Invalid walkable map data or out of bounds access attempted.");
             return false;
         }
-        return walkableMap[y, x] && !CheckIfPoisitionHasNonPhysicalUnwalkableObstacle(new Vector3(x, y, 0)) && CheckIfEnemyAtPosition(new Vector3(x, y, 0)) == null;
+        return walkableMap[y, x] 
+        && !CheckIfPositionHasNonPhysicalUnwalkableObstacle(new Vector3(x, y, 0))
+        && !CheckIfPositionHasPhysicalUnwalkableObstacle(new Vector3(x, y, 0))  
+        && GetObjectWithHealthAtPosition(new Vector3(x, y, 0)) == null;
     }
 
-    public bool CheckIfPoisitionHasNonPhysicalUnwalkableObstacle(Vector3 position)
+    public bool CheckIfPositionHasNonPhysicalUnwalkableObstacle(Vector3 position)
     {
-        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero);
-        if (hit.collider != null)
+        Collider2D[] hits = Physics2D.OverlapPointAll(position);
+        foreach (var hit in hits)
         {
-            ObstacleTriggerUnwalkable obstacle = hit.collider.GetComponent<ObstacleTriggerUnwalkable>();
-            return obstacle != null;
+            ObstacleTriggerUnwalkable obstacle = hit.GetComponent<ObstacleTriggerUnwalkable>();
+            if (obstacle != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public bool CheckIfPositionHasPhysicalUnwalkableObstacle(Vector3 position)
+    {
+        Collider2D[] hits = Physics2D.OverlapPointAll(position);
+        foreach (var hit in hits)
+        {
+            ObstaclePhysicalUnwalkable obstacle = hit.GetComponent<ObstaclePhysicalUnwalkable>();
+            if (obstacle != null)
+            {
+                return true;
+            }
         }
         return false;
     }
 
-    public GameObject CheckIfEnemyAtPosition(Vector3 position)
+    public GameObject GetObjectWithHealthAtPosition(Vector3 position)
     {
-        int enemyLayer = LayerMask.NameToLayer("Enemy");
-        int layerMask = 1 << enemyLayer;
-
-        Collider2D collider = Physics2D.OverlapPoint(position, layerMask);
-
-        if (collider != null && collider.gameObject.CompareTag("EnemyCollider"))
+        Debug.Log("Checking for object with health at position: " + position);
+        Collider2D[] hits = Physics2D.OverlapPointAll(position);
+        foreach (var hit in hits)
         {
-            return collider.transform.parent.gameObject;
+            EnemyProperties enemyProperties = hit.GetComponent<EnemyProperties>();
+            if (enemyProperties != null)
+            {
+                Debug.Log("Object with health found at position: " + position);
+                return hit.gameObject;
+            }
         }
-
         return null;
     }
 
-    private void OnDrawGizmos()
+    void OnDrawGizmos()
     {
         if (groundTilemap != null && walkableMap != null)
         {

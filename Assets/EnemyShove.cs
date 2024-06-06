@@ -19,9 +19,13 @@ public class EnemyShove : MonoBehaviour
         int newX = Mathf.FloorToInt(newPosition.x);
         int newY = Mathf.FloorToInt(newPosition.y);
 
-        bool canShoveHere = false;
+        bool canShoveHere = true;
 
-        if(pathfindingManager.CheckIfTileIsWalkable(newX, newY)) canShoveHere = true;
+        if(!pathfindingManager.CheckIfTileIsWalkable(newX, newY)) canShoveHere = false;
+        if(pathfindingManager.CheckIfPositionHasPhysicalUnwalkableObstacle(newPosition))
+            canShoveHere = false;
+        else if(pathfindingManager.CheckIfPositionHasNonPhysicalUnwalkableObstacle(newPosition))
+            canShoveHere = true;
 
         if (canShoveHere)
         {
@@ -32,7 +36,7 @@ public class EnemyShove : MonoBehaviour
             EnemyShovePublisher.NotifyEnemyShove(gameObject, direction, false);
 
             //handle damage
-            GameObject enemyAtPosition = pathfindingManager.CheckIfEnemyAtPosition(newPosition);
+            GameObject enemyAtPosition = pathfindingManager.GetObjectWithHealthAtPosition(newPosition);
             if (enemyAtPosition != null)
             {
                 EnemyDamagePublisher.NotifyEnemyDamage(enemyAtPosition, Vector3.zero, EnemyProperties.DamageType.GotShovedInto);

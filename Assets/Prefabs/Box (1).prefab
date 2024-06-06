@@ -1063,7 +1063,7 @@ MonoBehaviour:
         RemapRangeFalloff: {x: 0, y: 1}
         Owner: {fileID: 160906217456567713}
         DebugActive: 0
-        TargetGameObject: {fileID: 5865107441598133400}
+        TargetGameObject: {fileID: 3678448047046691930}
         ExtraTargetGameObjects: []
         SetStateOnInit: 0
         StateOnInit: 1
@@ -3410,7 +3410,7 @@ MonoBehaviour:
         RemapRangeFalloff: {x: 0, y: 1}
         Owner: {fileID: 5718897452642381779}
         DebugActive: 0
-        TargetGameObject: {fileID: 5865107441598133400}
+        TargetGameObject: {fileID: 3678448047046691930}
         ExtraTargetGameObjects: []
         SetStateOnInit: 0
         StateOnInit: 1
@@ -7000,6 +7000,8 @@ GameObject:
   - component: {fileID: 2637409089902361464}
   - component: {fileID: 2783711799383191480}
   - component: {fileID: 6977276611920487047}
+  - component: {fileID: 9074142559109534694}
+  - component: {fileID: 5928493131966613525}
   m_Layer: 13
   m_Name: Box (1)
   m_TagString: Obstacle
@@ -7140,6 +7142,30 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 7
+--- !u!114 &9074142559109534694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3678448047046691930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f0c4dffa0848004d8120a7dbf231e00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5928493131966613525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3678448047046691930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cca990362ac8c8448c6549b367865db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4167729881263437679
 GameObject:
   m_ObjectHideFlags: 0

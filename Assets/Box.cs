@@ -7,7 +7,7 @@ using UnityEditor.Experimental.GraphView;
 
 public class Box : MonoBehaviour
 {
-    [SerializeField]float health = 1;
+    EnemyProperties enemyProperties;
 
     [SerializeField] GameObject myColliderObject;
 
@@ -101,33 +101,19 @@ public class Box : MonoBehaviour
         rotationResetter.PlayFeedbacks();
     }
 
-
+    
     void OnEnable(){
+        enemyProperties = GetComponent<EnemyProperties>();
+
         BallCollisionPublisher.BallCollision += OnBallCollision;
-        EnemyDamagePublisher.EnemyDamage += OnEnemyDamage;
         EnemyShovePublisher.EnemyShove += OnEnemyShove;
         EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
     }
 
     void OnDisable(){
         BallCollisionPublisher.BallCollision -= OnBallCollision;
-        EnemyDamagePublisher.EnemyDamage -= OnEnemyDamage;
         EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
         EnemyShovePublisher.EnemyShove -= OnEnemyShove;
-    }
-
-
-    void OnEnemyDamage(GameObject enemyWhoGotHurt, Vector3 ballPosition, EnemyProperties.DamageType damageType){
-        if(gameObject == enemyWhoGotHurt){
-            if(damageType == EnemyProperties.DamageType.BallImpactCritical){
-                health -= 2;
-                EnemyHealthChangePublisher.NotifyEnemyHealthChange(gameObject, health, 2, damageType);
-            } 
-            else {
-                health--;
-                EnemyHealthChangePublisher.NotifyEnemyHealthChange(gameObject, health, 1, damageType);
-            }
-        }
     }
 
 
@@ -136,8 +122,10 @@ public class Box : MonoBehaviour
             Vector2 enemyPosition = transform.position;
             Vector2 direction = ballPosition - enemyPosition;
 
-            if(currentSpeedState == BallProperties.SpeedState.High)EnemyDamagePublisher.NotifyEnemyDamage(gameObject, ballPosition, EnemyProperties.DamageType.BallImpactCritical);
-            else EnemyDamagePublisher.NotifyEnemyDamage(gameObject, ballPosition, EnemyProperties.DamageType.BallImpact);
+            if(currentSpeedState == BallProperties.SpeedState.High)
+                EnemyDamagePublisher.NotifyEnemyDamage(gameObject, ballPosition, EnemyProperties.DamageType.BallImpactCritical);
+            else 
+                EnemyDamagePublisher.NotifyEnemyDamage(gameObject, ballPosition, EnemyProperties.DamageType.BallImpact);
 
             if(currentSpeedState == BallProperties.SpeedState.Low) return;
 
@@ -169,8 +157,8 @@ public class Box : MonoBehaviour
 
     void OnEnemyHealthChange(GameObject enemyWhoGotHurt, float newHealthCount, float amountLost, EnemyProperties.DamageType damageType){
         if(gameObject == enemyWhoGotHurt){
-            if(health <= 0 && damageType == EnemyProperties.DamageType.FireDamage)DeathFire();
-            else if(health <= 0)DeathFlush();
+            if(enemyProperties.health <= 0 && damageType == EnemyProperties.DamageType.FireDamage)DeathFire();
+            else if(enemyProperties.health <= 0)DeathFlush();
             else if(damageType == EnemyProperties.DamageType.FireDamage)DamageFire();
         }
     }
