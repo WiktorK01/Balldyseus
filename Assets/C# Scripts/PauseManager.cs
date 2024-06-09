@@ -25,6 +25,7 @@ public class PauseManager : MonoBehaviour
 
     void PauseGame(){
         uiManager.ShowUIElement("PauseMenuUI");
+        PausePublisher.NotifyPauseChange(true);
         isGamePaused = true;
         Time.timeScale = 0f;
     }
@@ -32,6 +33,7 @@ public class PauseManager : MonoBehaviour
     public void ResumeGame()
     {
         uiManager.HideUIElement("PauseMenuUI");
+        PausePublisher.NotifyPauseChange(false);
         isGamePaused = false;
         Time.timeScale = 1f;
     }
