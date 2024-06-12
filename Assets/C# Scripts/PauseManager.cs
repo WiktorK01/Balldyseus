@@ -4,17 +4,12 @@ using UnityEngine;
 
 public class PauseManager : MonoBehaviour
 {
-    UIManager uiManager;
-
     bool isGamePaused = false;
     bool isMoving = false;
-
-    void Start(){
-        uiManager = FindObjectOfType<UIManager>();
-    }
+    bool canPause = true;
 
     void Update(){
-        if (Input.GetKeyDown(KeyCode.Escape) && !isMoving){
+        if (Input.GetKeyDown(KeyCode.Escape) && !isMoving && canPause){
             Debug.Log("PAUSING");
             if (!isGamePaused) 
                 PauseGame();
@@ -24,18 +19,13 @@ public class PauseManager : MonoBehaviour
     }
 
     void PauseGame(){
-        uiManager.ShowUIElement("PauseMenuUI");
         PausePublisher.NotifyPauseChange(true);
         isGamePaused = true;
-        Time.timeScale = 0f;
     }
 
-    public void ResumeGame()
-    {
-        uiManager.HideUIElement("PauseMenuUI");
+    public void ResumeGame(){
         PausePublisher.NotifyPauseChange(false);
         isGamePaused = false;
-        Time.timeScale = 1f;
     }
 
 
@@ -56,11 +46,19 @@ public class PauseManager : MonoBehaviour
         if (isGamePaused && newState == TurnManager.GameState.PlayerTurn) {
             ResumeGame();
         }
+        if (newState == TurnManager.GameState.Loss || newState == TurnManager.GameState.Win) {
+            canPause = false;
+        }
+        else {
+            canPause = true;
+        }
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newState)
     {
-        if(newState == BallMovement.MovementState.IsMoving) isMoving = true;
-        else isMoving = false;
+        if(newState == BallMovement.MovementState.IsMoving) 
+            isMoving = true;
+        else 
+            isMoving = false;
     }
 }

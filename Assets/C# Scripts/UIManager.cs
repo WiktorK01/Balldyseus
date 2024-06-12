@@ -127,60 +127,8 @@ public class UIManager : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////
     /// 
 
-    void OnEnable()
-    {
-        //subscribes
-        GameStatePublisher.GameStateChange += UpdateUI;
-    }
-
-    void OnDisable()
-    {
-        //unsubscribes to avoid memory leaks
-        GameStatePublisher.GameStateChange -= UpdateUI;
-    }
-
-    private void UpdateUI(TurnManager.GameState newState)
-    {
-        HideUIElement("PauseMenuUI");
-        
-
-        switch (newState)
-        {
-            /*case TurnManager.GameState.PlayerTurn:
-                ShowPlayerTurnUI();
-                break;
-            case TurnManager.GameState.EnemyTurn:
-                ShowEnemyTurnUI();
-                break; ideally these will be handled by their own feedback animations*/
-            case TurnManager.GameState.Win:
-                ShowWinUI();
-                break;
-            case TurnManager.GameState.Loss:
-                ShowLossUI();
-                break;
-        }
-
-        
-    }
-
     //we call this in Awake so that the gameplay UI exists to perform their feedbacks after a turn happens
     public void ShowGameplayUI(){
         ShowUIElement("LaunchUI");
-    }
-    void ShowWinUI(){ 
-        ShowUIElement("WinUI");
-        float currentTurnNumber = TurnManager.Instance.TurnNumber;   
-
-        if(currentTurnNumber == 1f){
-            string winText = "It took you " + currentTurnNumber + " turn!";
-            SetTextValueInUIElement("WinUI", "TurnNumberText", winText);
-        }
-        else{
-            string winText = "It took you " + currentTurnNumber + " turns!";
-            SetTextValueInUIElement("WinUI", "TurnNumberText", winText);
-        }
-    }
-    void ShowLossUI(){
-        ShowUIElement("LossUI");
     }
 }
