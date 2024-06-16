@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2a9460aae1c4420a415466d1db880f, type: 3}
+  m_Name: PART1
+  m_EditorClassIdentifier: 
+  Title: PART 1
+  Exchanges:
+  - Lines:
+    - Text: Hello there! This is a test
+      Guid:
+        Value: 358f6956-5458-448b-ace5-71150fa2781e
+    Speaker: Elpenor
+    Guid:
+      Value: 9eb3b147-7e23-4d82-92ad-168c8cd507c9
+  - Lines:
+    - Text: ...
+      Guid:
+        Value: 2f1d2519-bb44-4f65-8d4c-41d83ec9b6fe
+    Speaker: Balldyseus
+    Guid:
+      Value: 26ff9819-f55b-4493-becc-e8c6003dd364
+  Guid:
+    Value: efff1d53-365a-40f1-9c55-a2156b5b5f9f

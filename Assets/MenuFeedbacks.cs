@@ -5,6 +5,8 @@ using MoreMountains.Feedbacks;
 
 public class MenuFeedbacks : MonoBehaviour
 {
+    bool isWinLossMenuOpen = false;
+
     enum MenuType{
         Pause,
         Win,
@@ -27,19 +29,28 @@ public class MenuFeedbacks : MonoBehaviour
     [SerializeField] MMF_Player nextLevelButtonHover;
     [SerializeField] MMF_Player nextLevelButtonHoverExit;
 
+    [SerializeField] MMF_Player winUiTurnCountUpdate;
+    MMF_TMPText winUiTurnCountText;
+
     public void LossEntrances(){
+        if(isWinLossMenuOpen) return;
+        WinLossMenuOpenedPublisher.NotifyWinLossMenuOpen(true);
         lossEntrances.Initialization();
         lossEntrances.PlayFeedbacks();
     }
     public void WinEntrances(){
+        if(isWinLossMenuOpen) return;
+        WinLossMenuOpenedPublisher.NotifyWinLossMenuOpen(true);
         winEntrances.Initialization();
         winEntrances.PlayFeedbacks();
     }
     public void PauseEntrances(){
+        if(isWinLossMenuOpen) return;
         pauseEntrances.Initialization();
         pauseEntrances.PlayFeedbacks();
     }
     public void Exits(){
+        if(isWinLossMenuOpen) return;
         exits.Initialization();
         exits.PlayFeedbacks();
     }
@@ -88,15 +99,27 @@ public class MenuFeedbacks : MonoBehaviour
         nextLevelButtonHoverExit.PlayFeedbacks();
     }
 
+    int turnCount = -1;
+    public void WinUiTurnCountUpdate(){
+        if(turnCount == 1) winUiTurnCountText.NewText = "It Took You " + turnCount + " Turn to Win!";
+        else winUiTurnCountText.NewText = "It Took You " + turnCount + " Turns to Win!";
+        winUiTurnCountUpdate.Initialization();
+        winUiTurnCountUpdate.PlayFeedbacks();
+    }
+
     //******OBSERVERS********
 
+
     void OnEnable(){
+        if(winUiTurnCountUpdate != null) winUiTurnCountText = winUiTurnCountUpdate.GetFeedbackOfType<MMF_TMPText>();
         PausePublisher.PauseChange += OnPauseChange;
         GameStatePublisher.GameStateChange += OnGameStateChange;
+        WinLossMenuOpenedPublisher.WinLossMenuOpened += OnWinLossMenuOpened;
     }
     void OnDisable(){
         PausePublisher.PauseChange -= OnPauseChange;
-        GameStatePublisher.GameStateChange += OnGameStateChange;
+        GameStatePublisher.GameStateChange -= OnGameStateChange;
+        WinLossMenuOpenedPublisher.WinLossMenuOpened -= OnWinLossMenuOpened;
     }
 
     private void OnPauseChange(bool isGamePaused){
@@ -117,6 +140,18 @@ public class MenuFeedbacks : MonoBehaviour
             case TurnManager.GameState.Loss:
                 if(menuType == MenuType.Loss) LossEntrances();
                 break;
+            case TurnManager.GameState.PlayerTurn:
+                if(menuType == MenuType.Win){
+                    turnCount++;
+                    WinUiTurnCountUpdate();
+                }
+                break;
+
         }
+    }
+
+    private void OnWinLossMenuOpened(bool newIsWinLossMenuOpen){
+        if(newIsWinLossMenuOpen) isWinLossMenuOpen = true;
+        else isWinLossMenuOpen = false;
     }
 }

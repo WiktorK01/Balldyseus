@@ -1,0 +1,18 @@
+ BEGIN
+ TITLE: PART 1
+ NAME: Elpenor
+ Hello there! This is a test
+ /
+ NAME: Balldyseus
+ ...
+ /
+ /
+ TITLE: PART 2
+ NAME: Elpenor
+ yup, still a test
+ /
+ NAME: Balldyseus
+ ...
+ /
+ /
+ END

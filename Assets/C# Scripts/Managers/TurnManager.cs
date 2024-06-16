@@ -61,7 +61,6 @@ public class TurnManager : MonoBehaviour
                 break;
 
             case GameState.PlayerTurn:
-                Debug.Log("Player Turn Starting");
                 HandlePlayerTurnStart();
                 break;
 
@@ -130,6 +129,7 @@ public class TurnManager : MonoBehaviour
 
     private IEnumerator EnemyTurnRoutine()
     {
+        //Remove Enemies if needed
         foreach(var enemyToRemove in enemiesToRemove){
             RemoveEnemy(enemyToRemove);
             Destroy(enemyToRemove);
@@ -148,6 +148,7 @@ public class TurnManager : MonoBehaviour
             yield return new WaitUntil(() => !currentEnemyTurnActive);
         }
 
+        //Remove Enemies if needed
         foreach(var enemyToRemove in enemiesToRemove){
             RemoveEnemy(enemyToRemove);
             Destroy(enemyToRemove);
@@ -173,27 +174,20 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-    //used by Objective when it detects a collision with enemies
-    public void OnEnemyReachedObjective()
-    {
-        if (currentState != GameState.Loss)
-        {
-            ChangeGameState(GameState.Loss);
-        }
-    }
-
 
 //***************OBSERVERS********************
     private void OnEnable(){
         MovementStatePublisher.MovementStateChange += OnMovementStateChange;
         EndEnemyTurnPublisher.EndEnemyTurn += OnEndEnemyTurn;
         EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
+        EnemyEnteredObjectivePublisher.EnemyEnteredObjective += OnEnemyEnteredObjective;
     }
 
     private void OnDisable(){
         MovementStatePublisher.MovementStateChange -= OnMovementStateChange;
         EndEnemyTurnPublisher.EndEnemyTurn -= OnEndEnemyTurn;
         EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
+        EnemyEnteredObjectivePublisher.EnemyEnteredObjective -= OnEnemyEnteredObjective;
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newMovementState)
@@ -217,5 +211,12 @@ public class TurnManager : MonoBehaviour
 
     void OnEnemyHealthChange(GameObject enemyWhoLostDamage, float newHealthCount, float amountLost, EnemyProperties.DamageType damageType){
         if(newHealthCount <= 0f) FlagEnemyForRemovalAtEndOfRound(enemyWhoLostDamage);
+    }
+
+    private void OnEnemyEnteredObjective(GameObject enemy){
+        if (currentState != GameState.Loss)
+        {
+            ChangeGameState(GameState.Loss);
+        }
     }
 }

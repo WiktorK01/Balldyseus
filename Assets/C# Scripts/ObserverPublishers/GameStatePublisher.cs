@@ -10,7 +10,6 @@ public static class GameStatePublisher
     public static void NotifyGameStateChange(TurnManager.GameState newGameState)
     {
         GameStateChange?.Invoke(newGameState);
-        Debug.Log("NEW GAME STATE AS: " + newGameState.ToString());
     }
 
     /* 

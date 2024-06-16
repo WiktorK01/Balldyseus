@@ -170,7 +170,6 @@ public class PathfindingManager : MonoBehaviour
 
     public GameObject GetObjectWithHealthAtPosition(Vector3 position)
     {
-        Debug.Log("Checking for object with health at position: " + position);
         Collider2D[] hits = Physics2D.OverlapPointAll(position);
         foreach (var hit in hits)
         {

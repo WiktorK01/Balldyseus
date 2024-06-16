@@ -10,7 +10,6 @@ public class EnemyTurnPublisher : MonoBehaviour
     public static void NotifyEnemyTurnChange(GameObject enemyObject)
     {
         EnemyTurnChange?.Invoke(enemyObject);
-        Debug.Log("New Turn for: " + enemyObject.ToString());
     }
     /*
     void OnEnable(){

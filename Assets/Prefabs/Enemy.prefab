@@ -3463,6 +3463,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     OnRestoreInitialValues:
       m_PersistentCalls:
         m_Calls: []
@@ -23712,6 +23724,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     OnRestoreInitialValues:
       m_PersistentCalls:
         m_Calls: []
@@ -27812,6 +27836,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     OnRestoreInitialValues:
       m_PersistentCalls:
         m_Calls: []
@@ -29361,6 +29397,7 @@ GameObject:
   - component: {fileID: 7653494653039141096}
   - component: {fileID: 8855590854960388877}
   - component: {fileID: 6896991761344743042}
+  - component: {fileID: 3167386906760137124}
   m_Layer: 13
   m_Name: EnemyCollider
   m_TagString: EnemyCollider
@@ -29455,6 +29492,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 7
+--- !u!114 &3167386906760137124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7264873440963694526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56d344f24fea62943a794ce3728b45dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7342153173212752563
 GameObject:
   m_ObjectHideFlags: 0
@@ -29780,6 +29829,18 @@ MonoBehaviour:
         - m_Target: {fileID: 8143312824454417974}
           m_TargetAssemblyTypeName: FeedbackEnemyMovementCompletePublisher, Assembly-CSharp
           m_MethodName: NotifyFeedbackEnemyMovementComplete
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -32852,6 +32913,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     OnRestoreInitialValues:
       m_PersistentCalls:
         m_Calls: []
@@ -33603,6 +33676,18 @@ MonoBehaviour:
         - m_Target: {fileID: 9103932921822903828}
           m_TargetAssemblyTypeName: EnemyFeedback, Assembly-CSharp
           m_MethodName: RotationResetter
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -37646,8 +37731,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 2
-  startingImpulse: 12
-  endingImpulse: 12
   isOnFire: 0
 --- !u!114 &4495284835339937166
 MonoBehaviour:
@@ -37966,6 +38049,18 @@ MonoBehaviour:
         - m_Target: {fileID: 9103932921822903828}
           m_TargetAssemblyTypeName: EnemyFeedback, Assembly-CSharp
           m_MethodName: RotationResetter
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -44529,6 +44624,18 @@ MonoBehaviour:
         - m_Target: {fileID: 9103932921822903828}
           m_TargetAssemblyTypeName: EnemyFeedback, Assembly-CSharp
           m_MethodName: RotationResetter
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 3167386906760137124}
+          m_TargetAssemblyTypeName: EnemyObjectiveCollision, Assembly-CSharp
+          m_MethodName: CheckIfObjectiveEntered
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}

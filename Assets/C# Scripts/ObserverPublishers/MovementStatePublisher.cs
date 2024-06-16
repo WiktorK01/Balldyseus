@@ -10,7 +10,6 @@ public class MovementStatePublisher : MonoBehaviour
     public static void NotifyMovementStateChange(BallMovement.MovementState newMovementState)
     {
         MovementStateChange?.Invoke(newMovementState);
-        Debug.Log("NEW MOVEMENT STATE AS: " + newMovementState);
     }
 
     /*     
