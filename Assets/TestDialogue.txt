@@ -1,18 +1,73 @@
- BEGIN
- TITLE: PART 1
- NAME: Elpenor
- Hello there! This is a test
- /
- NAME: Balldyseus
- ...
- /
- /
- TITLE: PART 2
- NAME: Elpenor
- yup, still a test
- /
- NAME: Balldyseus
- ...
- /
- /
- END
+BEGIN
+TITLE: General Overview
+NAME: Balldyseus
+Welcome to Balldyseus!
+/
+NAME: Balldyseus
+You and the enemies will take turns. On the Player turn, you attack and try to defeat enemies. If you defeat all enemies, you win.
+/
+NAME: Balldyseus
+On an Enemy's turn, they will move and try to reach their Objective(the magenta zone on the bottom) If an enemy reaches this zone, you lose.
+/
+/
+TITLE: Enemy Overview
+NAME: Balldyseus
+This is an Enemy
+/
+NAME: Balldyseus
+It's Red Number represents it's health
+It's Blue Number represents how many spaces it will move on it's turn.
+/
+/
+TITLE: Learning to attack
+NAME: Balldyseus
+Let's attack this enemy using Attack-Mode!
+/
+NAME: Balldyseus
+Click and hold on Balldyseus
+Drag your mouse to aim at the enemy. The further you pull back, the higher the velocity.
+Click the LAUNCH button. Balldyseus will be propelled in the specified direction!
+/
+/
+TITLE: Learning to Bounce
+NAME: Balldyseus
+Nice! Now let's try using Bounce-Mode! It's a bit different from Attack-Mode!
+/
+NAME: Balldyseus
+Bounce-Mode causes Balldyseus to bounce on impact, propelling him and pushing enemies back without dealing damage.
+If an enemy can't be pushed back due to a wall or another enemy, they will take damage instead.
+You have a limited number of bounces.
+/
+NAME: Balldyseus
+You can switch between Attack-Mode and Bounce-Mode at any time using Left-Click and Right-Click!
+/
+NAME: Balldyseus
+Try and push the enemy back into the fire by using Bounce-Mode and Right-Click!
+/
+/
+TITLE: Learning to Switch
+NAME: Balldyseus
+Awesome! now let's make sure you have a solid grasp on switching-modes!
+/
+NAME: Balldyseus
+You can switch modes at ANY time, including while you're moving!
+/
+NAME: Balldyseus
+Let's try making a movement and switching modes 8 times during the movement!
+/
+/
+TITLE: Learning about High-Speeds
+NAME: Balldyseus
+You seem to have good grasp on everything! let's touch on one last thing!
+/
+NAME: Balldyseus
+If yellow stars are radiating off of Balldyseus, it means he's moving at High-Speeds!
+/
+NAME: Balldyseus
+When Balldyseus is moving at High-Speeds, he deals DOUBLE-DAMAGE in Attack-Mode
+/
+NAME: Balldyseus
+Let's try using Bounce-Mode to reach these High-Speeds!
+/
+/
+END

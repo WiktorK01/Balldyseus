@@ -12,6 +12,13 @@ public class EnemyShove : MonoBehaviour
     private PathfindingManager pathfindingManager;
     private Tilemap groundTilemap;
 
+    void Update(){
+        if(Input.GetKeyDown(KeyCode.Space)){
+            Vector3 newPosition = new Vector3(23,9,0);
+            pathfindingManager.GetObjectWithHealthAtPosition(newPosition);
+        }
+    }
+
     public void Shove(EnemyMovement.Direction direction, Vector3 ballPosition)
     {
         Vector3 directionVector = DirectionToVector(direction);
@@ -21,11 +28,19 @@ public class EnemyShove : MonoBehaviour
 
         bool canShoveHere = true;
 
-        if(!pathfindingManager.CheckIfTileIsWalkable(newX, newY)) canShoveHere = false;
+        //first check if the tile is walkable, 
+        //then prioritize the existence of obstacles (fire for example is unwalkable but shoveable)
+        //then prioritize the existence of enemies
+
+        if(!pathfindingManager.CheckIfTileIsWalkable(newX, newY)) 
+            canShoveHere = false;
         if(pathfindingManager.CheckIfPositionHasPhysicalUnwalkableObstacle(newPosition))
             canShoveHere = false;
         else if(pathfindingManager.CheckIfPositionHasNonPhysicalUnwalkableObstacle(newPosition))
             canShoveHere = true;
+        if(pathfindingManager.GetObjectWithHealthAtPosition(newPosition) != null)
+            canShoveHere = false;
+        
 
         if (canShoveHere)
         {
@@ -39,6 +54,7 @@ public class EnemyShove : MonoBehaviour
             GameObject enemyAtPosition = pathfindingManager.GetObjectWithHealthAtPosition(newPosition);
             if (enemyAtPosition != null)
             {
+                Debug.Log("Shoved into enemy");
                 EnemyDamagePublisher.NotifyEnemyDamage(enemyAtPosition, Vector3.zero, EnemyProperties.DamageType.GotShovedInto);
             }
 
@@ -46,6 +62,7 @@ public class EnemyShove : MonoBehaviour
         }
     }
 
+    //we're just using the direction enum from EnemyMovement since it already exists 
     private Vector3 DirectionToVector(EnemyMovement.Direction direction)
     {
         switch (direction)

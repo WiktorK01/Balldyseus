@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Dossamer.Dialogue;
+using Dossamer.Dialogue.Schema;
+
 
 public class TurnManager : MonoBehaviour
 {
@@ -9,6 +12,7 @@ public class TurnManager : MonoBehaviour
     public enum GameState
     {
         Null,
+        Cutscene,
         PlayerTurn,
         EnemyTurn,
         Win,
@@ -16,6 +20,8 @@ public class TurnManager : MonoBehaviour
     }
 
     [SerializeField] private PathfindingManager pathfindingManager;
+    public Cutscene startingCutscene;
+    public Cutscene endingCutscene;
 
     public GameState currentState = GameState.Null;
     public float TurnNumber { get; private set; }
@@ -41,11 +47,18 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        pathfindingManager = FindObjectOfType<PathfindingManager>();
-
+        pathfindingManager = FindObjectOfType<PathfindingManager>();         
         if (pathfindingManager == null) Debug.LogError("PathfindingManager not found.");
+
+        if (startingCutscene != null)
+        {
+            ChangeGameState(GameState.Cutscene);
+        }
+        else
+        {
+            ChangeGameState(GameState.PlayerTurn); //Player turn begins
+        }
         
-        ChangeGameState(GameState.PlayerTurn); //Player turn begins
     }
 
     public void ChangeGameState(GameState newState)
@@ -174,6 +187,16 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    public void StartPlayerTurn(){
+        ChangeGameState(GameState.PlayerTurn);
+    }
+    public void StartWinState(){
+        ChangeGameState(GameState.Win);
+    }
+    public void StartLossState(){
+        ChangeGameState(GameState.Loss);
+    }
+
 
 //***************OBSERVERS********************
     private void OnEnable(){
@@ -181,6 +204,7 @@ public class TurnManager : MonoBehaviour
         EndEnemyTurnPublisher.EndEnemyTurn += OnEndEnemyTurn;
         EnemyHealthChangePublisher.EnemyHealthChange += OnEnemyHealthChange;
         EnemyEnteredObjectivePublisher.EnemyEnteredObjective += OnEnemyEnteredObjective;
+        ScreenWipeCompletePublisher.ScreenWipeComplete += OnScreenWipeComplete;
     }
 
     private void OnDisable(){
@@ -188,6 +212,7 @@ public class TurnManager : MonoBehaviour
         EndEnemyTurnPublisher.EndEnemyTurn -= OnEndEnemyTurn;
         EnemyHealthChangePublisher.EnemyHealthChange -= OnEnemyHealthChange;
         EnemyEnteredObjectivePublisher.EnemyEnteredObjective -= OnEnemyEnteredObjective;
+        ScreenWipeCompletePublisher.ScreenWipeComplete -= OnScreenWipeComplete;
     }
 
     private void OnMovementStateChange(BallMovement.MovementState newMovementState)
@@ -218,5 +243,10 @@ public class TurnManager : MonoBehaviour
         {
             ChangeGameState(GameState.Loss);
         }
+    }
+
+    private void OnScreenWipeComplete()
+    {
+        DialogueManager.Instance.StartNewDialogue(startingCutscene);
     }
 }

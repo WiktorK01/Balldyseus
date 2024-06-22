@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: Characters
   m_EditorClassIdentifier: 
   _characterList:
+  - Name: Elpenor
+    Photo: {fileID: 2800000, guid: 0fe17a5fda0fee14a8903227ee99c119, type: 3}
   - Name: Balldyseus
     Photo: {fileID: 2800000, guid: a874834768681714fb4efde9eabfd02a, type: 3}

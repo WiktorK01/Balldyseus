@@ -62,6 +62,7 @@ public class EnemyProperties : MonoBehaviour
 
     void OnEnemyDamage(GameObject enemyWhoGotHurt, Vector3 balldyseusLocation, DamageType damageType){
         if(gameObject == enemyWhoGotHurt){
+            Debug.Log("The GameObject that got hurt is: " + gameObject.name);
             if(damageType == DamageType.BallImpactCritical){
                 TakeDamage(2f, damageType);
             }

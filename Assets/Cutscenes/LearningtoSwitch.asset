@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2a9460aae1c4420a415466d1db880f, type: 3}
+  m_Name: LearningtoSwitch
+  m_EditorClassIdentifier: 
+  Title: Learning to Switch
+  Exchanges:
+  - Lines:
+    - Text: Awesome! now let's make sure you have a solid grasp on switching-modes!
+      Guid:
+        Value: da6cf6fe-c25e-4fb8-86e1-07914b3727b9
+    Speaker: Balldyseus
+    Guid:
+      Value: 74547c48-a135-4293-b677-e5111841a193
+  - Lines:
+    - Text: You can switch modes at ANY time, including while you're moving!
+      Guid:
+        Value: f234b17b-3c58-4078-946f-6bd1642f5942
+    Speaker: Balldyseus
+    Guid:
+      Value: 28a9aa58-26e7-4518-ba98-9b8df4e9d6ed
+  - Lines:
+    - Text: Let's try making a movement and switching modes 8 times during the movement!
+      Guid:
+        Value: a385adc3-d472-47bd-9792-c39a09c73307
+    Speaker: Balldyseus
+    Guid:
+      Value: 5b0fef7b-c03a-433c-be54-96d7372b75fc
+  Guid:
+    Value: f25b6b41-0db0-4d37-aa67-2c93ded99eea

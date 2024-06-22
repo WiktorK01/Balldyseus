@@ -173,13 +173,14 @@ public class PathfindingManager : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapPointAll(position);
         foreach (var hit in hits)
         {
-            EnemyProperties enemyProperties = hit.GetComponent<EnemyProperties>();
+            EnemyProperties enemyProperties = hit.GetComponentInParent<EnemyProperties>();
             if (enemyProperties != null)
             {
                 Debug.Log("Object with health found at position: " + position);
-                return hit.gameObject;
+                return enemyProperties.gameObject;
             }
         }
+        Debug.Log("No object with health found at position: " + position);
         return null;
     }
 

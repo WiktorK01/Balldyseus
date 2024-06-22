@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2a9460aae1c4420a415466d1db880f, type: 3}
+  m_Name: Learningtoattack
+  m_EditorClassIdentifier: 
+  Title: Learning to attack
+  Exchanges:
+  - Lines:
+    - Text: Let's attack this enemy using Attack-Mode!
+      Guid:
+        Value: 86f4ad54-4e2b-4bb9-b7ae-046948b372b7
+    Speaker: Balldyseus
+    Guid:
+      Value: 313f90a1-1fb2-4aa8-9973-3445d8dd7950
+  - Lines:
+    - Text: Click and hold on Balldyseus
+      Guid:
+        Value: 3525c1a4-36d1-4a4f-b3a6-9bdd8cff81d9
+    - Text: Drag your mouse to aim at the enemy. The further you pull back, the higher
+        the velocity.
+      Guid:
+        Value: 5942c710-18ad-48b5-8eda-cdeaa185e259
+    - Text: Click the LAUNCH button. Balldyseus will be propelled in the specified
+        direction!
+      Guid:
+        Value: 09d6f2b5-c1b7-49c1-add5-127e07583d42
+    Speaker: Balldyseus
+    Guid:
+      Value: 625f4a93-1c5e-4bf3-80b4-8d9fc1001371
+  Guid:
+    Value: 2023759c-fc62-4745-91e3-60c1193db61b
