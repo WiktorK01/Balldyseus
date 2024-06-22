@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2a9460aae1c4420a415466d1db880f, type: 3}
+  m_Name: LearningtoBounce
+  m_EditorClassIdentifier: 
+  Title: Learning to Bounce
+  Exchanges:
+  - Lines:
+    - Text: Nice! Now let's try using Bounce-Mode! It's a bit different from Attack-Mode!
+      Guid:
+        Value: 2d5bbd9c-8534-472c-868a-c533e48a255e
+    Speaker: Balldyseus
+    Guid:
+      Value: d3087c52-da3a-4cf8-9f56-944801424ecc
+  - Lines:
+    - Text: Bounce-Mode causes Balldyseus to bounce on impact, propelling him and
+        pushing enemies back without dealing damage.
+      Guid:
+        Value: e98f002a-4125-4be4-88de-84c9e5867fae
+    - Text: If an enemy can't be pushed back due to a wall or another enemy, they
+        will take damage instead.
+      Guid:
+        Value: 961f6b50-9841-4f05-b624-f399d0d8d2c8
+    - Text: You have a limited number of bounces.
+      Guid:
+        Value: 28546741-8737-4db6-8c2f-58723b6a2e8e
+    Speaker: Balldyseus
+    Guid:
+      Value: 397348f4-6c1c-470e-a3bd-1e9d087c903a
+  - Lines:
+    - Text: You can switch between Attack-Mode and Bounce-Mode at any time using
+        Left-Click and Right-Click!
+      Guid:
+        Value: 75628d1b-221b-43fc-be94-7bbcdfa72fa8
+    Speaker: Balldyseus
+    Guid:
+      Value: b73a4e88-8932-4c26-9ae7-e2a0d99882de
+  - Lines:
+    - Text: Try and push the enemy back into the fire by using Bounce-Mode and Right-Click!
+      Guid:
+        Value: cbe8122d-2ab8-4044-a777-1de116b63312
+    Speaker: Balldyseus
+    Guid:
+      Value: fd43f0a6-d4f5-456a-ab76-7f2dde220863
+  Guid:
+    Value: db2c24d8-12d8-441c-9b55-85d3347d3fd5

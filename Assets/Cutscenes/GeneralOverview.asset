@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2a9460aae1c4420a415466d1db880f, type: 3}
+  m_Name: GeneralOverview
+  m_EditorClassIdentifier: 
+  Title: General Overview
+  Exchanges:
+  - Lines:
+    - Text: Welcome to Balldyseus!
+      Guid:
+        Value: 8d44f169-0c5d-49d7-8a7a-fbee5af85f0b
+    Speaker: Balldyseus
+    Guid:
+      Value: 21e9b7aa-3c42-469f-8e4e-08bbd8275bc9
+  - Lines:
+    - Text: You and the enemies will take turns. On the Player turn, you attack and
+        try to defeat enemies. If you defeat all enemies, you win.
+      Guid:
+        Value: 74eedfb8-37a0-49e2-ac0b-dbeba68a2f2f
+    Speaker: Balldyseus
+    Guid:
+      Value: ab49524d-5b55-4a8a-8aeb-98a96bd761d3
+  - Lines:
+    - Text: On an Enemy's turn, they will move and try to reach their Objective(the
+        magenta zone on the bottom) If an enemy reaches this zone, you lose.
+      Guid:
+        Value: 7b091c4e-832d-422d-b0a5-545cb506ded3
+    Speaker: Balldyseus
+    Guid:
+      Value: fa6cd513-1722-4af6-93f6-989ca4835eb0
+  Guid:
+    Value: 883ab197-3162-4630-8ddc-3435ceaa4818

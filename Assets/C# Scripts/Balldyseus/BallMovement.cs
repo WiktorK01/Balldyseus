@@ -125,13 +125,11 @@ public class BallMovement : MonoBehaviour
 
             if (BallProperties.bounceMode && Input.GetMouseButtonUp(1))
             {
-                Debug.Log(forcePercentage);
                 isDragging = false;
                 BallVisuals.DisablePullLineRenderer();
             }
             else if (!BallProperties.bounceMode && Input.GetMouseButtonUp(0))
             {
-                Debug.Log(forcePercentage);
                 isDragging = false;
                 BallVisuals.DisablePullLineRenderer();
             }

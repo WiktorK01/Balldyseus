@@ -10,6 +10,7 @@ public class EnemyDamagePublisher : MonoBehaviour
 
     public static void NotifyEnemyDamage(GameObject enemyWhoGotHurt, Vector3 ballPosition, EnemyProperties.DamageType damageType)
     {
+        Debug.Log("NOTIFYING ENEMY DAMAGE");
         EnemyDamage?.Invoke(enemyWhoGotHurt, ballPosition, damageType);
     }
 

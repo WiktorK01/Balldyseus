@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class BallOnLoss : MonoBehaviour
 {
-    void OnEnable(){
+    //i dont think this script is needed anymore
+    /*void OnEnable(){
         GameStatePublisher.GameStateChange += OnGameStateChange;
     }
 
@@ -16,5 +17,5 @@ public class BallOnLoss : MonoBehaviour
         if(newState == TurnManager.GameState.Loss){
             gameObject.SetActive(false);
         }
-    }
+    }*/
 }

@@ -10,7 +10,6 @@ public class SpeedStatePublisher : MonoBehaviour
     public static void NotifySpeedStateChange(BallProperties.SpeedState newSpeedState)
     {
         SpeedStateChange?.Invoke(newSpeedState);
-        Debug.Log("NEW SPEED STATE AS:" + newSpeedState.ToString());
     }
 
     /* 

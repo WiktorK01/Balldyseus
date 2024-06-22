@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2a9460aae1c4420a415466d1db880f, type: 3}
+  m_Name: LearningaboutHighSpeeds
+  m_EditorClassIdentifier: 
+  Title: Learning about High-Speeds
+  Exchanges:
+  - Lines:
+    - Text: You seem to have good grasp on everything! let's touch on one last thing!
+      Guid:
+        Value: 63a148ac-e5ee-4ad4-97b1-2b803b8e832f
+    Speaker: Balldyseus
+    Guid:
+      Value: aa31f231-38d3-41f0-ad19-09b6cb4c289a
+  - Lines:
+    - Text: If yellow stars are radiating off of Balldyseus, it means he's moving
+        at High-Speeds!
+      Guid:
+        Value: 6a6596dd-d920-4764-9814-0ddf6ca77b81
+    Speaker: Balldyseus
+    Guid:
+      Value: ff6792e3-9213-4c77-8860-fa0ed8b76d4a
+  - Lines:
+    - Text: When Balldyseus is moving at High-Speeds, he deals DOUBLE-DAMAGE in Attack-Mode
+      Guid:
+        Value: d3038770-68b4-4303-8102-75282baaaa26
+    Speaker: Balldyseus
+    Guid:
+      Value: e1a2427a-0706-4866-af82-56fb3b915e61
+  - Lines:
+    - Text: Let's try using Bounce-Mode to reach these High-Speeds!
+      Guid:
+        Value: 68918910-c07f-4ec2-867e-fa9dce82b32d
+    Speaker: Balldyseus
+    Guid:
+      Value: 80d18c05-026d-4996-b43c-de94cc1a27e9
+  Guid:
+    Value: c9961078-de78-4c47-80bb-c8860967fd04
